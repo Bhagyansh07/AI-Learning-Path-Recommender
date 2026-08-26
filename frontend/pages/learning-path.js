@@ -1,39 +1,13 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import NavBar from '../components/NavBar';
 import { getProfile, getLearningPath, getSkillGaps, submitFeedback } from '../lib/engine';
-
-const NavBar = ({ active }) => (
-  <nav className="navbar">
-    <div className="container navbar-inner">
-      <div className="navbar-brand">
-        <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: 'white' }}>LP</div>
-        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>LearnPath AI</span></Link>
-      </div>
-      <div className="navbar-links">
-        <Link href="/" className={`nav-link ${active === 'home' ? 'active' : ''}`}>Home</Link>
-        <Link href="/chat" className={`nav-link ${active === 'chat' ? 'active' : ''}`}>AI Assistant</Link>
-        <Link href="/dashboard" className={`nav-link ${active === 'dashboard' ? 'active' : ''}`}>Dashboard</Link>
-        <Link href="/learning-path" className={`nav-link ${active === 'path' ? 'active' : ''}`}>My Path</Link>
-      </div>
-    </div>
-  </nav>
-);
-
-const FEEDBACK_OPTS = [
-  { value: 'easy', label: 'Too Easy', color: '#22c55e' },
-  { value: 'good', label: 'Just Right', color: '#3b82f6' },
-  { value: 'hard', label: 'Too Hard', color: '#ef4444' },
-];
 
 function SkillCard({ skill, index }) {
   const [showWhy, setShowWhy] = useState(false);
   const [feedback, setFeedback] = useState(null);
-
-  const handleFeedback = (val) => {
-    setFeedback(val);
-    submitFeedback(skill.skill_id, val, skill.duration_hours);
-  };
+  const handleFeedback = (val) => { setFeedback(val); submitFeedback(skill.skill_id, val, skill.duration_hours); };
 
   return (
     <div className={`skill-card ${skill.completed ? 'completed' : ''}`}>
@@ -41,21 +15,16 @@ function SkillCard({ skill, index }) {
       <div className="skill-card-content">
         <h4 className="skill-card-title">{skill.title}</h4>
         <div className="skill-card-meta">
-          <span>{skill.provider}</span>
-          <span>·</span>
-          <span>{skill.duration_hours}h</span>
-          <span>·</span>
+          <span>{skill.provider}</span><span>·</span><span>{skill.duration_hours}h</span><span>·</span>
           <span className={`level-badge ${skill.level}`}>{skill.level}</span>
         </div>
         <div className="skill-card-actions">
-          <button className="btn-xs btn-outline" onClick={() => setShowWhy(!showWhy)}>
-            {showWhy ? 'Hide' : 'Why this?'}
-          </button>
+          <button className="btn-outline" style={{ fontSize: '0.75rem', padding: '3px 8px' }} onClick={() => setShowWhy(!showWhy)}>{showWhy ? 'Hide' : 'Why this?'}</button>
           {!feedback && !skill.completed && (
             <div className="feedback-inline">
-              {FEEDBACK_OPTS.map(o => (
-                <button key={o.value} className="feedback-btn-sm" style={{ borderColor: o.color, color: o.color }} onClick={() => handleFeedback(o.value)}>{o.label}</button>
-              ))}
+              <button className="feedback-btn-sm" style={{ borderColor: '#22c55e', color: '#22c55e' }} onClick={() => handleFeedback('easy')}>Too Easy</button>
+              <button className="feedback-btn-sm" style={{ borderColor: '#3b82f6', color: '#3b82f6' }} onClick={() => handleFeedback('good')}>Just Right</button>
+              <button className="feedback-btn-sm" style={{ borderColor: '#ef4444', color: '#ef4444' }} onClick={() => handleFeedback('hard')}>Too Hard</button>
             </div>
           )}
           {feedback && <span className="feedback-thanks-sm">Thanks!</span>}
@@ -63,9 +32,7 @@ function SkillCard({ skill, index }) {
         {showWhy && (
           <div className="why-panel">
             <p><strong>Why this skill:</strong> {skill.explanation || 'Recommended for your learning path.'}</p>
-            {skill.prerequisites?.length > 0 && (
-              <p><strong>Prerequisites:</strong> {skill.prerequisites.join(', ')}</p>
-            )}
+            {skill.prerequisites?.length > 0 && <p><strong>Prerequisites:</strong> {skill.prerequisites.join(', ')}</p>}
           </div>
         )}
       </div>
@@ -82,10 +49,7 @@ export default function LearningPath() {
   useEffect(() => {
     const p = getProfile();
     setProfile(p);
-    if (p) {
-      setPath(getLearningPath(p));
-      setGap(getSkillGaps(p));
-    }
+    if (p) { setPath(getLearningPath(p)); setGap(getSkillGaps(p)); }
     setLoading(false);
   }, []);
 
@@ -117,27 +81,20 @@ export default function LearningPath() {
           </div>
           {gap && (
             <div className="readiness-badge">
-              <div className="readiness-circle">
-                <span className="readiness-value">{gap.readiness_score}%</span>
-              </div>
+              <div className="readiness-circle"><span className="readiness-value">{gap.readiness_score}%</span></div>
               <span className="readiness-label">Ready</span>
             </div>
           )}
         </div>
 
-        {/* Milestones */}
-        {path.milestones && path.milestones.length > 0 && (
+        {path.milestones?.length > 0 && (
           <div className="milestones-bar">
             {path.milestones.map((m, i) => (
-              <div key={i} className={`milestone ${m.type}`}>
-                <div className="milestone-dot" />
-                <span className="milestone-text">{m.title}</span>
-              </div>
+              <div key={i} className={`milestone ${m.type}`}><div className="milestone-dot" /><span className="milestone-text">{m.title}</span></div>
             ))}
           </div>
         )}
 
-        {/* Phases */}
         <div className="path-phases">
           {path.phases.map((phase, i) => (
             <div key={i} className="phase-section">
@@ -149,9 +106,7 @@ export default function LearningPath() {
                 </div>
               </div>
               <div className="skills-list">
-                {phase.courses.map((skill, j) => (
-                  <SkillCard key={j} skill={skill} index={j} />
-                ))}
+                {phase.courses.map((skill, j) => <SkillCard key={j} skill={skill} index={j} />)}
               </div>
             </div>
           ))}
