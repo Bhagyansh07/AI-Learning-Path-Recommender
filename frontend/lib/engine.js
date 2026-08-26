@@ -275,7 +275,6 @@ function assignPhases(sortedSkills, profile) {
     else advanced.push(id);
   });
 
-  const userLevel = LEVEL_MAP[profile.experience_level] || 0;
   const timeMultiplier = TIME_MULTIPLIER[profile.time_commitment] || 1;
   const phases = [];
 
@@ -385,23 +384,22 @@ function generateWhyThis(skillId, profile) {
   const userSkills = getUserSkills(profile);
   const reasons = [];
 
-  // Check if it's a prerequisite for something
   const descendants = getAllDescendants(skillId);
   if (descendants.length > 0) {
     reasons.push(`Prerequisite for ${descendants.slice(0, 3).map(d => (getSkillById(d) || {}).name || d).join(', ')}`);
   }
 
-  // Check if user has unmet prerequisites
   const unmet = skill.prerequisites.filter(p => !userSkills.has(p));
   if (unmet.length === 0 && skill.prerequisites.length > 0) {
     reasons.push(`You meet all ${skill.prerequisites.length} prerequisites`);
   }
 
-  // Demand score
   const demand = SKILL_DEMAND[skillId] || 0.5;
   if (demand > 0.7) reasons.push(`High-demand skill in Indian job market (${Math.round(demand * 100)}%)`);
 
-  // Difficulty match
+  const matchedCareer = Object.entries(SKILL_GRAPH.career_paths).find(([, c]) => c.target_skills.includes(skillId));
+  if (matchedCareer) reasons.push(`Required for ${matchedCareer[1].display_name}`);
+
   const userLevel = LEVEL_MAP[profile.experience_level] || 0;
   if (skill.difficulty <= userLevel + 1) reasons.push(`Matches your ${profile.experience_level} level`);
 

@@ -86,10 +86,13 @@ function processMessage(text, profile) {
 async function callLLM(text, profile) {
   try {
     const context = profile ? { level: profile.experience_level, interests: profile.interests, skills: profile.current_skills.map(s => typeof s === 'object' ? s.skill : s) } : null;
-    const res = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, context, mode: 'chat' }) });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, context, mode: 'chat' }), signal: controller.signal });
+    clearTimeout(timeout);
     const data = await res.json();
     return data.response || null;
-  } catch { return null; }
+  } catch (e) { if (e.name !== 'AbortError') console.error('LLM call failed:', e.message); return null; }
 }
 
 export default function Chat() {
@@ -159,7 +162,6 @@ export default function Chat() {
     }
 
     const newD = { ...onbData, [step.field]: choice };
-    if (isMulti) newD[step.field] = selectedSkills;
     setOnbData(newD);
     const userMsg = { id: Date.now(), type: 'user', text: choice };
     const next = onboarding + 1;
@@ -191,7 +193,6 @@ export default function Chat() {
         } else {
           completeOnboarding({ ...newD, current_skills: selectedSkills });
         }
-        setLoading(false);
         return;
       }
       const match = step.opts.find(o => o.toLowerCase().includes(text.toLowerCase()) || text.toLowerCase().includes(o.toLowerCase().split(' ')[0]));

@@ -1,16 +1,25 @@
 const RATE_LIMIT = new Map();
 const RATE_WINDOW = 60000;
 const RATE_MAX = 15;
+const ALLOWED_ORIGINS = ['https://frontend-mu-jet-18.vercel.app', 'http://localhost:3000'];
 
 function isRateLimited(ip) {
   const now = Date.now();
   const entry = RATE_LIMIT.get(ip);
   if (!entry || now - entry.start > RATE_WINDOW) {
     RATE_LIMIT.set(ip, { start: now, count: 1 });
+    if (RATE_LIMIT.size > 5000) {
+      for (const [k, v] of RATE_LIMIT) { if (now - v.start > RATE_WINDOW) RATE_LIMIT.delete(k); }
+    }
     return false;
   }
   entry.count++;
   return entry.count > RATE_MAX;
+}
+
+function setCors(res, origin) {
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  res.setHeader('Access-Control-Allow-Origin', allowed);
 }
 
 function sanitize(str) {
@@ -19,8 +28,9 @@ function sanitize(str) {
 }
 
 export default async function handler(req, res) {
+  const origin = req.headers.origin || '';
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', 'https://frontend-mu-jet-18.vercel.app');
+    setCors(res, origin);
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     return res.status(200).end();
@@ -31,10 +41,11 @@ export default async function handler(req, res) {
   const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
   if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
-  res.setHeader('Access-Control-Allow-Origin', 'https://frontend-mu-jet-18.vercel.app');
+  setCors(res, origin);
 
   const { message, context, mode } = req.body;
-  if (!message || typeof message !== 'string') return res.status(400).json({ error: 'Valid message required' });
+  if (!message || typeof message !== 'string' || message.trim().length === 0) return res.status(400).json({ error: 'Valid message required' });
+  if (message.length > 2000) return res.status(400).json({ error: 'Message too long (max 2000 characters)' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.length < 10) {
@@ -45,7 +56,7 @@ export default async function handler(req, res) {
     const safeMsg = sanitize(message);
     let prompt;
     if (mode === 'chat') {
-      const ctx = context ? `\nLearner level: ${sanitize(context.level || '')}, interests: ${(context.interests || []).slice(0, 5).join(', ')}, skills: ${(context.skills || []).slice(0, 10).join(', ')}` : '';
+      const ctx = context ? `\nLearner level: ${sanitize(context.level || '')}, interests: ${(context.interests || []).slice(0, 5).map(sanitize).join(', ')}, skills: ${(context.skills || []).slice(0, 10).map(sanitize).join(', ')}` : '';
       prompt = `You are LearnPath AI, a friendly learning assistant for a course recommendation platform.\n${ctx}\n\nUser: ${safeMsg}\n\nRespond in 2-3 sentences max. Be helpful and encouraging. If recommending something, explain why briefly.`;
     } else if (mode === 'explain') {
       prompt = `Explain why this course is recommended in 2-3 sentences. Be concise and encouraging.\nCourse: ${safeMsg}\n\nExplanation:`;
