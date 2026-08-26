@@ -184,7 +184,7 @@ export default function Chat() {
             <div ref={endRef} />
           </div>
           <form className="chat-input-area" onSubmit={(e) => { e.preventDefault(); sendMessage(input); }}>
-            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={onboarding !== null ? "Type your answer or click a suggestion above..." : "Ask me anything about learning..."} disabled={false} />
+            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={onboarding !== null ? "Type your answer or click a suggestion above (English or Hindi)..." : "Ask me anything about learning... (English or Hindi)"} disabled={false} />
             <button type="submit" className="chat-send" disabled={loading || !input.trim()}>{loading ? '...' : 'Send'}</button>
           </form>
         </div>

@@ -57,21 +57,21 @@ export function analyzeText(text) {
   const t = text.toLowerCase();
   const interests = [];
   const domainMap = {
-    data_science: ['data', 'analytics', 'statistics', 'data science', 'analysis'],
-    machine_learning: ['machine learning', 'ml', 'ai', 'artificial intelligence', 'deep learning', 'neural', 'nlp', 'computer vision'],
-    web_development: ['web', 'frontend', 'backend', 'fullstack', 'full stack', 'react', 'node', 'javascript', 'html', 'css'],
-    cloud_computing: ['cloud', 'aws', 'devops', 'docker', 'kubernetes', 'ci/cd'],
-    cybersecurity: ['security', 'cyber', 'hacking', 'penetration', 'encryption'],
-    mobile_development: ['mobile', 'android', 'ios', 'flutter', 'app', 'react native'],
-    programming: ['programming', 'coding', 'software', 'developer', 'python', 'java'],
+    data_science: ['data', 'analytics', 'statistics', 'data science', 'analysis', 'डेटा', 'विश्लेषण'],
+    machine_learning: ['machine learning', 'ml', 'ai', 'artificial intelligence', 'deep learning', 'neural', 'nlp', 'computer vision', 'मशीन लर्निंग', 'आर्टिफिशियल इंटेलिजेंस'],
+    web_development: ['web', 'frontend', 'backend', 'fullstack', 'full stack', 'react', 'node', 'javascript', 'html', 'css', 'वेब', 'फ्रंटएंड', 'बैकएंड'],
+    cloud_computing: ['cloud', 'aws', 'devops', 'docker', 'kubernetes', 'ci/cd', 'क्लाउड', 'डेवऑप्स'],
+    cybersecurity: ['security', 'cyber', 'hacking', 'penetration', 'encryption', 'सुरक्षा', 'साइबर'],
+    mobile_development: ['mobile', 'android', 'ios', 'flutter', 'app', 'react native', 'मोबाइल', 'एंड्रॉयड'],
+    programming: ['programming', 'coding', 'software', 'developer', 'python', 'java', 'प्रोग्रामिंग', 'कोडिंग', 'सॉफ्टवेयर'],
   };
   for (const [domain, keywords] of Object.entries(domainMap)) {
     if (keywords.some(kw => t.includes(kw))) interests.push(domain);
   }
 
   let level = 'beginner';
-  if (['advanced', 'experienced', 'senior', 'expert', 'professional'].some(w => t.includes(w))) level = 'advanced';
-  else if (['intermediate', 'some experience', 'familiar', 'know', 'worked with'].some(w => t.includes(w))) level = 'intermediate';
+  if (['advanced', 'experienced', 'senior', 'expert', 'professional', 'उन्नत', 'अनुभवी'].some(w => t.includes(w))) level = 'advanced';
+  else if (['intermediate', 'some experience', 'familiar', 'know', 'worked with', 'मध्यम', 'कुछ अनुभव'].some(w => t.includes(w))) level = 'intermediate';
 
   const skills = [];
   const skillKeywords = {
@@ -301,7 +301,16 @@ function assignPhases(sortedSkills, profile) {
 function skillToCourse(skillId, profile) {
   const skill = getSkillById(skillId);
   const completed = new Set(profile.completed_courses || []);
-  const bestResource = skill ? skill.resources[0] : null;
+  const userLevel = LEVEL_MAP[profile.experience_level] || 0;
+  // Filter resources by learner level — prefer free + matching difficulty
+  const resources = skill ? [...skill.resources].sort((a, b) => {
+    const aFree = a.free ? 0 : 1;
+    const bFree = b.free ? 0 : 1;
+    const aDiff = Math.abs((a.difficulty || skill.difficulty) - userLevel - 1);
+    const bDiff = Math.abs((b.difficulty || skill.difficulty) - userLevel - 1);
+    return aFree - bFree || aDiff - bDiff;
+  }) : [];
+  const bestResource = resources[0] || null;
   return {
     skill_id: skillId,
     title: skill ? skill.name : skillId,
@@ -528,6 +537,12 @@ export function submitFeedback(skillId, rating, actualHours) {
       profile.progress.skills_acquired = profile.current_skills.map(sk => typeof sk === 'object' ? sk.skill : sk);
     }
   }
+
+  // Recalculate timeline: if feedback says "hard", add buffer time
+  if (rating === 'hard' && skill) {
+    profile.progress.total_hours_learned += Math.round(skill.estimated_hours * 0.3);
+  }
+
   if (typeof window !== 'undefined') localStorage.setItem('learner_profile', JSON.stringify(profile));
   return profile;
 }

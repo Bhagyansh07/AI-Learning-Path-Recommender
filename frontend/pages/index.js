@@ -63,6 +63,7 @@ export default function Home() {
               { icon: '🗺️', title: 'Learning Roadmaps', desc: 'Structured paths with prerequisites, milestones, and estimated timelines.' },
               { icon: '💡', title: 'Explainable AI', desc: 'Every recommendation comes with a clear explanation of why it fits you.' },
               { icon: '📊', title: 'Progress Dashboard', desc: 'Visualize your skills, milestones, and learning progress in real-time.' },
+              { icon: '🇮🇳', title: 'India-First Design', desc: 'NPTEL, SWAYAM resources. Indian salary data. Aligned with NEP 2020 and Skill India vision.' },
             ].map((f, i) => (
               <div key={i} className="feature-card">
                 <div className="feature-icon">{f.icon}</div>
