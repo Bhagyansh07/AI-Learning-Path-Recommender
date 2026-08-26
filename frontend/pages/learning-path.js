@@ -7,8 +7,8 @@ const NavBar = ({ active }) => (
   <nav className="navbar">
     <div className="container navbar-inner">
       <div className="navbar-brand">
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>LP</div>
-        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>LearnPath AI</span></Link>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>PA</div>
+        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>Pragya AI</span></Link>
       </div>
       <div className="navbar-links">
         <Link href="/" className={`nav-link ${active === 'home' ? 'active' : ''}`}>Home</Link>
@@ -34,7 +34,7 @@ export default function LearningPath() {
 
   if (!path) return (
     <div className="page-wrapper">
-      <Head><title>Learning Path - LearnPath AI</title></Head>
+      <Head><title>Learning Path - Pragya AI</title></Head>
       <NavBar active="path" />
       <div className="bg-glow" />
       <main className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
@@ -48,7 +48,7 @@ export default function LearningPath() {
 
   return (
     <div className="page-wrapper">
-      <Head><title>Learning Path - LearnPath AI</title></Head>
+      <Head><title>Learning Path - Pragya AI</title></Head>
       <NavBar active="path" />
       <div className="bg-glow" />
       <main className="container main-content">

@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div className="page-wrapper">
       <Head>
-        <title>LearnPath AI - Personalized AI Learning Paths</title>
+        <title>Pragya AI - Personalized AI Learning Paths</title>
         <meta name="description" content="AI-powered personalized learning path recommender. Stop guessing what to learn next." />
       </Head>
       <div className="bg-glow" />
@@ -22,8 +22,8 @@ export default function Home() {
               background: 'linear-gradient(135deg, #6366f1, #0ea5e9)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '1.1rem', boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
-            }}>LP</div>
-            <span>LearnPath AI</span>
+            }}>PA</div>
+            <span>Pragya AI</span>
           </div>
           <div className="navbar-links">
             <Link href="/" className="nav-link active">Home</Link>
@@ -131,7 +131,7 @@ export default function Home() {
 
       <footer className="footer">
         <div className="container">
-          LearnPath AI &mdash; Built for <a href="https://hcltech.com" target="_blank" rel="noopener noreferrer">HCLTech AMPlified</a> Round 2
+          Pragya AI &mdash; Built for <a href="https://hcltech.com" target="_blank" rel="noopener noreferrer">HCLTech AMPlified</a> Round 2
         </div>
       </footer>
     </div>

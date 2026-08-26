@@ -7,8 +7,8 @@ const NavBar = ({ active }) => (
   <nav className="navbar">
     <div className="container navbar-inner">
       <div className="navbar-brand">
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>LP</div>
-        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>LearnPath AI</span></Link>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>PA</div>
+        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>Pragya AI</span></Link>
       </div>
       <div className="navbar-links">
         <Link href="/" className={`nav-link ${active === 'home' ? 'active' : ''}`}>Home</Link>
@@ -72,7 +72,7 @@ export default function Chat() {
       setOnboarding(0);
       setMessages([{
         id: 1, type: 'ai',
-        text: "Welcome to LearnPath AI! I'm your personal learning assistant powered by Google Gemini.\n\nLet me understand your goals so I can build your personalized learning path.\n\n" + ONBOARDING_STEPS[0].q,
+        text: "Welcome to Pragya AI! I'm your personal learning assistant powered by Google Gemini.\n\nLet me understand your goals so I can build your personalized learning path.\n\n" + ONBOARDING_STEPS[0].q,
         suggestions: ONBOARDING_STEPS[0].opts
       }]);
     }
