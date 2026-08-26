@@ -13,7 +13,8 @@ function Toast({ msg, onClose }) {
 function SkillCard({ skill, index, onFeedback, profile }) {
   const [showWhy, setShowWhy] = useState(false);
   const [feedback, setFeedback] = useState(null);
-  const [completed, setCompleted] = useState(skill.completed);
+  const completedCourses = new Set(profile?.completed_courses || []);
+  const [completed, setCompleted] = useState(completedCourses.has(skill.skill_id));
   const [toast, setToast] = useState(null);
 
   const handleFeedback = (val) => {

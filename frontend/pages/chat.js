@@ -286,10 +286,19 @@ export default function Chat() {
       const path = getLearningPath(profile);
       const recs = getRecommendations(profile);
       const nextAction = getNextAction(profile);
-      let summary = "Your profile is ready!\n\n" + formatProfileSummary(profile, path) + "\n\nNext action: " + nextAction + "\n\nTop recommendations:\n";
-      recs.slice(0, 3).forEach((r, i) => { summary += `\n${i + 1}. ${r.course.title} (${r.course.duration_hours}h) — ${Math.round(r.score * 100)}% match\n   ${r.explanation}`; });
-      summary += "\n\nAsk me anything about your learning journey!";
-      setMessages(prev => [...prev, { id: Date.now() + 100, type: 'ai', text: summary, suggestions: ['Recommend courses for me', 'Show my learning path', 'How long will this take?', 'What should I start with?'] }]);
+      const skills = profile.current_skills.map(s => typeof s === 'object' ? s.skill : s);
+      
+      // Step 1: "Creating your profile..." message
+      const loadingMsg = { id: Date.now() + 50, type: 'ai', text: '⏳ Creating your personalized learning path...', suggestions: [] };
+      
+      // Step 2: Profile ready card
+      const summaryMsg = {
+        id: Date.now() + 100, type: 'ai',
+        text: `✅ Your profile is ready!\n\n👤 Level: ${profile.experience_level}\n🎯 Interests: ${profile.interests.map(i => i.replace(/_/g, ' ')).join(', ')}\n🛠 Skills: ${skills.join(', ') || 'None yet'}\n⏰ Time: ${profile.time_commitment}\n\n📊 Your Learning Path:\n• ${path.total_courses} skills to learn\n• ${path.phases.length} phases\n• ~${path.estimated_weeks} weeks (~${path.estimated_hours}h)\n\n🎯 Next: ${nextAction}`,
+        suggestions: ['Show my learning path', 'Recommend courses', 'How long will this take?', 'What skills do I need?']
+      };
+
+      setMessages(prev => [...prev, loadingMsg, summaryMsg]);
     } catch (e) {
       console.error('completeOnboarding error:', e);
       setMessages(prev => [...prev, { id: Date.now() + 100, type: 'ai', text: "Profile created! Check your Dashboard for recommendations, or ask me anything.", suggestions: ['Recommend courses', 'Show my learning path'] }]);
