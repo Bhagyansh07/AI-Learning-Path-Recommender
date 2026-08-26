@@ -86,24 +86,47 @@ function processMessage(text, profile) {
     if (lower.includes('next') || lower.includes('what now') || lower.includes('start') || lower.includes('aage')) {
       return `Here's what you should do next:\n\n${getNextAction(profile)}\n\nOr check your dashboard for the full overview.`;
     }
-    if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('namaste')) {
-      return `Hello! I'm your LearnPath AI assistant. I can help you with:\n\n- Course recommendations\n- Learning path details\n- Skill gap analysis\n- Time estimates\n\nJust ask me anything!`;
+    if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('namaste') || lower.includes('hii') || lower.includes('helloo')) {
+      return `Hello! I'm your LearnPath AI assistant. I can help you with:\n\n- Course recommendations\n- Learning path details\n- Skill gap analysis\n- Time estimates\n- Career guidance\n\nJust ask me anything!`;
     }
-    if (lower.includes('help') || lower.includes('kya kar')) {
-      return "Try asking:\n• \"Recommend courses for me\"\n• \"Show my learning path\"\n• \"What skills do I need?\"\n• \"How long will this take?\"\n• \"Why this skill?\"";
+    if (lower.includes('help') || lower.includes('kya kar') || lower.includes('kya kar sakta')) {
+      return "Try asking:\n• \"Recommend courses for me\"\n• \"Show my learning path\"\n• \"What skills do I need?\"\n• \"How long will this take?\"\n• \"Why this skill?\"\n• \"Tell me about my career options\"\n• \"What should I learn for data science?\"";
     }
     if (lower.includes('dashboard') || lower.includes('progress')) {
       return "Check your Dashboard for a full overview of your progress, skill coverage, and learning phases. Click the Dashboard link in the navigation above!";
     }
-    if (lower.includes('career') || lower.includes('job') || lower.includes('salary')) {
+    if (lower.includes('career') || lower.includes('job') || lower.includes('salary') || lower.includes('placement') || lower.includes('interview') || lower.includes('resume') || lower.includes('hiring')) {
       const gapData = getSkillGaps(profile);
       return `You're targeting: ${gapData.career_title}\n\nReadiness: ${gapData.readiness_score}%\nAvg Salary: ${gapData.avg_salary}\nGrowth Rate: ${gapData.growth_rate}\n\nMissing skills: ${gapData.missing_skills.slice(0, 3).map(s => s.name).join(', ')}`;
     }
+    if (lower.includes('data science') || lower.includes('machine learning') || lower.includes('web dev') || lower.includes('full stack') || lower.includes('frontend') || lower.includes('backend') || lower.includes('cloud') || lower.includes('devops') || lower.includes('cyber') || lower.includes('mobile') || lower.includes('android') || lower.includes('ios') || lower.includes('flutter')) {
+      const gapDataLocal = getSkillGaps(profile);
+      const recsLocal = getRecommendations(profile, 5);
+      const pathLocal = getLearningPath(profile);
+      return `For your target field (${gapDataLocal.career_title}), here's what I recommend:\n\n` +
+        recsLocal.slice(0, 3).map((r, i) => `${i + 1}. ${r.course.title} (${r.course.duration_hours}h) — ${Math.round(r.score * 100)}% match`).join('\n') +
+        `\n\nYour path: ${pathLocal.total_courses} skills across ${pathLocal.phases.length} phases (~${pathLocal.estimated_weeks} weeks).\n\nAsk me "recommend courses" for more details!`;
+    }
+    if (lower.includes('thank') || lower.includes('thanks') || lower.includes('dhanyavad') || lower.includes('shukriya')) {
+      return "You're welcome! Keep learning and stay consistent. If you need anything else, just ask!";
+    }
+    if (lower.includes('bye') || lower.includes('goodbye') || lower.includes('alvida')) {
+      return "Goodbye! Keep up the great work on your learning journey. See you next time!";
+    }
+    // Fallback: generate a helpful response based on profile
+    const gapData = getSkillGaps(profile);
+    const recs = getRecommendations(profile, 3);
+    const path = getLearningPath(profile);
+    return `Here's a quick overview for you:\n\n` +
+      `Target: ${gapData.career_title} (${gapData.readiness_score}% ready)\n` +
+      `Path: ${path.total_courses} skills, ~${path.estimated_weeks} weeks\n\n` +
+      `Top recommendations:\n` +
+      recs.slice(0, 3).map((r, i) => `${i + 1}. ${r.course.title} (${r.course.duration_hours}h)`).join('\n') +
+      `\n\nTry asking:\n• "Recommend courses"\n• "Show my learning path"\n• "What skills do I need?"\n• "How long will this take?"`;
   } catch (e) {
     console.error('processMessage error:', e.message);
     return null;
   }
-  return null;
 }
 
 async function callLLM(text, profile) {
