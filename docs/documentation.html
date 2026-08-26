@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnPath AI — Documentation | HCLTech AMPlified Round 2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  @page { size: A4; margin: 0; }
+  @media print {
+    .page { page-break-after: always; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+    body { background: white; }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; color: #0f172a; }
+
+  .page {
+    width: 210mm; min-height: 297mm; margin: 20px auto; padding: 48px 56px;
+    background: white; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: relative; overflow: hidden;
+  }
+
+  /* Cover Page */
+  .cover { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  .cover .logo { width: 80px; height: 80px; background: #2563eb; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 900; margin-bottom: 32px; }
+  .cover h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 12px; }
+  .cover h1 span { color: #2563eb; }
+  .cover .subtitle { font-size: 1.1rem; color: #475569; margin-bottom: 40px; max-width: 500px; line-height: 1.6; }
+  .cover .team { font-size: 0.9rem; color: #94a3b8; margin-top: 48px; }
+  .cover .team strong { color: #475569; }
+  .cover .badge-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 32px; }
+  .cover .badge { padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+  .cover .url { margin-top: 24px; padding: 10px 24px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; color: #2563eb; font-weight: 500; }
+
+  /* Section headers */
+  .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid #e2e8f0; }
+  .page-num { width: 36px; height: 36px; background: #2563eb; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+  .page-header h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+  .page-header .section-tag { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: #0f172a; }
+  p { font-size: 0.88rem; color: #475569; line-height: 1.7; margin-bottom: 12px; }
+  .small { font-size: 0.8rem; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+
+  /* Cards */
+  .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .card-blue { background: #eff6ff; border-color: #bfdbfe; }
+  .card-green { background: #f0fdf4; border-color: #bbf7d0; }
+  .card-amber { background: #fffbeb; border-color: #fde68a; }
+  .card-red { background: #fef2f2; border-color: #fecaca; }
+  .card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
+  .card p { font-size: 0.8rem; margin-bottom: 0; }
+
+  /* Stats */
+  .stat-box { text-align: center; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; }
+  .stat-val { font-size: 1.6rem; font-weight: 900; color: #2563eb; letter-spacing: -0.5px; }
+  .stat-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 0.82rem; }
+  th { text-align: left; padding: 10px 12px; background: #f1f5f9; color: #475569; font-weight: 600; border-bottom: 2px solid #e2e8f0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px; }
+  td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Lists */
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  li { font-size: 0.85rem; color: #475569; line-height: 1.8; }
+
+  /* Code blocks */
+  .code-block { background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 1.7; margin-bottom: 16px; overflow-x: auto; }
+  .code-block .kw { color: #93c5fd; }
+  .code-block .fn { color: #86efac; }
+  .code-block .str { color: #fcd34d; }
+  .code-block .cm { color: #64748b; }
+  .code-block .num { color: #f9a8d4; }
+
+  /* Flow diagram */
+  .flow { display: flex; align-items: center; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+  .flow-step { padding: 8px 16px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; }
+  .flow-step.active { background: #2563eb; color: white; border-color: #2563eb; }
+  .flow-arrow { color: #94a3b8; font-size: 1.2rem; }
+
+  /* Footer */
+  .page-footer { position: absolute; bottom: 24px; left: 56px; right: 56px; display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+
+  /* Highlight box */
+  .highlight { background: #eff6ff; border-left: 4px solid #2563eb; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 16px; }
+  .highlight p { margin-bottom: 0; color: #1e40af; font-weight: 500; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .tag-blue { background: #dbeafe; color: #2563eb; }
+  .tag-green { background: #dcfce7; color: #16a34a; }
+  .tag-amber { background: #fef3c7; color: #d97706; }
+  .tag-red { background: #fee2e2; color: #dc2626; }
+
+  .algo-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+  .algo-num { width: 28px; height: 28px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+  .algo-content h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+  .algo-content p { font-size: 0.8rem; margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1: COVER ============ -->
+<div class="page cover">
+  <div class="logo">LP</div>
+  <h1>Learn<span>Path</span> AI</h1>
+  <p class="subtitle">AI-Powered Personalized Learning Path Recommender that uses dedicated algorithms — not API calls — to generate correct, complete, and explainable learning paths.</p>
+  <div class="badge-row">
+    <span class="badge">HCLTech AMPlified 2025</span>
+    <span class="badge">Round 2 Submission</span>
+    <span class="badge">Team nightcoders</span>
+  </div>
+  <div class="url">Live: https://frontend-mu-jet-18.vercel.app</div>
+  <div class="team">
+    <strong>Team nightcoders</strong> — JECRC University, Jaipur<br>
+    5 Members &nbsp;|&nbsp; Built for HCLTech AMPlified Round 2
+  </div>
+  <div class="page-footer">
+    <span>LearnPath AI — Documentation</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 2: PROBLEM STATEMENT ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">02</div>
+    <div>
+      <div class="section-tag">Problem</div>
+      <h2>Problem Statement</h2>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p>"Students waste months figuring out what to learn, which courses to take, and in what order — because existing platforms give the same catalog to everyone."</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-red">
+      <h4>The Problem</h4>
+      <ul>
+        <li>Course catalogs treat every learner identically</li>
+        <li>No structured, prerequisite-aware learning paths</li>
+        <li>No explainability — students don't know <em>why</em> a course is recommended</li>
+        <li>Indian students lack platform-specific resources (NPTEL, SWAYAM)</li>
+        <li>No feedback loop to adapt suggestions over time</li>
+      </ul>
+    </div>
+    <div class="card card-green">
+      <h4>Our Solution</h4>
+      <ul>
+        <li><strong>Algorithmic intelligence</strong> — dedicated DAG traversal, not LLM calls</li>
+        <li><strong>65-skill knowledge graph</strong> with prerequisite edges</li>
+        <li><strong>5-factor hybrid scoring</strong> with explainable reasons</li>
+        <li><strong>India-first design</strong> — NPTEL, SWAYAM, Indian salary data</li>
+        <li><strong>Adaptive feedback loop</strong> — suggestions improve with every interaction</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Target Users</h3>
+  <div class="grid-3">
+    <div class="stat-box"><div class="stat-val">🎓</div><div class="stat-label">College Students</div><p class="small" style="margin-top:8px">Freshmen to final-year students exploring career paths</p></div>
+    <div class="stat-box"><div class="stat-val">🔄</div><div class="stat-label">Career Switchers</div><p class="small" style="margin-top:8px">Working professionals transitioning to tech roles</p></div>
+    <div class="stat-box"><div class="stat-val">🇮🇳</div><div class="stat-label">Indian Learners</div><p class="small" style="margin-top:8px">Learners seeking India-relevant resources and salary data</p></div>
+  </div>
+
+  <h3>Key Challenges Addressed</h3>
+  <table>
+    <tr><th>Challenge</th><th>Our Approach</th><th>Judging Criterion</th></tr>
+    <tr><td>No personalized paths</td><td>DAG-based path generation with gap analysis</td><td>Features (25%)</td></tr>
+    <tr><td>No explainability</td><td>3-level rule-based explanation engine</td><td>AI/ML (20%)</td></tr>
+    <tr><td>No Indian context</td><td>NPTEL/SWAYAM resources, Indian salary data</td><td>Innovation (15%)</td></tr>
+    <tr><td>Complex UX</td><td>Conversational AI with 5-step onboarding</td><td>UX Design (10%)</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 3: ARCHITECTURE ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">03</div>
+    <div>
+      <div class="section-tag">Architecture</div>
+      <h2>System Architecture</h2>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p>Golden Rule: "If you remove every LLM call, the system still generates correct, complete, explainable learning paths."</p>
+  </div>
+
+  <h3>High-Level Architecture</h3>
+  <div class="code-block">
+<span class="cm">┌──────────────────────────────────────────────────────────────────┐</span>
+<span class="cm">│</span>  <span class="kw">CLIENT (Browser)</span>                                                <span class="cm">│</span>
+<span class="cm">│</span>                                                                  <span class="cm">│</span>
+<span class="cm">│</span>  <span class="fn">lib/engine.js</span>          <span class="fn">lib/skillGraph.js</span>                       <span class="cm">│</span>
+<span class="cm">│</span>  ┌──────────────┐       ┌──────────────────┐                    <span class="cm">│</span>
+<span class="cm">│</span>  │ Profiler      │       │ 65 Skills        │                    <span class="cm">│</span>
+<span class="cm">│</span>  │ Gap Analysis  │◄─────►│ 8 Career Paths   │                    <span class="cm">│</span>
+<span class="cm">│</span>  │ Topo Sort     │       │ Prerequisite DAG │                    <span class="cm">│</span>
+<span class="cm">│</span>  │ Path Gen      │       │ Skill Demand     │                    <span class="cm">│</span>
+<span class="cm">│</span>  │ Hybrid Score  │       └──────────────────┘                    <span class="cm">│</span>
+<span class="cm">│</span>  │ Explanation   │                                               <span class="cm">│</span>
+<span class="cm">│</span>  │ Feedback Loop │       <span class="fn">components/</span> + <span class="fn">pages/</span>                    <span class="cm">│</span>
+<span class="cm">│</span>  └──────────────┘       ┌──────────────────┐                    <span class="cm">│</span>
+<span class="cm">│</span>                         │ React Pages       │                    <span class="cm">│</span>
+<span class="cm">│</span>                         │ ThemeContext       │                    <span class="cm">│</span>
+<span class="cm">│</span>                         │ NavBar + Toast     │                    <span class="cm">│</span>
+<span class="cm">│</span>                         └──────────────────┘                    <span class="cm">│</span>
+<span class="cm">│</span>                                   │                               <span class="cm">│</span>
+<span class="cm">└───────────────────────────────────┼───────────────────────────────┘</span>
+                                    │ fetch('/api/gemini')
+<span class="cm">┌───────────────────────────────────┼───────────────────────────────┐</span>
+<span class="cm">│</span>  <span class="kw">SERVER (Vercel Serverless)</span>       ▼                               <span class="cm">│</span>
+<span class="cm">│</span>                         ┌──────────────────┐                    <span class="cm">│</span>
+<span class="cm">│</span>                         │ <span class="fn">pages/api/gemini</span>  │  ← NLU/NLG polish <span class="cm">│</span>
+<span class="cm">│</span>                         │ Rate Limiting     │  ← NOT the brain  <span class="cm">│</span>
+<span class="cm">│</span>                         │ Input Sanitize    │                   <span class="cm">│</span>
+<span class="cm">│</span>                         │ CORS              │                   <span class="cm">│</span>
+<span class="cm">│</span>                         └──────────────────┘                    <span class="cm">│</span>
+<span class="cm">│</span>                                   │                               <span class="cm">│</span>
+<span class="cm">│</span>                                   ▼                               <span class="cm">│</span>
+<span class="cm">│</span>                         ┌──────────────────┐                    <span class="cm">│</span>
+<span class="cm">│</span>                         │ Gemini 2.0 Flash  │  ← Optional polish <span class="cm">│</span>
+<span class="cm">│</span>                         │ (Google AI API)   │                   <span class="cm">│</span>
+<span class="cm">│</span>                         └──────────────────┘                    <span class="cm">│</span>
+<span class="cm">└──────────────────────────────────────────────────────────────────┘</span>
+  </div>
+
+  <h3>Key Design Decisions</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>100% Client-Side ML Engine</h4>
+      <p>All algorithms (gap analysis, topological sort, path generation, hybrid scoring, explanations) run in the browser. The server is only used for optional Gemini API calls for natural language polish.</p>
+    </div>
+    <div class="card">
+      <h4>No Framework Lock-in</h4>
+      <p>Zero external ML libraries. Pure JavaScript engine. Works offline, loads instantly, deployable anywhere (Vercel, Netlify, any static host).</p>
+    </div>
+    <div class="card">
+      <h4>Security Hardened</h4>
+      <p>XSS protection, rate limiting, CORS, input sanitization, security headers (X-Frame-Options, nosniff, etc.). No secrets exposed to client.</p>
+    </div>
+    <div class="card">
+      <h4>India-First Resources</h4>
+      <p>Skill graph prioritizes NPTEL, SWAYAM, freeCodeCamp. Salary data and growth rates are India-specific (LPA). Aligned with NEP 2020 and Skill India.</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 4: AI/ML ALGORITHMS ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">04</div>
+    <div>
+      <div class="section-tag">AI/ML</div>
+      <h2>Algorithms & AI/ML Implementation</h2>
+    </div>
+  </div>
+
+  <p>Every algorithm is deterministic, explainable, and runs client-side. No LLM calls in core logic.</p>
+
+  <h3>1. Skill Graph — Directed Acyclic Graph (DAG)</h3>
+  <div class="card" style="margin-bottom:16px">
+    <p>A knowledge graph of <strong>65 skills</strong> across <strong>9 domains</strong> with prerequisite edges forming a DAG. Each skill has: difficulty level, estimated hours, curated resources, and domain classification.</p>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="stat-box"><div class="stat-val">65</div><div class="stat-label">Skills</div></div>
+      <div class="stat-box"><div class="stat-val">8</div><div class="stat-label">Career Paths</div></div>
+      <div class="stat-box"><div class="stat-val">~120</div><div class="stat-label">Prereq Edges</div></div>
+      <div class="stat-box"><div class="stat-val">9</div><div class="stat-label">Domains</div></div>
+    </div>
+  </div>
+
+  <h3>2. Gap Analysis — Set Difference Algorithm</h3>
+  <div class="algo-step">
+    <div class="algo-num">1</div>
+    <div class="algo-content">
+      <h4>Extract User Skills</h4>
+      <p>Collect current_skills + completed_courses into a Set of skill IDs</p>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="algo-num">2</div>
+    <div class="algo-content">
+      <h4>Match Career Path</h4>
+      <p>Score each career path by overlap between user skills and target_skills. Add interest bonus for domain match.</p>
+    </div>
+  </div>
+  <div class="algo-step">
+    <div class="algo-num">3</div>
+    <div class="algo-content">
+      <h4>Compute Set Difference</h4>
+      <p><code>missing_skills = target_skills − user_skills</code> — This IS the AI. Pure set difference algorithm.</p>
+    </div>
+  </div>
+
+  <h3>3. Path Generation — Topological Sort (Kahn's Algorithm)</h3>
+  <div class="code-block">
+<span class="cm">// 1. For each missing skill, traverse DAG backwards to collect prerequisites</span>
+<span class="kw">for</span> (id <span class="kw">of</span> targetSkillIds) {
+  <span class="fn">getPrerequisites</span>(id).forEach(p => allRequiredSkills.add(p));
+}
+
+<span class="cm">// 2. Remove skills user already has</span>
+skillsToLearn = [...allRequiredSkills].filter(s => !<span class="fn">userSkills.has</span>(s));
+
+<span class="cm">// 3. Topological sort — ensures prerequisites come first</span>
+sorted = <span class="fn">topologicalSort</span>(skillsToLearn);  <span class="cm">// Kahn's algorithm</span>
+
+<span class="cm">// 4. Assign phases: difficulty ≤ 1 → Foundation, ≤ 3 → Development, else Mastery</span>
+phases = <span class="fn">assignPhases</span>(sorted, profile);
+  </div>
+
+  <h3>4. 5-Factor Hybrid Scoring</h3>
+  <table>
+    <tr><th>Factor</th><th>Weight</th><th>Algorithm</th><th>Explanation</th></tr>
+    <tr><td><span class="tag tag-blue">Skill Gap</span></td><td>35%</td><td>Binary: is target skill?</td><td>Whether this skill is required for the matched career</td></tr>
+    <tr><td><span class="tag tag-green">Career Relevance</span></td><td>25%</td><td>60% career match + 40% interest match</td><td>How well it aligns with career goals and interests</td></tr>
+    <tr><td><span class="tag tag-amber">ML Similarity</span></td><td>20%</td><td>50% demand score + 50% interest match</td><td>Market demand + interest alignment</td></tr>
+    <tr><td><span class="tag tag-blue">Difficulty Fit</span></td><td>10%</td><td>Distance from user level</td><td>Whether difficulty matches experience level</td></tr>
+    <tr><td><span class="tag tag-green">Prerequisite Fit</span></td><td>10%</td><td>met_prereqs / total_prereqs</td><td>Whether user is ready to learn this skill</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 5: EXPLAINABILITY + FEEDBACK ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">05</div>
+    <div>
+      <div class="section-tag">AI/ML</div>
+      <h2>Explainability & Adaptive Feedback</h2>
+    </div>
+  </div>
+
+  <h3>3-Level Explanation Engine (Rule-Based, NOT LLM)</h3>
+  <div class="grid-3">
+    <div class="card card-blue">
+      <h4>Level 1: Why This Skill?</h4>
+      <p>Checks: prerequisites met, downstream skills unlocked, market demand score, difficulty match against user level.</p>
+      <p style="margin-top:8px;font-size:0.75rem;color:#64748b"><em>"Python Basics is a fundamental skill. It unlocks 12 downstream skills including Machine Learning. High-demand skill in Indian job market (95%)."</em></p>
+    </div>
+    <div class="card card-green">
+      <h4>Level 2: Difficulty Reason</h4>
+      <p>Compares skill difficulty (1-5) against user experience level (0-2). Returns one of: "Review/foundation", "Perfect match", "Good stretch", or "May be challenging".</p>
+    </div>
+    <div class="card card-amber">
+      <h4>Level 3: Prerequisite Info</h4>
+      <p>Lists which prerequisites are met vs unmet. Shows exact count: "All 3 prerequisites met" or "Missing 1 prerequisite(s): Linear Algebra".</p>
+    </div>
+  </div>
+
+  <h3>Adaptive Feedback Loop</h3>
+  <p>Every recommendation has 3 feedback buttons: <span class="tag tag-green">Too Easy</span> <span class="tag tag-blue">Just Right</span> <span class="tag tag-red">Too Hard</span></p>
+
+  <div class="flow">
+    <div class="flow-step active">User Feedback</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Store in feedback_history</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Mark skill completed</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Recalculate scores</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">Adjusted Recommendations</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>Feedback Adjustments</h4>
+      <ul>
+        <li><strong>Too Easy (×1.1):</strong> Boosts next difficulty level. Adds advanced project.</li>
+        <li><strong>Just Right (×1.0):</strong> No adjustment. Continue on path.</li>
+        <li><strong>Too Hard (×0.9):</strong> Reduces difficulty. Adds foundational warm-up.</li>
+        <li><strong>Related feedback:</strong> Same-domain feedback affects related skills.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Time Tracking</h4>
+      <ul>
+        <li>Estimated hours from skill graph</li>
+        <li>"Hard" feedback adds 30% time buffer</li>
+        <li>Timeline adjusts with time_commitment preference</li>
+        <li>Progress calculated from completed_courses vs path skills</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Natural Language Understanding (Without LLM)</h3>
+  <div class="card">
+    <p><strong>Rule-based text analyzer</strong> extracts structured profile from free text:</p>
+    <div class="grid-2" style="margin-top:8px">
+      <div>
+        <ul>
+          <li><strong>Domain detection:</strong> 7 categories, 50+ keywords (English + Hindi)</li>
+          <li><strong>Level detection:</strong> beginner / intermediate / advanced</li>
+          <li><strong>Skill extraction:</strong> 20+ skill patterns</li>
+          <li><strong>Goal mapping:</strong> 8 career goal categories</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li><strong>Hindi keywords:</strong> डेटा, मशीन लर्निंग, प्रोग्रामिंग, कोडिंग</li>
+          <li><strong>Fallback:</strong> Defaults to programming domain</li>
+          <li><strong>LLM role:</strong> Optional polish layer (NLU/NLG only)</li>
+          <li><strong>Core logic:</strong> 100% deterministic, zero API calls</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 5</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 6: FEATURES & UX ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">06</div>
+    <div>
+      <div class="section-tag">Features</div>
+      <h2>Key Features & User Experience</h2>
+    </div>
+  </div>
+
+  <h3>Conversational AI Onboarding (5 Steps)</h3>
+  <div class="flow">
+    <div class="flow-step active">1. Career Interest</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">2. Experience Level</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">3. Time Commitment</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">4. Primary Goal</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step active">5. Existing Skills</div>
+  </div>
+  <p class="small">Users can click suggestions OR type free text in English or Hindi. Chat stays active after onboarding for follow-up queries.</p>
+
+  <h3>Feature Summary</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>Conversational AI Chat</h4>
+      <p>Natural language interface. Type in English or Hindi. Handles recommendations, paths, skill gaps, time estimates, career guidance, and general Q&A.</p>
+    </div>
+    <div class="card">
+      <h4>Progress Dashboard</h4>
+      <p>Circular progress chart, next action card, phase-wise breakdown, skill coverage bar, career readiness score, recommendation list with "Why this?" panels.</p>
+    </div>
+    <div class="card">
+      <h4>Structured Learning Path</h4>
+      <p>Phase-based timeline (Foundation → Development → Mastery). Prerequisites, milestones, estimated hours. Feedback buttons on every skill.</p>
+    </div>
+    <div class="card">
+      <h4>Dark/Light Mode</h4>
+      <p>Full theme support with localStorage persistence. Moon/sun toggle in shared NavBar. Professional Google/Microsoft-style design.</p>
+    </div>
+    <div class="card">
+      <h4>Mobile Responsive</h4>
+      <p>Hamburger menu, responsive grids, touch-friendly buttons. Works on all screen sizes. Progressive enhancement.</p>
+    </div>
+    <div class="card">
+      <h4>India-First Design</h4>
+      <p>NPTEL, SWAYAM resources prioritized. Indian salary data (LPA). Growth rates for Indian market. NEP 2020 and Skill India alignment.</p>
+    </div>
+  </div>
+
+  <h3>Pages & Navigation</h3>
+  <table>
+    <tr><th>Page</th><th>Purpose</th><th>Key Components</th></tr>
+    <tr><td><strong>Home</strong> /</td><td>Landing page with features, stats, CTA</td><td>Hero, Stats Bar, Feature Grid, CTA Card</td></tr>
+    <tr><td><strong>Chat</strong> /chat</td><td>AI assistant + onboarding</td><td>Chat bubbles, suggestions, input, loading spinner</td></tr>
+    <tr><td><strong>Dashboard</strong> /dashboard</td><td>Overview of progress & recommendations</td><td>Next Action, Progress Chart, Skills, Phases</td></tr>
+    <tr><td><strong>Learning Path</strong> /learning-path</td><td>Phase-based skill timeline</td><td>SkillCards, Prerequisites, Feedback, Milestones</td></tr>
+    <tr><td><strong>Profile</strong> /profile</td><td>View learner profile</td><td>Stats, Skills, Goals, Completed Courses</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 6</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 7: TECHNICAL IMPLEMENTATION ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">07</div>
+    <div>
+      <div class="section-tag">Technical</div>
+      <h2>Technical Implementation</h2>
+    </div>
+  </div>
+
+  <h3>Tech Stack</h3>
+  <div class="grid-4">
+    <div class="stat-box"><div class="stat-val" style="font-size:1rem">Next.js 14</div><div class="stat-label">Framework</div></div>
+    <div class="stat-box"><div class="stat-val" style="font-size:1rem">React 18</div><div class="stat-label">UI Library</div></div>
+    <div class="stat-box"><div class="stat-val" style="font-size:1rem">Vercel</div><div class="stat-label">Deployment</div></div>
+    <div class="stat-box"><div class="stat-val" style="font-size:1rem">Gemini 2.0</div><div class="stat-label">LLM (Optional)</div></div>
+  </div>
+
+  <h3>File Structure</h3>
+  <div class="code-block">
+<span class="kw">frontend/</span>
+├── lib/
+│   ├── <span class="fn">engine.js</span>          <span class="cm">// Core AI engine — 585 lines, all algorithms</span>
+│   └── <span class="fn">skillGraph.js</span>      <span class="cm">// 65 skills, 8 career paths, demand scores</span>
+├── components/
+│   ├── <span class="fn">NavBar.js</span>          <span class="cm">// Shared nav with mobile hamburger + theme toggle</span>
+│   └── <span class="fn">ThemeContext.js</span>     <span class="cm">// Dark/light mode with localStorage persistence</span>
+├── pages/
+│   ├── <span class="fn">index.js</span>           <span class="cm">// Landing page</span>
+│   ├── <span class="fn">chat.js</span>            <span class="cm">// AI assistant + 5-step onboarding</span>
+│   ├── <span class="fn">dashboard.js</span>       <span class="cm">// Progress overview, recommendations</span>
+│   ├── <span class="fn">learning-path.js</span>   <span class="cm">// Phase-based skill timeline</span>
+│   ├── <span class="fn">profile.js</span>         <span class="cm">// Learner profile viewer</span>
+│   └── api/
+│       └── <span class="fn">gemini.js</span>       <span class="cm">// Serverless Gemini endpoint (NLU/NLG only)</span>
+├── styles/
+│   └── <span class="fn">globals.css</span>        <span class="cm">// Complete light/dark theme, 493 lines</span>
+└── <span class="fn">next.config.js</span>        <span class="cm">// Security headers, standalone output</span>
+
+<span class="kw">backend/</span>                   <span class="cm">// Flask backend (for source code ZIP only, not deployed)</span>
+├── app.py                  <span class="cm">// Flask API server</span>
+├── ml/                     <span class="cm">// ML models, scoring, skill gap analysis</span>
+├── recommendation_engine/  <span class="cm">// Path generation, profiler, NLP processor</span>
+└── data/                   <span class="cm">// JSON datasets, CSV metadata</span>
+  </div>
+
+  <h3>Code Metrics</h3>
+  <div class="grid-4">
+    <div class="stat-box"><div class="stat-val">~1,800</div><div class="stat-label">Total LOC</div></div>
+    <div class="stat-box"><div class="stat-val">0</div><div class="stat-label">External ML Libs</div></div>
+    <div class="stat-box"><div class="stat-val">5</div><div class="stat-label">React Pages</div></div>
+    <div class="stat-box"><div class="stat-val">82 KB</div><div class="stat-label">First Load JS</div></div>
+  </div>
+
+  <h3>Security Hardening</h3>
+  <table>
+    <tr><th>Mitigation</th><th>Implementation</th></tr>
+    <tr><td>XSS Prevention</td><td>React auto-escaping + server-side input sanitization (HTML entity encoding)</td></tr>
+    <tr><td>Rate Limiting</td><td>15 req/min/IP on Gemini endpoint, with automatic cleanup</td></tr>
+    <tr><td>CORS</td><td>Dynamic origin validation (production + localhost only)</td></tr>
+    <tr><td>Security Headers</td><td>X-Frame-Options: DENY, X-Content-Type-Options: nosniff, X-XSS-Protection, Referrer-Policy</td></tr>
+    <tr><td>Input Validation</td><td>2000 char max, type checking, empty string guards</td></tr>
+    <tr><td>Secrets</td><td>GEMINI_API_KEY as Vercel env var (server-side only, never exposed to client)</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 7</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 8: JUDGING ALIGNMENT ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">08</div>
+    <div>
+      <div class="section-tag">Evaluation</div>
+      <h2>Judging Criteria Alignment</h2>
+    </div>
+  </div>
+
+  <h3>How We Score on Each Criterion</h3>
+
+  <table>
+    <tr><th>Criterion</th><th>Weight</th><th>Our Approach</th><th>Evidence</th></tr>
+    <tr>
+      <td><strong>Features</strong></td>
+      <td><span class="tag tag-blue">25%</span></td>
+      <td>Chat-based onboarding, personalized recommendations, learning paths, progress tracking, feedback loop, dark mode, mobile responsive</td>
+      <td>5 pages, full onboarding flow, 3 feedback types, phase-based milestones</td>
+    </tr>
+    <tr>
+      <td><strong>Problem Understanding</strong></td>
+      <td><span class="tag tag-green">20%</span></td>
+      <td>Solves real student problem: "What should I learn next?" with structured, prerequisite-aware paths</td>
+      <td>65-skill DAG, gap analysis, career alignment, Indian context</td>
+    </tr>
+    <tr>
+      <td><strong>AI/ML</strong></td>
+      <td><span class="tag tag-amber">20%</span></td>
+      <td>Dedicated algorithms, NOT API calls. DAG traversal, topological sort, 5-factor scoring, rule-based explainability</td>
+      <td>engine.js:585 lines of pure algorithmic intelligence</td>
+    </tr>
+    <tr>
+      <td><strong>Innovation</strong></td>
+      <td><span class="tag tag-blue">15%</span></td>
+      <td>India-first design, offline-capable, zero ML libraries, bilingual support (EN+HI)</td>
+      <td>NPTEL/SWAYAM resources, Hindi keywords, Skill India alignment</td>
+    </tr>
+    <tr>
+      <td><strong>UX Design</strong></td>
+      <td><span class="tag tag-green">10%</span></td>
+      <td>Clean professional UI, conversational onboarding, explainable recommendations, progress visualization</td>
+      <td>Google/Microsoft-style design, theme toggle, responsive</td>
+    </tr>
+    <tr>
+      <td><strong>Code Quality</strong></td>
+      <td><span class="tag tag-amber">10%</span></td>
+      <td>Clean architecture, security hardening, error handling, no dead code</td>
+      <td>try-catch everywhere, rate limiting, input validation, no unused deps</td>
+    </tr>
+  </table>
+
+  <h3>Golden Rule Compliance</h3>
+  <div class="highlight">
+    <p>"If you remove every LLM call, the system still generates correct, complete, explainable learning paths."</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4>✅ Verified</h4>
+      <ul>
+        <li>Path generation: pure DAG + topological sort</li>
+        <li>Gap analysis: pure set difference</li>
+        <li>Recommendations: 5-factor hybrid scoring</li>
+        <li>Explanations: 3-level rule-based engine</li>
+        <li>Profiler: rule-based NLU (no LLM needed)</li>
+      </ul>
+    </div>
+    <div class="card card-blue">
+      <h4>Optional LLM Use (NLU/NLG Polish Only)</h4>
+      <ul>
+        <li>Chat fallback when algorithmic response unavailable</li>
+        <li>Context-aware encouragement messages</li>
+        <li>Fallback works identically when API is down</li>
+        <li>Rate limited, sanitized, CORS-restricted</li>
+        <li>Client always has algorithmic response first</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Submission Checklist</h3>
+  <table>
+    <tr><th>Material</th><th>Status</th><th>Details</th></tr>
+    <tr><td>Source Code ZIP</td><td><span class="tag tag-green">Ready</span></td><td>Frontend (Next.js) + Backend (Flask) — complete codebase</td></tr>
+    <tr><td>GitHub Repository</td><td><span class="tag tag-green">Public</span></td><td>github.com/Bhagyansh07/AI-Learning-Path-Recommender</td></tr>
+    <tr><td>Documentation</td><td><span class="tag tag-green">This Document</span></td><td>HTML → PDF export</td></tr>
+    <tr><td>Demo Video</td><td><span class="tag tag-amber">Pending</span></td><td>3-5 minute screen recording</td></tr>
+    <tr><td>Deployed URL</td><td><span class="tag tag-green">Live</span></td><td>frontend-mu-jet-18.vercel.app</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 8</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 9: TEAM ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">09</div>
+    <div>
+      <div class="section-tag">Team</div>
+      <h2>Team nightcoders</h2>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3>Team Members</h3>
+      <table>
+        <tr><th>Name</th><th>Role</th></tr>
+        <tr><td>Bhagyansh Sharma</td><td>Team Lead, Full Stack</td></tr>
+        <tr><td>Member 2</td><td>Backend & ML</td></tr>
+        <tr><td>Member 3</td><td>Frontend & UX</td></tr>
+        <tr><td>Member 4</td><td>Data & Testing</td></tr>
+        <tr><td>Member 5</td><td>Documentation</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Institution</h3>
+      <div class="card">
+        <h4>JECRC University</h4>
+        <p>Jaipur, Rajasthan, India</p>
+      </div>
+      <h3 style="margin-top:16px">Project Links</h3>
+      <div class="card">
+        <p><strong>GitHub:</strong> github.com/Bhagyansh07/AI-Learning-Path-Recommender</p>
+        <p><strong>Deployed:</strong> frontend-mu-jet-18.vercel.app</p>
+        <p><strong>Deadline:</strong> 31 Aug 2026, 11:59 PM IST</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:16px">Technologies Used</h3>
+  <div class="grid-3">
+    <div class="card">
+      <h4>Frontend</h4>
+      <p>Next.js 14, React 18, CSS3 (custom properties), Vercel</p>
+    </div>
+    <div class="card">
+      <h4>AI/ML</h4>
+      <p>Pure JavaScript engine, DAG algorithms, 5-factor scoring, Gemini 2.0 Flash (optional)</p>
+    </div>
+    <div class="card">
+      <h4>Backend (Submission)</h4>
+      <p>Python Flask, scikit-learn, joblib, pandas</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:16px">Acknowledgments</h3>
+  <div class="card">
+    <p>Built for <strong>HCLTech AMPlified Round 2</strong> — an initiative to foster innovation and practical AI solutions among engineering students. We focused on solving a real problem that every Indian engineering student faces: "What should I learn next?"</p>
+    <p style="margin-bottom:0">Our approach prioritizes <strong>algorithmic transparency</strong> over LLM dependency, ensuring that every recommendation is explainable, deterministic, and works offline. This is not just a chatbot — it's a complete AI-powered curriculum engine.</p>
+  </div>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 9</span>
+  </div>
+</div>
+
+</body>
+</html>
