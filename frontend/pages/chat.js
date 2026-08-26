@@ -3,6 +3,23 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { createProfile, getProfile, analyzeText } from '../lib/engine';
 
+const NavBar = ({ active }) => (
+  <nav className="navbar">
+    <div className="container navbar-inner">
+      <div className="navbar-brand">
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>LP</div>
+        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>LearnPath AI</span></Link>
+      </div>
+      <div className="navbar-links">
+        <Link href="/" className={`nav-link ${active === 'home' ? 'active' : ''}`}>Home</Link>
+        <Link href="/chat" className={`nav-link ${active === 'chat' ? 'active' : ''}`}>AI Assistant</Link>
+        <Link href="/dashboard" className={`nav-link ${active === 'dashboard' ? 'active' : ''}`}>Dashboard</Link>
+        <Link href="/learning-path" className={`nav-link ${active === 'path' ? 'active' : ''}`}>My Path</Link>
+      </div>
+    </div>
+  </nav>
+);
+
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -24,19 +41,14 @@ export default function Chat() {
       setProfileId(existing.id);
       setMessages([{ id: 1, type: 'ai', text: `Welcome back, ${existing.name}! What would you like to explore?`, suggestions: ['Recommend courses', 'Show my learning path', 'What skills do I need?'] }]);
     } else {
-      setMessages([{ id: 1, type: 'ai', text: "Welcome to LearnPath AI! I'm your personal learning assistant. Let me understand your goals.\n\n" + steps[0].q, suggestions: steps[0].opts }]);
+      setMessages([{ id: 1, type: 'ai', text: "Welcome to LearnPath AI! I'm your personal learning assistant powered by Google Gemini.\n\nLet me understand your goals so I can build your personalized learning path.\n\n" + steps[0].q, suggestions: steps[0].opts }]);
     }
   }, []);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   const handleSuggestion = (s) => {
-    if (step < steps.length) {
-      handleChoice(s);
-    } else {
-      setInput(s);
-      sendMessage(s);
-    }
+    if (step < steps.length) { handleChoice(s); } else { setInput(s); sendMessage(s); }
   };
 
   const handleChoice = async (choice) => {
@@ -51,24 +63,16 @@ export default function Chat() {
     } else {
       setMessages(prev => [...prev, userMsg]);
       setLoading(true);
-
       const levelMap = { 'Beginner': 'beginner', 'Intermediate': 'intermediate', 'Advanced': 'advanced' };
       const lvl = Object.entries(levelMap).find(([k]) => (newD.experience_level || '').includes(k));
       const level = lvl ? lvl[1] : 'beginner';
-
       const interests = [newD.primary_interest || 'programming'].map(i => {
         const map = { 'Data Science & Analytics': 'data_science', 'Web Development': 'web_development', 'Machine Learning & AI': 'machine_learning', 'Cloud Computing & DevOps': 'cloud_computing', 'Cybersecurity': 'cybersecurity', 'Mobile Development': 'mobile_development', 'Software Engineering': 'programming' };
         return map[i] || i.toLowerCase().replace(/\s+/g, '_');
       });
-
-      const profile = createProfile({
-        name: 'Learner', interests, experience_level: level,
-        time_commitment: newD.time_commitment || '5-10 hours',
-        career_goals: [newD.career_goal || 'career change to tech'],
-      });
+      const profile = createProfile({ name: 'Learner', interests, experience_level: level, time_commitment: newD.time_commitment || '5-10 hours', career_goals: [newD.career_goal || 'career change to tech'] });
       setProfileId(profile.id);
-
-      setMessages(prev => [...prev, { id: Date.now() + 2, type: 'ai', text: `Great! I've created your profile. Your personalized learning path is ready!\n\nYou can now:\n- Ask me anything about your learning journey\n- View your Dashboard for recommendations\n- Check your Learning Path for milestones`, suggestions: ['Recommend courses for me', 'Show my learning path', 'What skills do I need?'] }]);
+      setMessages(prev => [...prev, { id: Date.now() + 2, type: 'ai', text: "Your profile is ready! Here's what I've set up:\n\nYour personalized learning path has been generated with courses matched to your goals.\n\nYou can now:\nAsk me anything about your learning journey\nView your Dashboard for recommendations\nCheck your Learning Path for milestones", suggestions: ['Recommend courses for me', 'Show my learning path', 'What skills do I need?'] }]);
       setLoading(false);
     }
   };
@@ -78,10 +82,8 @@ export default function Chat() {
     setMessages(prev => [...prev, { id: Date.now(), type: 'user', text }]);
     setInput('');
     setLoading(true);
-
     const profile = getProfile();
     const context = profile ? { level: profile.experience_level, interests: profile.interests, skills: profile.current_skills.map(s => typeof s === 'object' ? s.skill : s) } : null;
-
     try {
       const res = await fetch('/api/gemini', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -98,8 +100,12 @@ export default function Chat() {
   return (
     <div className="page-wrapper">
       <Head><title>AI Learning Assistant - Chat</title></Head>
-      <nav className="navbar"><div className="container navbar-inner"><div className="navbar-brand"><div style={{ fontSize: '1.5rem' }}>&#129302;</div><Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>LearnPath AI</span></Link></div><div className="navbar-links"><Link href="/" className="nav-link">Home</Link><Link href="/chat" className="nav-link active">AI Assistant</Link><Link href="/dashboard" className="nav-link">Dashboard</Link><Link href="/learning-path" className="nav-link">My Path</Link></div></div></nav>
-      <main className="container" style={{ paddingTop: '16px' }}>
+      <NavBar active="chat" />
+      <div className="bg-glow" />
+      <main className="container" style={{ paddingTop: 12 }}>
+        <div style={{ textAlign: 'center', marginBottom: 12 }}>
+          <span className="tech-badge">Powered by Google Gemini AI</span>
+        </div>
         <div className="chat-container">
           <div className="chat-messages">
             {messages.map((msg) => (
@@ -107,16 +113,30 @@ export default function Chat() {
                 <div className={`chat-avatar ${msg.type === 'ai' ? 'ai' : 'human'}`}>{msg.type === 'ai' ? 'AI' : 'You'}</div>
                 <div>
                   <div className="chat-bubble" style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
-                  {msg.suggestions?.length > 0 && <div className="chat-suggestions">{msg.suggestions.map((s, i) => <button key={i} className="chat-suggestion" onClick={() => handleSuggestion(s)}>{s}</button>)}</div>}
+                  {msg.suggestions?.length > 0 && (
+                    <div className="chat-suggestions">
+                      {msg.suggestions.map((s, i) => <button key={i} className="chat-suggestion" onClick={() => handleSuggestion(s)}>{s}</button>)}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
-            {loading && <div className="chat-message ai"><div className="chat-avatar ai">AI</div><div className="chat-bubble"><div className="loading-spinner" /></div></div>}
+            {loading && (
+              <div className="chat-message ai">
+                <div className="chat-avatar ai">AI</div>
+                <div className="chat-bubble" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div className="loading-spinner" />
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Thinking...</span>
+                </div>
+              </div>
+            )}
             <div ref={endRef} />
           </div>
           <form className="chat-input-area" onSubmit={(e) => { e.preventDefault(); if (step >= steps.length) sendMessage(input); }}>
-            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={step < steps.length ? "Click a suggestion above..." : "Type your message..."} disabled={step < steps.length} />
-            <button type="submit" className="chat-send" disabled={loading || step < steps.length}>Send</button>
+            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={step < steps.length ? "Click a suggestion above..." : "Ask me anything about learning..."} disabled={step < steps.length} />
+            <button type="submit" className="chat-send" disabled={loading || step < steps.length}>
+              {loading ? '...' : 'Send'}
+            </button>
           </form>
         </div>
       </main>
