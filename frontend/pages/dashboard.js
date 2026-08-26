@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getProfile, createProfile, getRecommendations, getLearningPath } from '../lib/engine';
+import { getProfile, createProfile, getRecommendations, getLearningPath, submitFeedback, getDemoProfiles } from '../lib/engine';
 
 const NavBar = ({ active }) => (
   <nav className="navbar">
@@ -20,29 +20,71 @@ const NavBar = ({ active }) => (
   </nav>
 );
 
+function FeedbackButtons({ courseId, onFeedback }) {
+  const [submitted, setSubmitted] = useState(false);
+  const [rating, setRating] = useState(null);
+  const handle = (r) => { setRating(r); setSubmitted(true); submitFeedback(courseId, r, 0); if (onFeedback) onFeedback(); };
+  if (submitted) return <span className="badge badge-success">Rated: {rating}</span>;
+  return (
+    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+      <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.75rem', padding: '4px 10px', background: 'rgba(16,185,129,0.1)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }} onClick={() => handle('easy')}>Too Easy</button>
+      <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.75rem', padding: '4px 10px', background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)' }} onClick={() => handle('just_right')}>Just Right</button>
+      <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.75rem', padding: '4px 10px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)' }} onClick={() => handle('hard')}>Too Hard</button>
+    </div>
+  );
+}
+
+function WhyThisPanel({ rec }) {
+  const [open, setOpen] = useState(false);
+  if (!rec.why_this) return null;
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.75rem', padding: '4px 10px', color: 'var(--primary-light)' }} onClick={() => setOpen(!open)}>
+        {open ? 'Hide' : 'Why this?'}
+      </button>
+      {open && (
+        <div style={{ marginTop: 8, padding: 12, background: 'rgba(99,102,241,0.05)', borderRadius: 8, border: '1px solid rgba(99,102,241,0.1)', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          <div style={{ marginBottom: 8, color: 'var(--text-primary)', fontWeight: 600 }}>Recommendation Rationale:</div>
+          <div>{rec.why_this}</div>
+          {rec.difficulty_reason && <div style={{ marginTop: 6, color: 'var(--text-muted)' }}>Difficulty: {rec.difficulty_reason}</div>}
+          {rec.prerequisite_info && <div style={{ marginTop: 6, color: rec.prerequisite_info.met ? 'var(--success)' : 'var(--warning)' }}>{rec.prerequisite_info.message}</div>}
+          {rec.breakdown && (
+            <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4 }}>
+              {Object.entries(rec.breakdown).map(([k, v]) => (
+                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                  <span>{k.replace(/_/g, ' ')}</span><span style={{ fontWeight: 600 }}>{Math.round(v * 100)}%</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [recs, setRecs] = useState(null);
   const [path, setPath] = useState(null);
   const [tab, setTab] = useState('overview');
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const p = getProfile();
-    if (p) {
-      setProfile(p);
-      setRecs(getRecommendations(p));
-      setPath(getLearningPath(p));
-    }
+    if (p) { setProfile(p); setRecs(getRecommendations(p)); setPath(getLearningPath(p)); }
     setLoading(false);
-  }, []);
+  }, [refreshKey]);
 
-  const createDemo = () => {
-    const p = createProfile({ name: 'Demo Learner', interests: ['machine_learning', 'data_science'], experience_level: 'intermediate', current_skills: ['python', 'basic_programming'], career_goals: ['data_scientist'], time_commitment: '10-20 hours' });
-    setProfile(p);
-    setRecs(getRecommendations(p));
-    setPath(getLearningPath(p));
+  const refresh = () => { const p = getProfile(); if (p) { setProfile(p); setRecs(getRecommendations(p)); setPath(getLearningPath(p)); } };
+
+  const loadDemo = (demoData) => {
+    const p = createProfile(demoData);
+    setProfile(p); setRecs(getRecommendations(p)); setPath(getLearningPath(p)); setRefreshKey(k => k + 1);
   };
+
+  const demos = getDemoProfiles();
 
   if (loading) return <div className="page-wrapper"><NavBar active="dashboard" /><main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><div className="loading-spinner" style={{ width: 40, height: 40 }} /></main></div>;
 
@@ -54,10 +96,21 @@ export default function Dashboard() {
       <main className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
         <div style={{ fontSize: '3rem', marginBottom: 20 }}>&#128202;</div>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 12 }}>No Profile Found</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 32, fontSize: '1.05rem' }}>Create a profile to see your personalized dashboard.</p>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 32, fontSize: '1.05rem' }}>Create a profile or load a demo to see your personalized dashboard.</p>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/chat" className="btn btn-primary" style={{ padding: '14px 28px' }}>Start with AI Assistant</Link>
-          <button className="btn btn-secondary" onClick={createDemo} style={{ padding: '14px 28px' }}>Create Demo Profile</button>
+        </div>
+        <div style={{ marginTop: 40 }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 16, color: 'var(--text-secondary)' }}>Or try a demo profile:</h3>
+          <div className="grid-3" style={{ maxWidth: 800, margin: '0 auto' }}>
+            {demos.map((d, i) => (
+              <button key={i} className="feature-card" style={{ cursor: 'pointer', textAlign: 'center', border: '1px solid var(--border)' }} onClick={() => loadDemo(d.data)}>
+                <div style={{ fontSize: '2rem', marginBottom: 12 }}>{i === 0 ? '&#128202;' : i === 1 ? '&#128187;' : '&#129302;'}</div>
+                <h3 style={{ fontSize: '0.95rem', marginBottom: 4 }}>{d.name}</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.data.experience_level} &middot; {d.data.interests.join(', ').replace(/_/g, ' ')}</p>
+              </button>
+            ))}
+          </div>
         </div>
       </main>
     </div>
@@ -106,9 +159,7 @@ export default function Dashboard() {
                 <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Overall Progress</span>
                 <span style={{ color: 'var(--primary-light)', fontWeight: 700 }}>{progressPct}%</span>
               </div>
-              <div className="progress-bar" style={{ height: 12 }}>
-                <div className="progress-fill" style={{ width: `${progressPct}%` }} />
-              </div>
+              <div className="progress-bar" style={{ height: 12 }}><div className="progress-fill" style={{ width: `${progressPct}%` }} /></div>
             </div>
             {path && (
               <div className="dashboard-grid">
@@ -124,7 +175,9 @@ export default function Dashboard() {
                           </div>
                           <span className="badge badge-primary">{Math.round(r.score * 100)}%</span>
                         </div>
-                        <div className="course-meta"><span>{r.course.level}</span><span>&middot;</span><span>{r.course.duration_hours}h</span><span>&middot;</span><span>{r.course.provider}</span><span>&middot;</span><span>{'★'.repeat(Math.round(r.course.rating))} {r.course.rating}</span></div>
+                        <div className="course-meta"><span>{r.course.level}</span><span>&middot;</span><span>{r.course.duration_hours}h</span><span>&middot;</span><span>{r.course.provider}</span><span>&middot;</span><span>{'&#9733;'.repeat(Math.round(r.course.rating))} {r.course.rating}</span></div>
+                        <WhyThisPanel rec={r} />
+                        <FeedbackButtons courseId={r.course_id} onFeedback={() => { refresh(); setRefreshKey(k => k + 1); }} />
                       </div>
                     ))}
                   </div>
@@ -135,7 +188,7 @@ export default function Dashboard() {
                     {path.milestones.slice(0, 5).map((ms, i) => (
                       <div key={i} className="card" style={{ padding: 16 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: ms.type === 'path_complete' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #6366f1, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 800, flexShrink: 0, boxShadow: `0 4px 12px ${ms.type === 'path_complete' ? 'rgba(16,185,129,0.3)' : 'rgba(99,102,241,0.3)'}` }}>{ms.phase}</div>
+                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: ms.type === 'path_complete' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #6366f1, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 800, flexShrink: 0 }}>{ms.phase}</div>
                           <div><div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{ms.title}</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>{ms.description || 'Keep going!'}</div></div>
                         </div>
                       </div>
@@ -156,6 +209,8 @@ export default function Dashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}><h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>{r.course.title}</h4><span className="badge badge-primary">{Math.round(r.score * 100)}%</span></div>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 8 }}>{r.explanation}</p>
                   <div className="course-meta"><span className="badge badge-primary">{r.course.level}</span><span>{r.course.duration_hours}h</span><span>{r.course.provider}</span></div>
+                  <WhyThisPanel rec={r} />
+                  <FeedbackButtons courseId={r.course_id} onFeedback={() => { refresh(); setRefreshKey(k => k + 1); }} />
                 </div>
               ))}
             </div>
