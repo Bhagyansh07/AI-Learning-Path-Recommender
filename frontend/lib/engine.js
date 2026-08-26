@@ -320,7 +320,16 @@ function generateMilestones(phases) {
   let msNum = 1;
   phases.forEach(ph => {
     if (ph.courses.length) milestones.push({ id: `ms_${msNum++}`, title: `Start ${ph.name}`, phase: ph.phase, type: 'start' });
-    ph.courses.forEach(c => { if (c.difficulty >= 2) milestones.push({ id: `ms_${msNum++}`, title: `Complete: ${c.title}`, phase: ph.phase, type: 'completion', course_id: c.skill_id }); });
+    // Only add milestones at 25%, 50%, 75% and end of each phase
+    const len = ph.courses.length;
+    [0.25, 0.5, 0.75, 1.0].forEach(pct => {
+      const idx = Math.min(Math.ceil(len * pct), len) - 1;
+      if (idx >= 0 && idx < len) {
+        const c = ph.courses[idx];
+        const label = pct === 1 ? `${ph.name} Complete` : `${Math.round(pct * 100)}% of ${ph.name}`;
+        milestones.push({ id: `ms_${msNum++}`, title: label, phase: ph.phase, type: pct === 1 ? 'completion' : 'progress', course_id: c.skill_id });
+      }
+    });
   });
   milestones.push({ id: `ms_${msNum}`, title: 'Path Complete!', phase: phases.length, type: 'path_complete' });
   return milestones;
@@ -512,9 +521,9 @@ export function submitFeedback(skillId, rating, actualHours) {
   // Update skills
   const skill = getSkillById(skillId);
   if (skill) {
-    profile.progress.total_courses_completed = profile.completed_courses.length;
     profile.progress.total_hours_learned += skill.estimated_hours || 0;
-    if (!profile.current_skills.includes(skillId)) {
+    const alreadyHas = profile.current_skills.some(sk => (typeof sk === 'object' ? sk.skill : sk) === skillId);
+    if (!alreadyHas) {
       profile.current_skills.push({ skill: skillId, acquired_via: skillId, date: new Date().toISOString() });
       profile.progress.skills_acquired = profile.current_skills.map(sk => typeof sk === 'object' ? sk.skill : sk);
     }

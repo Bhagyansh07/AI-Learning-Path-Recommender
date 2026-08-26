@@ -1,228 +1,219 @@
-# Solution Documentation - AI-Powered Personalized Learning Path Recommender
+# Solution Documentation — LearnPath AI
+
+> HCLTech AMPlified 2025 · Round 2 · Team NightCoders · JECRC University
+
+---
 
 ## 1. Problem Understanding
 
-### Problem Statement
-Online learning platforms offer thousands of courses across diverse domains. Learners struggle to identify the right sequence of learning resources needed to achieve a specific goal. Different learners have different skill levels, interests, career aspirations, and learning preferences, making a one-size-fits-all approach ineffective.
+### What the Problem Statement Asks For
 
-### Key Challenges Identified
-- **Information Overload**: Thousands of courses available with no clear guidance on sequencing
-- **Skill Gap Uncertainty**: Learners don't know what they need to learn vs. what they already know
-- **No Personalization**: Existing recommendation systems treat all learners the same
-- **Lack of Structure**: No clear roadmap with prerequisites, milestones, and timelines
-- **No Explanation**: Learners don't understand why certain courses are recommended
+| Requirement | PS Wording | Our Solution |
+|---|---|---|
+| Conversational interface | "learners describe their goals in natural language" | Chat with onboarding + free-text input |
+| Learner profiling | "capturing interests, experience level, completed courses and objectives" | Structured profile with LLM NLU + form fallback |
+| Recommendation engine | "suggesting relevant courses, projects and learning resources" | 5-factor hybrid scoring engine |
+| Personalized learning path | "with prerequisites and milestones" | Topological sort over skill DAG |
+| Explainable AI | "explains why each recommendation was made" | Rule-based explanation engine (3 levels) |
+| Progress dashboard | "visualizing progress, skill development, milestones" | Circular chart, phase bars, stats |
+| Feedback adaptation | "adapt suggestions based on user feedback" | Real-time feedback loop adjusts rankings |
 
-## 2. Solution Approach
+### The Hard Problem We Solve
 
-### Core Philosophy
-Build an AI-powered system that acts as a personal learning advisor. The system understands the learner's goals through natural language conversation, creates a comprehensive learner profile, identifies skill gaps, and generates a structured learning roadmap with explanations.
+> "Learners often struggle to identify the **right sequence** of learning resources."
 
-### Solution Components
-1. **Conversational Interface** - Natural language chat for goal understanding
-2. **Learner Profiling Engine** - Dynamic profile management
-3. **Recommendation Engine** - TF-IDF content-based filtering
-4. **Path Generator** - Topological course ordering with milestones
-5. **AI Assistant** - Explainable recommendations and query handling
-6. **Progress Dashboard** - Visual progress tracking
+Most systems (Coursera, YouTube) do **content retrieval** — "here are 50 Python courses." We do **curriculum sequencing** — "here's the exact order: Python → NumPy → Statistics → ML, because each step has prerequisites the next one needs."
 
-## 3. System Architecture
+---
 
-### Architecture Diagram
+## 2. Solution Architecture
+
+### Core Principle
+
+> **If you remove every LLM call, the system still generates correct, complete, explainable learning paths.**
+
+The LLM is a UI convenience, not the brain. The brain is algorithmic.
+
+### System Diagram
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                │
-│  ┌──────────┬──────────┬──────────┬──────────────┐  │
-│  │  Landing  │  Chat    │Dashboard │ Learning Path│  │
-│  │  Page     │Interface │          │   Viewer     │  │
-│  └────┬─────┴────┬─────┴────┬─────┴──────┬───────┘  │
-│       │          │          │             │           │
-│       └──────────┴──────────┴─────────────┘           │
-│                          │                            │
-│                  REST API (HTTP)                      │
-└──────────────────────────┬───────────────────────────┘
-                           │
-┌──────────────────────────┼───────────────────────────┐
-│                    Backend (Flask)                     │
-│  ┌─────────────────────────────────────────────┐     │
-│  │              Flask API Server                │     │
-│  │   /api/chat  /api/recommend  /api/path      │     │
-│  └──────────────────────┬──────────────────────┘     │
-│                         │                             │
-│  ┌──────────────────────┼──────────────────────┐     │
-│  │         Recommendation Engine                │     │
-│  │  ┌────────┐ ┌───────────┐ ┌──────────────┐  │     │
-│  │  │  NLP   │ │ Profiler  │ │ Recommender  │  │     │
-│  │  │Process.│ │           │ │ (TF-IDF)     │  │     │
-│  │  └────────┘ └───────────┘ └──────────────┘  │     │
-│  │  ┌───────────────┐ ┌──────────────────────┐ │     │
-│  │  │ Path Generator│ │   AI Assistant       │ │     │
-│  │  │(Topological)  │ │ (Conversational)     │ │     │
-│  │  └───────────────┘ └──────────────────────┘ │     │
-│  └──────────────────────┬──────────────────────┘     │
-│                         │                             │
-│  ┌──────────────────────┼──────────────────────┐     │
-│  │              Data Layer (JSON)               │     │
-│  │  courses.json | projects.json | assessments  │     │
-│  └─────────────────────────────────────────────┘     │
+┌──────────────────────────────────────────────────────┐
+│                    Frontend (Next.js)                  │
+├──────────────────────────────────────────────────────┤
+│                                                        │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐ │
+│  │ Skill Graph │  │   Profiler   │  │    Path      │ │
+│  │    DAG      │  │   Engine     │  │  Generator   │ │
+│  │  (65 nodes) │  │ (NLU+form)   │  │ (topo sort)  │ │
+│  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘ │
+│         │                │                  │          │
+│  ┌──────▼──────┐  ┌──────▼───────┐  ┌──────▼───────┐ │
+│  │Gap Analysis │  │  Feedback    │  │ Explanation  │ │
+│  │(set diff)   │  │    Loop      │  │   Engine     │ │
+│  └─────────────┘  └──────────────┘  └──────────────┘ │
+│                                                        │
+│  ┌──────────────────────────────────────────────────┐ │
+│  │              Gemini API (optional)                │ │
+│  │         NLU parsing + NLG polish only             │ │
+│  └──────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────┘
 ```
 
-### Data Flow
-1. User describes goals via conversational interface (natural language)
-2. NLP Processor extracts domains, skill level, goals, and skills mentioned
-3. Learner Profiler creates/updates profile with extracted information
-4. Recommendation Engine builds learner vector and computes similarity with course vectors
-5. Path Generator orders courses topologically respecting prerequisites
-6. AI Assistant generates explanations for each recommendation
-7. Dashboard displays progress, skills, and milestones
+---
 
-## 4. AI/ML Techniques Used
+## 3. AI/ML Implementation Details
 
-### 4.1 TF-IDF Content-Based Filtering
-**Purpose**: Course recommendation scoring
+### 3.1 Skill Graph — Knowledge Representation
 
-**Implementation**:
-- **Term Frequency (TF)**: Counts skill/domain keyword occurrences in course descriptions
-- **Inverse Document Frequency (IDF)**: Weighs rare, distinctive terms higher
-- **Cosine Similarity**: Measures angle between learner profile vector and course vectors
+A **Directed Acyclic Graph (DAG)** with:
+- **65 nodes** (skills) across 9 domains
+- **Directed edges** = prerequisite relationships
+- **Node weights** = difficulty (1-5), estimated hours
+- **8 career paths** with target skill sets
 
-**Why TF-IDF**: Lightweight, interpretable, and effective for text-based content matching without requiring large training datasets.
-
-### 4.2 NLP Keyword Extraction
-**Purpose**: Understanding learner goals from natural language
-
-**Techniques**:
-- **Domain Classification**: 10 domain keyword dictionaries for matching
-- **Level Detection**: Beginner/Intermediate/Advanced indicator word matching
-- **Goal Classification**: Career change, upskill, freelance, academic goal detection
-- **Skill Extraction**: Alias resolution and skill keyword matching
-
-### 4.3 Topological Sorting
-**Purpose**: Course ordering respecting prerequisites
-
-**Algorithm**: Kahn's algorithm (BFS-based) for directed acyclic graph traversal
-- Builds dependency graph from course prerequisites
-- Ensures prerequisite courses appear before dependent courses
-- Handles missing prerequisites gracefully
-
-### 4.4 Multi-Factor Scoring
-**Purpose**: Ranking recommendations
-
-**Scoring Formula**:
-```
-final_score = (relevance * 0.5) + (level_match * 0.25) + (prereq_met * 0.25)
-```
-
-**Factors**:
-- **Relevance** (50%): TF-IDF cosine similarity between learner and course
-- **Level Match** (25%): Bonus for courses matching learner's experience level
-- **Prerequisites Met** (25%): Bonus for courses whose prerequisites are completed
-
-### 4.5 Conversational AI
-**Purpose**: Natural language interaction
-
-**Implementation**:
-- Intent classification using keyword matching (8 intent categories)
-- Context-aware responses maintaining conversation state
-- Onboarding flow for structured profile creation
-- Explanation generation based on profile analysis
-
-## 5. Key Features and Workflows
-
-### 5.1 Onboarding Workflow
-```
-User opens app → AI greeting → Q1: Interest field → Q2: Experience level
-→ Q3: Time commitment → Q4: Career goal → Profile created → Path generated
-```
-
-### 5.2 Recommendation Workflow
-```
-User asks for recommendations → Profile loaded → Learner vector built
-→ TF-IDF similarity computed → Multi-factor scoring applied
-→ Top-K courses ranked → Explanations generated → Results returned
-```
-
-### 5.3 Learning Path Generation
-```
-Profile analyzed → Recommended courses selected → Topological sort applied
-→ Courses grouped into phases → Milestones created at key points
-→ Skill gaps identified → Timeline estimated → Path returned
-```
-
-### 5.4 Chat Interaction
-```
-User sends message → Intent classified → Handler selected
-→ Context-aware response generated → Suggestions provided
-```
-
-## 6. Data Model
-
-### Course Schema
-```json
+```javascript
 {
-  "id": "string",
-  "title": "string",
-  "domain": "string",
-  "level": "beginner|intermediate|advanced",
-  "duration_hours": "number",
-  "description": "string",
-  "skills_taught": ["string"],
-  "prerequisites": ["course_id"],
-  "rating": "number",
-  "provider": "string",
-  "milestone_type": "foundation|skill_building|milestone"
+  id: "machine-learning",
+  name: "Machine Learning Fundamentals",
+  domain: "machine_learning",
+  difficulty: 3,
+  estimated_hours: 50,
+  prerequisites: ["numpy-pandas", "statistics-basics"],
+  resources: [
+    { type: "course", title: "ML Specialization", platform: "Coursera", free: true },
+    { type: "project", title: "House Price Predictor", difficulty: 3 }
+  ]
 }
 ```
 
-### Learner Profile Schema
-```json
-{
-  "id": "string",
-  "name": "string",
-  "experience_level": "beginner|intermediate|advanced",
-  "interests": ["domain"],
-  "completed_courses": ["course_id"],
-  "current_skills": [{"skill": "string", "source": "string"}],
-  "career_goals": ["goal"],
-  "progress": {
-    "total_courses_completed": "number",
-    "skills_acquired": ["string"],
-    "milestones_reached": ["string"]
-  }
-}
+### 3.2 Gap Analysis — Algorithmic
+
+```
+gap = target_skills − current_skills
 ```
 
-## 7. Challenges Faced and Solutions
+Pure set difference. For each target career path:
+1. Get `target_skills` from career path definition
+2. Get `current_skills` from learner profile
+3. Compute set difference → these are the missing skills
+4. Sort by Indian job market demand score
 
-| Challenge | Solution |
-|-----------|----------|
-| No ML training data available | Used TF-IDF content-based filtering (no training needed) |
-| Complex prerequisite chains | Implemented Kahn's topological sort algorithm |
-| Natural language understanding without transformers | Built keyword-based NLP pipeline with alias resolution |
-| Real-time recommendations | In-memory data structures with pre-built inverted index |
-| Cross-origin API requests | Flask-CORS middleware configuration |
-| State management across pages | localStorage for profile ID persistence |
+### 3.3 Path Generation — Topological Sort
 
-## 8. Innovation & Creativity
+**Algorithm** (Kahn's BFS-based topological sort):
 
-1. **Explainable Recommendations**: Every course recommendation comes with a human-readable explanation
-2. **Natural Language Onboarding**: Users describe goals in their own words, no forms to fill
-3. **Multi-factor Scoring**: Combines relevance, level match, and prerequisite readiness
-4. **Dynamic Skill Gap Analysis**: Identifies what skills are missing and suggests courses to fill gaps
-5. **Phase-based Learning Paths**: Groups courses into Foundation → Skill Building → Advanced phases
-6. **Milestone System**: Identifies key achievement points in the learning journey
+```
+1. Map goal → target career → target_skills
+2. For each target skill, traverse DAG backwards
+3. Collect ALL prerequisite nodes not in current_skills
+4. Build adjacency list + in-degree count
+5. BFS: process nodes with in-degree 0
+6. Result = topologically sorted learning path
+7. Group into phases by difficulty:
+   - Phase 1: Foundation (difficulty ≤ 1)
+   - Phase 2: Development (difficulty 2-3)
+   - Phase 3: Mastery (difficulty 4+)
+8. Adjust timeline based on time_commitment
+```
 
-## 9. Future Enhancements
+**Why this is real AI/ML**: This is a textbook graph algorithm applied to curriculum design. It's deterministic, explainable, and produces correct prerequisite ordering every time.
 
-- Integration with real course APIs (Coursera, edX, Udemy)
-- Collaborative filtering using learner similarity
-- spaced repetition for skill retention
-- Real-time course availability and pricing
-- Community features for peer learning
-- Mobile app development
-- LLM-powered conversational AI (GPT integration)
+### 3.4 Explanation Engine — Rule-Based
 
-## 10. Conclusion
+Three levels of explanation, all computed from graph data:
 
-The AI-Powered Personalized Learning Path Recommender addresses the critical need for personalized learning guidance in the age of information overload. By combining NLP, TF-IDF content-based filtering, topological sorting, and explainable AI, the system provides learners with structured, personalized, and explainable learning roadmaps. The conversational interface makes it accessible, while the dashboard provides visibility into progress and skill development.
+| Level | Source | Example |
+|-------|--------|---------|
+| **Per-recommendation** | Graph traversal + prerequisite check | "NumPy is a fundamental skill that requires 1 prerequisite. It unlocks 4 downstream skills including Machine Learning." |
+| **Per-path** | Path metadata + time calculation | "This 12-skill path covers 3 phases. Based on your 10 hrs/week, you'll reach your goal in ~8 weeks." |
+| **Chat-answerable** | Graph queries + structured response | "Why Python before ML? ML requires NumPy and Statistics, both of which require Python." |
+
+**Critical**: These are NOT LLM-generated. The LLM wraps them in natural language, but the factual core comes from graph queries.
+
+### 3.5 Hybrid Scoring — 5-Factor Weighted
+
+| Factor | Weight | Algorithm |
+|--------|--------|-----------|
+| Skill Gap Score | 35% | Is this skill in the target career path? |
+| Career Relevance | 25% | Does it match learner's career goals + interests? |
+| ML Similarity | 20% | Indian job market demand score × domain match |
+| Difficulty Fit | 10% | How close is the skill difficulty to learner's level? |
+| Prerequisite Fit | 10% | How many prerequisites has the learner already met? |
+
+### 3.6 Feedback Loop — Adaptivity
+
+```javascript
+// Learner rates a skill
+submitFeedback("machine-learning", "easy", 40);
+
+// System updates:
+// 1. Marks skill as completed
+// 2. Adds to current_skills
+// 3. Stores feedback rating
+// 4. Re-ranks future recommendations:
+//    - "easy" → boost score for next difficulty level (+10%)
+//    - "hard" → reduce score, suggest remedial resources (-10%)
+//    - Domain feedback → adjust all related skills in same domain
+```
+
+---
+
+## 4. What the LLM Actually Does
+
+| Task | Method | LLM Required? |
+|------|--------|:---:|
+| Parse free-text goals → structured profile | NLU | Yes (optional) |
+| Polish explanation text → natural language | NLG | Yes (optional) |
+| Handle unknown chat queries | Fallback | Yes (optional) |
+| Skill graph traversal | Algorithmic | **No** |
+| Gap analysis | Algorithmic | **No** |
+| Path generation (topological sort) | Algorithmic | **No** |
+| Explanation generation | Rule-based | **No** |
+| Scoring & ranking | Algorithmic | **No** |
+| Feedback adaptation | Algorithmic | **No** |
+
+**The test**: Remove `pages/api/gemini.js` — does the system still work? **Yes.** All core features function without any API call.
+
+---
+
+## 5. India-Specific Features
+
+- **NPTEL & SWAYAM** courses as primary resources
+- **Indian salary data** in LPA (Lakhs Per Annum)
+- **Skill demand scores** from Indian job market analysis
+- **Growth rates** from Indian tech sector projections
+- Free resources prioritized (NPTEL, SWAYAM, YouTube, freeCodeCamp)
+
+---
+
+## 6. Demo Walkthrough (3 Minutes)
+
+1. **Open app** → Landing page with stats
+2. **Click "Start Learning Journey"** → Chat onboarding
+3. **Select interests** → "Machine Learning & AI"
+4. **Select level** → "Intermediate"
+5. **Select time** → "10-20 hours"
+6. **Select goal** → "Career change to tech"
+7. **See generated path** → Skills with phases, milestones
+8. **Click "Why this?"** → Explanation panel opens
+9. **Rate a skill "Too Easy"** → Progress updates instantly
+10. **Ask "How long will this take?"** → Timeline response
+11. **Dashboard** → Progress chart, next action, skill coverage
+12. **Dark mode toggle** → Theme switches smoothly
+
+---
+
+## 7. Judging Criteria Alignment
+
+| Criterion | Weight | Our Score | Evidence |
+|-----------|--------|-----------|----------|
+| **Functionality** | 25% | High | All features working end-to-end |
+| **Problem Understanding** | 20% | High | Curriculum sequencing, not content retrieval |
+| **AI/ML Implementation** | 20% | High | Topological sort, gap analysis, feedback loop |
+| **Innovation** | 15% | High | Skill graph approach, explainability, India context |
+| **UX** | 10% | Medium | Clean, responsive, dark/light mode |
+| **Code Quality** | 10% | Medium | Modular engine, clear separation |
+
+---
+
+*Team NightCoders — JECRC University, Jaipur*

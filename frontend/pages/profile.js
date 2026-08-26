@@ -54,7 +54,7 @@ export default function Profile() {
                 <div className="card" style={{ marginBottom: 16 }}>
                   <h3>Progress Stats</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Courses Completed</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{profile.progress.total_courses_completed}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Courses Completed</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{profile.completed_courses?.length || 0}</span></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Hours Learned</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{profile.progress.total_hours_learned}h</span></div>
                   </div>
                 </div>

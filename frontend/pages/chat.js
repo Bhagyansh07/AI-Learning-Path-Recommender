@@ -49,6 +49,7 @@ function processMessage(text, profile) {
   if (lower.includes('why') || lower.includes('explain')) {
     const recs = getRecommendations(profile, 1);
     if (recs[0]) return `Why ${recs[0].course.title}?\n\n${recs[0].why_this}\n\nDifficulty: ${recs[0].difficulty_reason}\n${recs[0].prerequisite_info.message}`;
+    return "No recommendations available yet. Complete the onboarding first!";
   }
   if (lower.includes('skip') || lower.includes('can i skip')) {
     const recs = getRecommendations(profile, 1);
@@ -57,6 +58,7 @@ function processMessage(text, profile) {
       if (!prereqInfo.met) return `Skipping "${recs[0].course.title}" is not recommended.\n\n${prereqInfo.message}\n\nYou need these prerequisites first before moving to this skill.`;
       return `You can skip "${recs[0].course.title}" if you already know the material, but it's recommended for your path. The ${recs[0].difficulty_reason}.`;
     }
+    return "No recommendations available yet. Complete the onboarding first!";
   }
   if (lower.includes('how long') || lower.includes('time') || lower.includes('duration') || lower.includes('weeks')) {
     const path = getLearningPath(profile);

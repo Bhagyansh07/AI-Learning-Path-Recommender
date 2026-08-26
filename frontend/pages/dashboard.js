@@ -52,11 +52,13 @@ function SkillGapBar({ name, acquired }) {
   );
 }
 
-function ProgressChart({ path, gap, completedCount }) {
+function ProgressChart({ path, profile }) {
   const phases = path?.phases || [];
-  const totalSkills = path?.total_courses || 1;
-  const completed = completedCount || 0;
-  const pct = Math.round((completed / Math.max(totalSkills, 1)) * 100);
+  const completedSet = new Set(profile?.completed_courses || []);
+  const allPathSkillIds = phases.flatMap(ph => ph.courses.map(c => c.skill_id));
+  const total = allPathSkillIds.length || 1;
+  const completed = allPathSkillIds.filter(id => completedSet.has(id)).length;
+  const pct = Math.min(Math.round((completed / total) * 100), 100);
   const circumference = 2 * Math.PI * 42;
   const offset = circumference - (pct / 100) * circumference;
   return (
@@ -74,7 +76,7 @@ function ProgressChart({ path, gap, completedCount }) {
         <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>Progress Overview</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {phases.map((p, i) => {
-            const phaseCompleted = Math.min(p.courses.length, Math.max(0, completed - phases.slice(0, i).reduce((s, ph) => s + ph.courses.length, 0)));
+            const phaseCompleted = p.courses.filter(c => completedSet.has(c.skill_id)).length;
             const phasePct = Math.round((phaseCompleted / Math.max(p.courses.length, 1)) * 100);
             return (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -132,12 +134,21 @@ export default function Dashboard() {
   useEffect(() => {
     const p = getProfile();
     setProfile(p);
-    if (p) { setRecs(getRecommendations(p, 5)); setPath(getLearningPath(p)); setGap(getSkillGaps(p)); }
-    else setDemoprofiles(getDemoProfiles());
+    if (p) {
+      setRecs(getRecommendations(p, 5));
+      setPath(getLearningPath(p));
+      setGap(getSkillGaps(p));
+    } else setDemoprofiles(getDemoProfiles());
     setLoading(false);
   }, []);
 
-  const refresh = () => { if (profile) { setRecs(getRecommendations(profile, 5)); setPath(getLearningPath(profile)); setGap(getSkillGaps(profile)); } };
+  const refresh = () => {
+    if (profile) {
+      setRecs(getRecommendations(profile, 5));
+      setPath(getLearningPath(profile));
+      setGap(getSkillGaps(profile));
+    }
+  };
 
   const loadDemo = (demo) => {
     const p = createProfile(demo.data);
@@ -185,11 +196,10 @@ export default function Dashboard() {
           <div className="stat-card"><div className="stat-value">{path ? path.total_courses : 0}</div><div className="stat-label">Skills to Learn</div></div>
           <div className="stat-card"><div className="stat-value">{path ? path.estimated_weeks : 0}w</div><div className="stat-label">Est. Duration</div></div>
           <div className="stat-card"><div className="stat-value">{gap ? gap.readiness_score : 0}%</div><div className="stat-label">Career Readiness</div></div>
-          <div className="stat-card"><div className="stat-value">{profile.progress?.total_courses_completed || 0}</div><div className="stat-label">Completed</div></div>
+          <div className="stat-card"><div className="stat-value">{profile.completed_courses?.length || 0}</div><div className="stat-label">Completed</div></div>
         </div>
 
-        {/* Progress Chart */}
-        {path && <ProgressChart path={path} gap={gap} completedCount={profile.progress?.total_courses_completed || 0} />}
+        {path && <ProgressChart path={path} profile={profile} />}
 
         <div className="dashboard-grid" style={{ marginTop: 24 }}>
           <section className="dashboard-section">

@@ -1,12 +1,40 @@
+const RATE_LIMIT = new Map();
+const RATE_WINDOW = 60000;
+const RATE_MAX = 15;
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = RATE_LIMIT.get(ip);
+  if (!entry || now - entry.start > RATE_WINDOW) {
+    RATE_LIMIT.set(ip, { start: now, count: 1 });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_MAX;
+}
+
+function sanitize(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[<>"'&]/g, c => ({ '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '&': '&amp;' }[c] || c)).slice(0, 2000);
+}
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', 'https://frontend-mu-jet-18.vercel.app');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
+
+  res.setHeader('Access-Control-Allow-Origin', 'https://frontend-mu-jet-18.vercel.app');
+
   const { message, context, mode } = req.body;
-  if (!message) return res.status(400).json({ error: 'Message required' });
+  if (!message || typeof message !== 'string') return res.status(400).json({ error: 'Valid message required' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.length < 10) {
@@ -14,17 +42,18 @@ export default async function handler(req, res) {
   }
 
   try {
+    const safeMsg = sanitize(message);
     let prompt;
     if (mode === 'chat') {
-      const ctx = context ? `\nLearner level: ${context.level}, interests: ${context.interests?.join(', ')}, skills: ${context.skills?.join(', ')}` : '';
-      prompt = `You are LearnPath AI, a friendly learning assistant for a course recommendation platform.\n${ctx}\n\nUser: ${message}\n\nRespond in 2-3 sentences max. Be helpful and encouraging. If recommending something, explain why briefly.`;
+      const ctx = context ? `\nLearner level: ${sanitize(context.level || '')}, interests: ${(context.interests || []).slice(0, 5).join(', ')}, skills: ${(context.skills || []).slice(0, 10).join(', ')}` : '';
+      prompt = `You are LearnPath AI, a friendly learning assistant for a course recommendation platform.\n${ctx}\n\nUser: ${safeMsg}\n\nRespond in 2-3 sentences max. Be helpful and encouraging. If recommending something, explain why briefly.`;
     } else if (mode === 'explain') {
-      prompt = `Explain why this course is recommended in 2-3 sentences. Be concise and encouraging.\nCourse: ${message}\n\nExplanation:`;
+      prompt = `Explain why this course is recommended in 2-3 sentences. Be concise and encouraging.\nCourse: ${safeMsg}\n\nExplanation:`;
     } else {
-      prompt = `Extract a learning profile from this text. Return ONLY valid JSON with: interests (array of domains), experience_level (beginner/intermediate/advanced), skills (array), goals (array).\nText: "${message}"\nJSON:`;
+      prompt = `Extract a learning profile from this text. Return ONLY valid JSON with: interests (array of domains), experience_level (beginner/intermediate/advanced), skills (array), goals (array).\nText: "${safeMsg}"\nJSON:`;
     }
 
-    const model = 'gemini-3.6-flash';
+    const model = 'gemini-2.0-flash';
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,17 +61,13 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini API error:', response.status, errText);
+      console.error('Gemini API error:', response.status);
       return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
     }
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-    if (!text) {
-      console.error('Gemini empty response:', JSON.stringify(data).slice(0, 200));
-      return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
-    }
+    if (!text) return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
 
     if (mode === 'chat') return res.status(200).json({ source: 'gemini', response: text });
     if (mode === 'explain') return res.status(200).json({ source: 'gemini', explanation: text });
@@ -59,7 +84,7 @@ export default async function handler(req, res) {
 }
 
 function getFallback(msg, mode) {
-  const m = msg.toLowerCase();
+  const m = (msg || '').toLowerCase();
   if (mode === 'explain') return 'This course is recommended because it aligns with your interests and matches your skill level. It will help you build practical, in-demand skills.';
   if (m.includes('hello') || m.includes('hi') || m.includes('hey')) return "Hello! I'm LearnPath AI. Tell me your learning goals and I'll create a personalized roadmap for you!";
   if (m.includes('recommend') || m.includes('suggest') || m.includes('what should')) return "Set up your profile through the onboarding, and I'll suggest the best courses tailored for you!";
@@ -70,7 +95,7 @@ function getFallback(msg, mode) {
 }
 
 function getFallbackProfile(text) {
-  const t = text.toLowerCase();
+  const t = (text || '').toLowerCase();
   const interests = [];
   if (['data', 'analytics', 'statistics'].some(w => t.includes(w))) interests.push('data_science');
   if (['ml', 'machine learning', 'ai', 'artificial intelligence'].some(w => t.includes(w))) interests.push('machine_learning');
