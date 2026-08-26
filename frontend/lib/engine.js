@@ -242,7 +242,26 @@ export function getLearningPath(profile) {
     getPrerequisites(id).forEach(p => allRequiredSkills.add(p));
   });
   // Remove skills user already has
-  const skillsToLearn = [...allRequiredSkills].filter(s => !userSkills.has(s));
+  let skillsToLearn = [...allRequiredSkills].filter(s => !userSkills.has(s));
+
+  // Apply path adjustments from feedback (remedial + enrichment)
+  const adjustments = profile.path_adjustments || [];
+  const completedSet = new Set(profile.completed_courses || []);
+  for (const adj of adjustments) {
+    if (adj.type === 'remedial' && adj.skill_id && !skillsToLearn.includes(adj.skill_id) && !completedSet.has(adj.skill_id)) {
+      skillsToLearn.push(adj.skill_id);
+    }
+    if (adj.type === 'enrichment' && adj.skill_id && !skillsToLearn.includes(adj.skill_id) && !completedSet.has(adj.skill_id)) {
+      const enrichmentSkill = getSkillById(adj.skill_id);
+      if (enrichmentSkill) {
+        // Add enrichment and its unmet prerequisites
+        skillsToLearn.push(adj.skill_id);
+        getPrerequisites(adj.skill_id).forEach(p => {
+          if (!skillsToLearn.includes(p) && !completedSet.has(p) && !userSkills.has(p)) skillsToLearn.push(p);
+        });
+      }
+    }
+  }
 
   // Step 4: Topological sort
   const sorted = topologicalSort(skillsToLearn);
@@ -536,9 +555,39 @@ export function submitFeedback(skillId, rating, actualHours) {
     }
   }
 
-  // Recalculate timeline: if feedback says "hard", add buffer time
+  // Path adaptation based on feedback
+  if (!profile.path_adjustments) profile.path_adjustments = [];
+  const userSkills = getUserSkills(profile);
+
   if (rating === 'hard' && skill) {
+    // Add 30% time buffer
     profile.progress.total_hours_learned += Math.round(skill.estimated_hours * 0.3);
+    // Insert a remedial prerequisite the user hasn't learned yet
+    const unmetPrereqs = skill.prerequisites.filter(p => !userSkills.has(p));
+    if (unmetPrereqs.length > 0) {
+      const remedialId = unmetPrereqs[0];
+      const existingAdj = profile.path_adjustments.find(a => a.skill_id === remedialId && a.type === 'remedial');
+      if (!existingAdj) {
+        profile.path_adjustments.push({ type: 'remedial', skill_id: remedialId, before_skill: skillId, timestamp: Date.now() });
+      }
+    }
+  }
+
+  if (rating === 'easy' && skill) {
+    // Find an advanced skill in same domain user doesn't have
+    const advancedSkills = SKILL_GRAPH.skills.filter(s =>
+      s.domain === skill.domain &&
+      s.difficulty > skill.difficulty &&
+      !userSkills.has(s.id) &&
+      !profile.completed_courses.includes(s.id)
+    );
+    if (advancedSkills.length > 0) {
+      const enrichmentId = advancedSkills[0].id;
+      const existingAdj = profile.path_adjustments.find(a => a.skill_id === enrichmentId && a.type === 'enrichment');
+      if (!existingAdj) {
+        profile.path_adjustments.push({ type: 'enrichment', skill_id: enrichmentId, after_skill: skillId, timestamp: Date.now() });
+      }
+    }
   }
 
   if (typeof window !== 'undefined') localStorage.setItem('learner_profile', JSON.stringify(profile));
