@@ -19,13 +19,20 @@ export default function LearningPathPage() {
     setLoading(false);
   }, []);
 
-  if (loading) return <div className="page-wrapper"><NavBar /><main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><div className="loading-spinner" style={{ width: 40, height: 40 }} /></main></div>;
+  if (loading) return (
+    <div className="page-wrapper">
+      <NavBar />
+      <main className="container loading-container">
+        <div className="loading-spinner" />
+      </main>
+    </div>
+  );
 
   if (!path) return (
     <div className="page-wrapper">
       <Head><title>Learning Path — LearnPath AI</title></Head>
       <NavBar active="path" />
-      <main className="container" style={{ paddingTop: 72, paddingBottom: 48 }}>
+      <main className="container page-body">
         <div className="empty-state">
           <h2>No Learning Path Yet</h2>
           <p>Complete your profile through the AI Assistant to generate a personalized learning path.</p>
@@ -41,58 +48,62 @@ export default function LearningPathPage() {
     <div className="page-wrapper">
       <Head><title>Learning Path — LearnPath AI</title></Head>
       <NavBar active="path" />
-      <main className="container" style={{ paddingTop: 72, paddingBottom: 48 }}>
+      <main className="container page-body">
         <div className="page-header">
           <h1 className="page-title">Your Learning Path</h1>
           <p className="page-subtitle">{path.career_title} · {path.total_skills} skills · {path.estimated_weeks} weeks estimated</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 28 }}>
-          <div className="stat-card" style={{ background: 'var(--accent-dim)', borderColor: 'color-mix(in srgb, var(--accent) 25%, transparent)' }}>
-            <div className="stat-value t-num" style={{ color: 'var(--accent-2)', fontSize: '1.3rem' }}>{path.total_skills}</div>
+        <div className="stats-grid">
+          <div className="stat-card stat-card--accent">
+            <div className="stat-value t-num">{path.total_skills}</div>
             <div className="stat-label">Skills to Learn</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value t-num" style={{ fontSize: '1.3rem' }}>{path.estimated_weeks}w</div>
+            <div className="stat-value t-num">{path.estimated_weeks}w</div>
             <div className="stat-label">Est. Weeks</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value t-num" style={{ fontSize: '1.3rem' }}>{path.phases.length}</div>
+            <div className="stat-value t-num">{path.phases.length}</div>
             <div className="stat-label">Phases</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value t-num" style={{ fontSize: '1.3rem' }}>{path.difficulty_distribution?.beginner || 0}</div>
+            <div className="stat-value t-num">{path.difficulty_distribution?.beginner || 0}</div>
             <div className="stat-label">Beginner</div>
           </div>
         </div>
 
-        <div className="path-phases" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="path-phases">
           {path.phases.map((phase, i) => (
-            <div key={i} className={`phase-section ${expanded[i] ? 'expanded' : ''}`} onClick={() => togglePhase(i)}>
-              <div className="phase-header">
+            <div key={i} className={`phase-section ${expanded[i] ? 'expanded' : ''}`}>
+              <div className="phase-header" onClick={() => togglePhase(i)}>
                 <div className="phase-badge">Phase {phase.phase}</div>
-                <div style={{ flex: 1, cursor: 'pointer' }}>
+                <div className="phase-header-body">
                   <h3 className="phase-title">{phase.name}</h3>
                   <p className="phase-desc">{phase.description}</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-3)' }}>{phase.duration_weeks}w</span>
-                  <span className={`phase-chevron ${expanded[i] ? 'open' : ''}`} style={{ fontSize: '0.8rem', color: 'var(--text-3)' }}>▼</span>
+                <div className="phase-header-meta">
+                  <span className="phase-duration">{phase.duration_weeks}w</span>
+                  <span className={`phase-chevron ${expanded[i] ? 'open' : ''}`}>&#9662;</span>
                 </div>
               </div>
               {expanded[i] && (
-                <div style={{ padding: '0 20px 14px' }}>
-                  <div className="phase-courses" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div className="phase-body">
+                  <div className="phase-courses">
                     {phase.courses.map((course, j) => (
-                      <div key={j} className="course-card" onClick={(e) => { e.stopPropagation(); setModal({ open: true, title: course.title, content: course }); }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div style={{ flex: 1 }}>
-                            <h4 style={{ fontSize: '0.88rem', fontWeight: 600, margin: '0 0 4px', color: 'var(--text)' }}>{course.title}</h4>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-3)', margin: 0 }}>{course.provider} · {course.duration_hours}h · {course.level}</p>
+                      <div
+                        key={j}
+                        className="course-card"
+                        onClick={(e) => { e.stopPropagation(); setModal({ open: true, title: course.title, content: course }); }}
+                      >
+                        <div className="course-card-top">
+                          <div className="course-card-info">
+                            <h4 className="course-card-title">{course.title}</h4>
+                            <p className="course-card-meta">{course.provider} · {course.duration_hours}h · {course.level}</p>
                           </div>
-                          <span className="badge badge-accent" style={{ fontSize: '0.65rem' }}>{course.type}</span>
+                          <span className="badge badge-accent course-type-badge">{course.type}</span>
                         </div>
-                        {course.description && <p style={{ fontSize: '0.78rem', color: 'var(--text-2)', marginTop: 8, lineHeight: 1.5 }}>{course.description}</p>}
+                        {course.description && <p className="course-card-desc">{course.description}</p>}
                       </div>
                     ))}
                   </div>

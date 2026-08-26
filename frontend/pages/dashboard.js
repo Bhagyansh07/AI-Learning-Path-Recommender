@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
 import { getProfile, getRecommendations, getLearningPath, getSkillGaps, getDemoProfiles, createProfile } from '../lib/engine';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
@@ -30,7 +30,16 @@ export default function Dashboard() {
     setProfile(p); setRecs(getRecommendations(p, 5)); setPath(getLearningPath(p)); setGap(getSkillGaps(p)); setDemoprofiles([]);
   };
 
-  if (loading) return <div className="page-wrapper"><NavBar active="dashboard" /><main className="container" style={{ paddingTop: 72 }}><div className="loading-text">Loading...</div></main></div>;
+  if (loading) return (
+    <div className="page-wrapper">
+      <NavBar active="dashboard" />
+      <main className="container" style={{ paddingTop: 72 }}>
+        <div className="empty-state">
+          <p>Loading...</p>
+        </div>
+      </main>
+    </div>
+  );
 
   if (!profile) return (
     <div className="page-wrapper">
@@ -45,7 +54,12 @@ export default function Dashboard() {
             <div className="demo-section">
               <p style={{ fontSize: '0.85rem', color: 'var(--text-3)', marginBottom: 12 }}>Or try a demo profile:</p>
               <div className="demo-grid">
-                {demoprofiles.map((d, i) => <button key={i} className="demo-card" onClick={() => loadDemo(d)}><span className="demo-name">{d.name}</span><span className="demo-level">{d.data.experience_level}</span></button>)}
+                {demoprofiles.map((d, i) => (
+                  <button key={i} className="demo-card" onClick={() => loadDemo(d)}>
+                    <span className="demo-name">{d.name}</span>
+                    <span className="demo-level">{d.data.experience_level}</span>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -69,16 +83,16 @@ export default function Dashboard() {
         </div>
 
         {topRec && (
-          <div className="card card-glow" style={{ marginBottom: 24, padding: 24, borderLeft: '3px solid var(--accent)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+          <div className="card card-glow" style={{ marginBottom: 24, borderLeft: '3px solid var(--accent)' }}>
+            <div className="rec-header">
               <div>
-                <div className="t-label" style={{ marginBottom: 6 }}>Next Recommended</div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>{topRec.course.title}</h3>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-3)', marginTop: 4 }}>{topRec.course.provider} · {topRec.course.duration_hours}h · {topRec.course.level}</p>
+                <div className="t-label">Next Recommended</div>
+                <h3 className="rec-title">{topRec.course.title}</h3>
+                <p className="rec-meta">{topRec.course.provider} · {topRec.course.duration_hours}h · {topRec.course.level}</p>
               </div>
-              <div className="rec-score">{Math.round(topRec.score * 100)}%</div>
+              <div className="rec-score t-num">{Math.round(topRec.score * 100)}%</div>
             </div>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 12 }}>{topRec.explanation}</p>
+            <p className="rec-explanation">{topRec.explanation}</p>
             <div style={{ display: 'flex', gap: 8 }}>
               <Link href="/learning-path" className="btn btn-primary btn-sm">Start Learning</Link>
               <Link href="/chat" className="btn btn-secondary btn-sm">Ask AI</Link>
@@ -87,10 +101,22 @@ export default function Dashboard() {
         )}
 
         <div className="stats-grid">
-          <div className="stat-card"><div className="stat-value t-num">{totalPathSkills}</div><div className="stat-label">Skills to Learn</div></div>
-          <div className="stat-card"><div className="stat-value t-num">{path ? path.estimated_weeks : 0}w</div><div className="stat-label">Est. Duration</div></div>
-          <div className="stat-card"><div className="stat-value t-num">{gap ? gap.readiness_score : 0}%</div><div className="stat-label">Career Readiness</div></div>
-          <div className="stat-card"><div className="stat-value t-num">{completedCount}</div><div className="stat-label">Completed</div></div>
+          <div className="stat-card">
+            <div className="stat-value t-num">{totalPathSkills}</div>
+            <div className="stat-label">Skills to Learn</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value t-num">{path ? path.estimated_weeks : 0}w</div>
+            <div className="stat-label">Est. Duration</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value t-num">{gap ? gap.readiness_score : 0}%</div>
+            <div className="stat-label">Career Readiness</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value t-num">{completedCount}</div>
+            <div className="stat-label">Completed</div>
+          </div>
         </div>
 
         <div className="dashboard-grid" style={{ marginTop: 24 }}>
@@ -99,8 +125,11 @@ export default function Dashboard() {
             {recs.map((r, i) => (
               <div key={i} className="rec-card">
                 <div className="rec-header">
-                  <div className="rec-info"><h3 className="rec-title">{r.course.title}</h3><p className="rec-meta">{r.course.provider} · {r.course.duration_hours}h · {r.course.level}</p></div>
-                  <div className="rec-score">{Math.round(r.score * 100)}%</div>
+                  <div>
+                    <h3 className="rec-title">{r.course.title}</h3>
+                    <p className="rec-meta">{r.course.provider} · {r.course.duration_hours}h · {r.course.level}</p>
+                  </div>
+                  <div className="rec-score t-num">{Math.round(r.score * 100)}%</div>
                 </div>
                 <p className="rec-explanation">{r.explanation}</p>
               </div>
@@ -117,18 +146,32 @@ export default function Dashboard() {
               <div className="skill-gaps-list">
                 {gap.missing_skills.slice(0, 8).map((s, i) => (
                   <div key={i} className="skill-gap-item">
-                    <div className="skill-gap-header"><span className="skill-name">{s.name}</span><span className="skill-status missing">Missing</span></div>
-                    <div className="skill-gap-bar"><div className="skill-gap-fill missing" style={{ width: '40%' }} /></div>
+                    <div className="skill-gap-header">
+                      <span className="skill-name">{s.name}</span>
+                      <span className="skill-status missing">Missing</span>
+                    </div>
+                    <div className="skill-gap-bar">
+                      <div className="skill-gap-fill missing" style={{ width: '40%' }} />
+                    </div>
                   </div>
                 ))}
                 {gap.acquired_skills.map((s, i) => (
                   <div key={`a${i}`} className="skill-gap-item">
-                    <div className="skill-gap-header"><span className="skill-name">{typeof s === 'string' ? s : s}</span><span className="skill-status acquired">Acquired</span></div>
-                    <div className="skill-gap-bar"><div className="skill-gap-fill acquired" style={{ width: '100%' }} /></div>
+                    <div className="skill-gap-header">
+                      <span className="skill-name">{typeof s === 'string' ? s : s}</span>
+                      <span className="skill-status acquired">Acquired</span>
+                    </div>
+                    <div className="skill-gap-bar">
+                      <div className="skill-gap-fill acquired" style={{ width: '100%' }} />
+                    </div>
                   </div>
                 ))}
               </div>
-              {gap.avg_salary && <p className="gap-info">Avg Salary: {gap.avg_salary} · Growth: {gap.growth_rate}</p>}
+              {gap.avg_salary && (
+                <p className="gap-info" style={{ marginTop: 16, color: 'var(--text-3)', fontSize: '0.8rem' }}>
+                  Avg Salary: {gap.avg_salary} · Growth: {gap.growth_rate}
+                </p>
+              )}
             </section>
           )}
         </div>
@@ -141,12 +184,19 @@ export default function Dashboard() {
                 <div key={i} className="phase-section">
                   <div className="phase-header">
                     <div className="phase-badge">Phase {phase.phase}</div>
-                    <div style={{ flex: 1 }}><h3 className="phase-title">{phase.name}</h3><p className="phase-desc">{phase.description} — {phase.duration_weeks} weeks</p></div>
+                    <div style={{ flex: 1 }}>
+                      <h3 className="phase-title">{phase.name}</h3>
+                      <p className="phase-desc">{phase.description} — {phase.duration_weeks} weeks</p>
+                    </div>
                   </div>
                   <div style={{ padding: '0 20px 14px' }}>
                     <div className="phase-skills">
-                      {phase.courses.slice(0, 6).map((c, j) => <span key={j} className="skill-tag">{c.title}</span>)}
-                      {phase.courses.length > 6 && <span className="skill-tag more">+{phase.courses.length - 6} more</span>}
+                      {phase.courses.slice(0, 6).map((c, j) => (
+                        <span key={j} className="skill-tag">{c.title}</span>
+                      ))}
+                      {phase.courses.length > 6 && (
+                        <span className="skill-tag more">+{phase.courses.length - 6} more</span>
+                      )}
                     </div>
                   </div>
                 </div>
