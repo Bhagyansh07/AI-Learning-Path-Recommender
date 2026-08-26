@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-
-const API_BASE = 'http://localhost:5000/api';
+import API_BASE from '../config';
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -146,7 +145,7 @@ export default function Chat() {
       setMessages(prev => [...prev, {
         id: prev.length + 1,
         type: 'ai',
-        text: "I'm having trouble connecting to the backend. Please make sure the Python server is running on port 5000.",
+        text: "I'm having trouble connecting to the AI service. Please try again in a moment, or refresh the page.",
         suggestions: [],
       }]);
     }

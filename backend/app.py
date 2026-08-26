@@ -1,5 +1,8 @@
 import os
 import json
+import time
+import hashlib
+from functools import wraps
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -7,7 +10,7 @@ from ml import MLRecommender, SkillGapAnalyzer, HybridScorer, RoadmapGenerator
 from ai import GeminiClient
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 ml_recommender = MLRecommender()
 skill_gap = SkillGapAnalyzer()
@@ -17,6 +20,26 @@ gemini = GeminiClient()
 
 learner_profiles = {}
 
+rate_limit_store = {}
+RATE_LIMIT_WINDOW = 60
+RATE_LIMIT_MAX = 30
+
+
+def rate_limit(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        ip = request.remote_addr or "unknown"
+        now = time.time()
+        key = f"{ip}:{f.__name__}"
+        if key not in rate_limit_store:
+            rate_limit_store[key] = []
+        rate_limit_store[key] = [t for t in rate_limit_store[key] if now - t < RATE_LIMIT_WINDOW]
+        if len(rate_limit_store[key]) >= RATE_LIMIT_MAX:
+            return jsonify({"error": "Rate limit exceeded. Try again later."}), 429
+        rate_limit_store[key].append(now)
+        return f(*args, **kwargs)
+    return decorated
+
 
 @app.route("/api/health", methods=["GET"])
 def health():
@@ -24,11 +47,13 @@ def health():
         "status": "ok",
         "message": "AI Learning Path Recommender API",
         "ml_model": ml_recommender.model_info(),
-        "gemini": gemini.available,
+        "gemini_active": gemini.available,
+        "version": "2.0",
     })
 
 
 @app.route("/api/train", methods=["POST"])
+@rate_limit
 def train_model():
     result = ml_recommender.train()
     return jsonify(result)
@@ -37,7 +62,7 @@ def train_model():
 @app.route("/api/onboarding", methods=["GET"])
 def get_onboarding():
     return jsonify({
-        "welcome_message": "Welcome to the AI-Powered Learning Path Recommender! Tell me about your learning goals.",
+        "welcome_message": "Welcome to LearnPath AI! I'm your personal learning assistant. Let me understand your goals and create a tailored learning roadmap for you.",
         "steps": [
             {
                 "question": "What field or career are you interested in?",
@@ -88,23 +113,30 @@ def get_onboarding():
 
 
 @app.route("/api/profile/create", methods=["POST"])
+@rate_limit
 def create_profile():
     data = request.json
-    profile_id = str(len(learner_profiles) + 1).zfill(4)
+    if not data:
+        return jsonify({"error": "Request body required"}), 400
+
+    profile_id = hashlib.md5(
+        f"{data.get('name', '')}{time.time()}".encode()
+    ).hexdigest()[:8]
+
     profile = {
         "id": profile_id,
         "name": data.get("name", "Learner"),
         "experience_level": data.get("experience_level", "beginner"),
         "interests": data.get("interests", []),
-        "current_skills": [{"skill": s} for s in data.get("current_skills", [])],
+        "current_skills": data.get("current_skills", []),
         "completed_courses": data.get("completed_courses", []),
         "career_goals": data.get("career_goals", []),
         "time_commitment": data.get("time_commitment", "5-10 hours"),
         "learning_style": data.get("learning_style", "visual"),
         "progress": {
-            "total_courses_completed": 0,
+            "total_courses_completed": len(data.get("completed_courses", [])),
             "total_hours_learned": 0,
-            "skills_acquired": [],
+            "skills_acquired": data.get("current_skills", []),
         },
     }
     learner_profiles[profile_id] = profile
@@ -120,6 +152,7 @@ def get_profile(profile_id):
 
 
 @app.route("/api/profile/<profile_id>", methods=["PUT"])
+@rate_limit
 def update_profile(profile_id):
     profile = learner_profiles.get(profile_id)
     if not profile:
@@ -132,8 +165,11 @@ def update_profile(profile_id):
 
 
 @app.route("/api/analyze", methods=["POST"])
+@rate_limit
 def analyze_input():
     data = request.json
+    if not data or not data.get("text"):
+        return jsonify({"error": "Text required"}), 400
     text = data.get("text", "")
     result = gemini.analyze_profile(text)
     return jsonify(result)
@@ -145,21 +181,39 @@ def get_recommendations(profile_id):
     if not profile:
         return jsonify({"error": "Profile not found"}), 404
 
-    text = " ".join([
-        " ".join(profile.get("interests", [])),
-        profile.get("experience_level", ""),
-        " ".join(profile.get("career_goals", [])),
-    ])
+    interests_text = " ".join(profile.get("interests", []))
+    level = profile.get("experience_level", "beginner")
+    goals = " ".join(profile.get("career_goals", []))
+    text = f"{interests_text} {level} {goals}"
 
     ml_results = ml_recommender.predict(text)
     similar = ml_recommender.find_similar(text, top_k=5)
-
     ranked = scorer.rank_courses(profile, ml_results, top_k=10)
 
+    courses_out = []
+    for r in ranked:
+        courses_out.append({
+            "course_id": r["course_id"],
+            "course": {
+                "title": r["title"],
+                "domain": r["domain"],
+                "level": r["level"],
+                "duration_hours": r["duration_hours"],
+                "rating": r["rating"],
+                "provider": r["provider"],
+                "skills_taught": r["skills_taught"],
+            },
+            "score": r["total_score"],
+            "breakdown": r["breakdown"],
+            "explanation": f"Recommended based on your interest in {r['domain'].replace('_', ' ')} and {r['level']} level.",
+        })
+
     return jsonify({
-        "courses": ranked,
+        "courses": courses_out,
         "ml_predictions": ml_results[:5],
-        "similar_courses": similar,
+        "similar_courses": [
+            {"course": s["course"], "similarity": s["similarity"]} for s in similar
+        ],
         "ml_model_info": ml_recommender.model_info(),
     })
 
@@ -170,25 +224,26 @@ def get_learning_path(profile_id):
     if not profile:
         return jsonify({"error": "Profile not found"}), 404
 
-    text = " ".join([
-        " ".join(profile.get("interests", [])),
-        profile.get("experience_level", ""),
-        " ".join(profile.get("career_goals", [])),
-    ])
+    interests_text = " ".join(profile.get("interests", []))
+    level = profile.get("experience_level", "beginner")
+    goals = " ".join(profile.get("career_goals", []))
+    text = f"{interests_text} {level} {goals}"
 
     ml_results = ml_recommender.predict(text)
     ranked = scorer.rank_courses(profile, ml_results, top_k=15)
 
     target_career = None
-    goals = profile.get("career_goals", [])
-    if goals:
-        goal_text = " ".join(goals).lower().replace(" ", "_")
+    goals_list = profile.get("career_goals", [])
+    if goals_list:
+        goal_text = " ".join(goals_list).lower().replace(" ", "_")
         for career_id in skill_gap.career_paths.get("career_paths", {}).keys():
             if goal_text in career_id or any(w in career_id for w in goal_text.split("_")):
                 target_career = career_id
                 break
 
     path = roadmap_gen.generate(profile, ranked, target_career)
+    path["target_level"] = level
+    path["total_projects"] = len(path.get("phases", []))
     return jsonify({"learning_path": path})
 
 
@@ -209,8 +264,12 @@ def get_careers():
 
 
 @app.route("/api/chat", methods=["POST"])
+@rate_limit
 def chat():
     data = request.json
+    if not data or not data.get("message"):
+        return jsonify({"error": "Message required"}), 400
+
     message = data.get("message", "")
     profile_id = data.get("profile_id")
 
@@ -220,8 +279,10 @@ def chat():
         context = {
             "level": profile.get("experience_level", "unknown"),
             "interests": profile.get("interests", []),
-            "skills": [s.get("skill", "") if isinstance(s, dict) else str(s)
-                       for s in profile.get("current_skills", [])],
+            "skills": [
+                s.get("skill", "") if isinstance(s, dict) else str(s)
+                for s in profile.get("current_skills", [])
+            ],
         }
 
     response = gemini.chat(message, context)
@@ -229,6 +290,7 @@ def chat():
 
 
 @app.route("/api/progress/<profile_id>", methods=["POST"])
+@rate_limit
 def update_progress(profile_id):
     profile = learner_profiles.get(profile_id)
     if not profile:
@@ -242,13 +304,20 @@ def update_progress(profile_id):
         if course_id and course_id not in profile["completed_courses"]:
             profile["completed_courses"].append(course_id)
             profile["progress"]["total_courses_completed"] = len(profile["completed_courses"])
+    elif action == "add_skill":
+        skill = data.get("skill")
+        if skill:
+            profile["progress"]["skills_acquired"].append(skill)
+    else:
+        return jsonify({"error": "Invalid action. Use 'complete_course' or 'add_skill'"}), 400
 
-    return jsonify({"profile": profile, "message": "Progress updated"})
+    return jsonify({"profile": profile, "message": "Progress updated successfully"})
 
 
 @app.route("/api/explain/<course_id>", methods=["POST"])
+@rate_limit
 def explain_course(course_id):
-    data = request.json
+    data = request.json or {}
     profile_id = data.get("profile_id")
 
     course = None
@@ -265,15 +334,33 @@ def explain_course(course_id):
     explanation = gemini.explain_recommendation(
         course.get("title", ""),
         profile or {},
-        f"Domain: {course.get('domain')}, Level: {course.get('level')}",
+        f"Domain: {course.get('domain')}, Level: {course.get('level')}, Skills: {course.get('skills_taught', '')}",
     )
 
     return jsonify({
-        "course": course,
+        "course_id": course_id,
+        "course_title": course.get("title", ""),
         "explanation": explanation,
     })
 
 
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "Endpoint not found"}), 404
+
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({"error": "Internal server error"}), 500
+
+
+@app.errorhandler(429)
+def too_many(e):
+    return jsonify({"error": "Too many requests. Please wait."}), 429
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, port=port, host="0.0.0.0")
+    print(f"Starting server on port {port}...")
+    print(f"Gemini API: {'Active' if gemini.available else 'Fallback mode'}")
+    app.run(debug=False, port=port, host="0.0.0.0")

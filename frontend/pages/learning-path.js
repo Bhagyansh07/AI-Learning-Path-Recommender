@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-
-const API_BASE = 'http://localhost:5000/api';
+import API_BASE from '../config';
 
 export default function LearningPath() {
   const [profileId, setProfileId] = useState(null);

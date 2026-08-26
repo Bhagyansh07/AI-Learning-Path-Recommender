@@ -1,8 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
 
-const API_BASE = 'http://localhost:5000/api';
-
 export default function Home() {
   return (
     <div className="page-wrapper">

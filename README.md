@@ -1,127 +1,127 @@
 # AI-Powered Personalized Learning Path Recommender
 
-An intelligent learning assistant that recommends personalized learning paths based on a learner's interests, goals, previous learning history, and skill level. The system generates structured learning roadmaps, explains recommendations, and adapts suggestions based on user feedback.
+> HCLTech AMPlified 2025 - Round 2 Submission by Team NightCoders
+
+An intelligent learning assistant that recommends personalized learning paths using AI/ML, natural language processing, and career-aligned skill gap analysis.
+
+## Live Demo
+
+- **Frontend**: https://frontend-mu-jet-18.vercel.app
+- **Backend API**: https://ai-learning-path-api.onrender.com/api/health
 
 ## Features
 
-- **Conversational AI Interface** - Chat with an AI assistant in natural language to describe your learning goals
-- **Learner Profiling Engine** - Captures interests, experience level, completed courses, and career objectives
-- **TF-IDF Recommendation Engine** - Content-based filtering using TF-IDF vectors and cosine similarity for course/project recommendations
-- **Learning Path Generator** - Creates structured roadmaps with prerequisites, milestones, and estimated timelines
-- **Explainable AI** - Every recommendation comes with a clear explanation of why it was made
-- **Progress Dashboard** - Visualizes progress, skill development, milestones, and next recommended actions
+- **Conversational AI Interface** - Chat naturally to describe learning goals
+- **ML-Powered Recommendations** - TF-IDF + LinearSVC trained on course catalog
+- **Hybrid Scoring Engine** - 5-factor scoring (skill gap 35%, career relevance 25%, ML similarity 20%, difficulty fit 10%, prerequisite fit 10%)
+- **Skill Gap Analysis** - Compare current skills vs career path requirements
+- **Personalized Learning Roadmaps** - Prerequisites, milestones, and timeline estimates
+- **Explainable AI** - Every recommendation includes reasoning
+- **Progress Dashboard** - Track courses, skills, and milestones
+- **Gemini AI Integration** - Enhanced conversational AI with Google Gemini (with smart fallback)
 
 ## Tech Stack
 
+| Component | Technology |
+|-----------|------------|
+| Frontend | Next.js 14, React 18 |
+| Backend | Python Flask |
+| ML Engine | scikit-learn (TF-IDF + LinearSVC) |
+| AI Chat | Google Gemini API (with rule-based fallback) |
+| Deployment | Vercel (frontend) + Render (backend) |
+
+## Local Setup
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- npm or yarn
+
 ### Backend
-- **Python 3.8+** with Flask
-- **TF-IDF** content-based recommendation engine (no external ML library dependency)
-- **NLP Processor** for natural language goal understanding
-- **RESTful API** with CORS support
+
+```bash
+cd backend
+pip install -r requirements.txt
+set GEMINI_API_KEY=your_api_key_here  # Optional
+python app.py
+```
+
+Server runs on `http://localhost:5000`
 
 ### Frontend
-- **Next.js 14** (React 18)
-- **CSS3** with custom design system (no external UI library)
-- **Responsive** dark-themed interface
+
+```bash
+cd frontend
+npm install
+set NEXT_PUBLIC_API_URL=http://localhost:5000/api
+npm run dev
+```
+
+App runs on `http://localhost:3000`
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health check + model status |
+| GET | `/api/onboarding` | Onboarding steps data |
+| POST | `/api/profile/create` | Create learner profile |
+| GET | `/api/profile/<id>` | Get profile details |
+| PUT | `/api/profile/<id>` | Update profile |
+| POST | `/api/analyze` | NLP analysis of text |
+| GET | `/api/recommend/<id>` | Get course recommendations |
+| GET | `/api/path/<id>` | Get learning roadmap |
+| GET | `/api/skill-gaps/<id>` | Skill gap analysis |
+| GET | `/api/careers` | List career paths |
+| POST | `/api/chat` | AI chat (Gemini powered) |
+| POST | `/api/progress/<id>` | Update learning progress |
+| POST | `/api/explain/<id>` | Explain a course recommendation |
 
 ## Project Structure
 
 ```
 HCL AMPLIFIED/
 ├── backend/
-│   ├── app.py                          # Flask API server
-│   ├── requirements.txt                # Python dependencies
-│   ├── recommendation_engine/
+│   ├── app.py                  # Flask API server
+│   ├── requirements.txt        # Python dependencies
+│   ├── ai/                     # Gemini AI client
 │   │   ├── __init__.py
-│   │   ├── nlp_processor.py            # NLP for goal understanding
-│   │   ├── profiler.py                 # Learner profiling engine
-│   │   ├── recommender.py              # TF-IDF recommendation engine
-│   │   ├── path_generator.py           # Learning path generator
-│   │   └── ai_assistant.py             # Conversational AI assistant
-│   └── data/
-│       ├── courses.json                # 20 courses across 10 domains
-│       ├── projects.json               # 6 hands-on projects
-│       ├── assessments.json            # 4 skill assessments
-│       └── domain_mappings.json        # Domain relationships & career paths
+│   │   └── gemini_client.py
+│   ├── ml/                     # ML engine
+│   │   ├── __init__.py
+│   │   ├── recommender.py      # TF-IDF + LinearSVC
+│   │   ├── skill_gap.py        # Career skill gap analysis
+│   │   ├── scoring.py          # Hybrid scoring engine
+│   │   └── roadmap.py          # Learning roadmap generator
+│   ├── data/                   # Course/skill/career data
+│   │   ├── course_metadata.csv
+│   │   ├── courses.json
+│   │   ├── skills.json
+│   │   ├── career_paths.json
+│   │   └── prerequisites.json
+│   └── recommendation_engine/  # Core recommendation logic
 ├── frontend/
-│   ├── package.json
-│   ├── next.config.js
-│   ├── pages/
-│   │   ├── index.js                    # Landing page
-│   │   ├── chat.js                     # Conversational AI interface
-│   │   ├── dashboard.js                # Progress dashboard
-│   │   ├── learning-path.js            # Learning path visualization
-│   │   └── profile.js                  # Learner profile view
-│   ├── components/                     # Reusable UI components
-│   └── styles/
-│       └── globals.css                 # Global styles & design system
-├── docs/
-│   └── documentation.md                # Solution documentation
-└── README.md
+│   ├── pages/                  # Next.js pages
+│   │   ├── index.js            # Landing page
+│   │   ├── chat.js             # AI chat interface
+│   │   ├── dashboard.js        # Progress dashboard
+│   │   ├── learning-path.js    # Roadmap viewer
+│   │   └── profile.js          # Profile page
+│   ├── styles/globals.css      # Dark theme UI
+│   ├── config.js               # API configuration
+│   └── next.config.js          # Next.js config
+└── docs/
+    └── documentation.md        # Solution documentation
 ```
 
-## Setup & Execution
+## ML Implementation
 
-### Prerequisites
-- Python 3.8 or higher
-- Node.js 18 or higher
-- npm or yarn
-
-### Backend Setup
-
-```bash
-cd backend
-pip install -r requirements.txt
-python app.py
-```
-
-The Flask server starts on `http://localhost:5000`.
-
-### Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The Next.js dev server starts on `http://localhost:3000`.
-
-### Access the Application
-
-1. Open `http://localhost:3000` in your browser
-2. Click "Start Learning Journey" or go to the AI Assistant
-3. Complete the onboarding (4 quick questions)
-4. Get your personalized learning path and recommendations
-5. Explore the dashboard and track your progress
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-| GET | `/api/onboarding` | Get onboarding chat flow |
-| POST | `/api/profile/create` | Create a new learner profile |
-| GET | `/api/profile/<id>` | Get learner profile |
-| PUT | `/api/profile/<id>` | Update learner profile |
-| POST | `/api/analyze` | Analyze natural language input |
-| GET | `/api/recommend/<id>` | Get course/project recommendations |
-| GET | `/api/path/<id>` | Generate learning path |
-| POST | `/api/chat` | Chat with AI assistant |
-| POST | `/api/progress/<id>` | Update learning progress |
-| GET | `/api/skill-coverage/<id>/<domain>` | Get skill coverage for a domain |
-| GET | `/api/courses` | List all courses |
-| GET | `/api/projects` | List all projects |
-| GET | `/api/domains` | List all domain mappings |
-
-## AI/ML Techniques Used
-
-1. **TF-IDF Vectorization** - Course and learner profile representation using Term Frequency-Inverse Document Frequency
-2. **Cosine Similarity** - Content-based recommendation scoring between learner profiles and course vectors
-3. **NLP Keyword Extraction** - Domain detection, skill level identification, and goal classification from natural language
-4. **Topological Sorting** - Course ordering respecting prerequisite dependencies
-5. **Multi-factor Scoring** - Combining relevance, level match, and prerequisite readiness for ranking
+- **TF-IDF Vectorizer** transforms course text into feature vectors
+- **LinearSVC Classifier** trained on course catalog for domain classification
+- **Cosine Similarity** for finding similar courses to user queries
+- **Hybrid Scoring** combines ML scores with skill gap, career relevance, difficulty, and prerequisites
+- **Models persisted** via joblib for fast inference
 
 ## License
 
-This project was built for the HCL Amplified program.
+Team NightCoders - JECRC University
