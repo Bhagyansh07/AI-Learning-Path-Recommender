@@ -1,0 +1,46 @@
+[
+  {
+    "id": "assess_python_basics",
+    "title": "Python Basics Assessment",
+    "domain": "programming",
+    "level": "beginner",
+    "duration_minutes": 30,
+    "skills_assessed": ["python", "basic_programming", "data_structures"],
+    "questions_count": 25,
+    "passing_score": 70,
+    "type": "quiz"
+  },
+  {
+    "id": "assess_web_basics",
+    "title": "Web Development Fundamentals Quiz",
+    "domain": "web_development",
+    "level": "beginner",
+    "duration_minutes": 25,
+    "skills_assessed": ["html", "css", "javascript"],
+    "questions_count": 20,
+    "passing_score": 70,
+    "type": "quiz"
+  },
+  {
+    "id": "assess_ml_foundations",
+    "title": "Machine Learning Foundations Assessment",
+    "domain": "machine_learning",
+    "level": "intermediate",
+    "duration_minutes": 45,
+    "skills_assessed": ["machine_learning", "linear_regression", "model_evaluation"],
+    "questions_count": 30,
+    "passing_score": 75,
+    "type": "quiz"
+  },
+  {
+    "id": "assess_algorithm_design",
+    "title": "Algorithm Design Challenge",
+    "domain": "computer_science",
+    "level": "intermediate",
+    "duration_minutes": 60,
+    "skills_assessed": ["algorithms", "dynamic_programming", "complexity_analysis"],
+    "questions_count": 10,
+    "passing_score": 60,
+    "type": "coding_challenge"
+  }
+]

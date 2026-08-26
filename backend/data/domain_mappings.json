@@ -1,0 +1,74 @@
+{
+  "domains": {
+    "computer_science": {
+      "display_name": "Computer Science",
+      "description": "Fundamental computing concepts, algorithms, and theory",
+      "related_domains": ["programming", "data_science", "machine_learning"],
+      "career_paths": ["Software Engineer", "Systems Architect", "Research Scientist"],
+      "icon": "monitor"
+    },
+    "programming": {
+      "display_name": "Programming",
+      "description": "Software development and programming languages",
+      "related_domains": ["web_development", "data_science", "mobile_development"],
+      "career_paths": ["Software Developer", "Full Stack Developer", "Backend Developer"],
+      "icon": "code"
+    },
+    "web_development": {
+      "display_name": "Web Development",
+      "description": "Building web applications and websites",
+      "related_domains": ["programming", "cloud_computing", "mobile_development"],
+      "career_paths": ["Frontend Developer", "Backend Developer", "Full Stack Developer"],
+      "icon": "globe"
+    },
+    "data_science": {
+      "display_name": "Data Science",
+      "description": "Data analysis, visualization, and statistical modeling",
+      "related_domains": ["machine_learning", "programming", "computer_science"],
+      "career_paths": ["Data Analyst", "Data Scientist", "Business Intelligence Engineer"],
+      "icon": "bar_chart"
+    },
+    "machine_learning": {
+      "display_name": "Machine Learning & AI",
+      "description": "AI, machine learning, deep learning, and NLP",
+      "related_domains": ["data_science", "programming", "computer_science"],
+      "career_paths": ["ML Engineer", "AI Researcher", "Data Scientist"],
+      "icon": "brain"
+    },
+    "cloud_computing": {
+      "display_name": "Cloud Computing",
+      "description": "Cloud platforms, DevOps, and infrastructure",
+      "related_domains": ["web_development", "cybersecurity"],
+      "career_paths": ["Cloud Engineer", "DevOps Engineer", "SRE"],
+      "icon": "cloud"
+    },
+    "cybersecurity": {
+      "display_name": "Cybersecurity",
+      "description": "Information security and network protection",
+      "related_domains": ["cloud_computing", "computer_science"],
+      "career_paths": ["Security Analyst", "Penetration Tester", "Security Architect"],
+      "icon": "shield"
+    },
+    "mobile_development": {
+      "display_name": "Mobile Development",
+      "description": "Building mobile applications for iOS and Android",
+      "related_domains": ["web_development", "programming"],
+      "career_paths": ["Mobile Developer", "Flutter Developer", "iOS/Android Developer"],
+      "icon": "smartphone"
+    },
+    "artificial_intelligence": {
+      "display_name": "Artificial Intelligence",
+      "description": "AI concepts, strategies, and business applications",
+      "related_domains": ["machine_learning", "data_science"],
+      "career_paths": ["AI Strategist", "AI Product Manager", "AI Consultant"],
+      "icon": "cpu"
+    },
+    "data_management": {
+      "display_name": "Data Management",
+      "description": "Databases, SQL, and data architecture",
+      "related_domains": ["data_science", "web_development"],
+      "career_paths": ["Database Administrator", "Data Engineer", "BI Developer"],
+      "icon": "database"
+    }
+  }
+}

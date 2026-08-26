@@ -1,0 +1,68 @@
+[
+  {
+    "id": "proj_portfolio",
+    "title": "Personal Portfolio Website",
+    "domain": "web_development",
+    "level": "beginner",
+    "duration_hours": 15,
+    "description": "Build a responsive personal portfolio website showcasing your projects and skills.",
+    "skills_practiced": ["html", "css", "javascript", "responsive_design"],
+    "prerequisites": ["webdev101"],
+    "type": "project"
+  },
+  {
+    "id": "proj_data_analysis",
+    "title": "Exploratory Data Analysis Project",
+    "domain": "data_science",
+    "level": "beginner",
+    "duration_hours": 20,
+    "description": "Perform EDA on a real-world dataset, create visualizations, and present findings.",
+    "skills_practiced": ["pandas", "matplotlib", "data_analysis", "data_visualization"],
+    "prerequisites": ["datascience101"],
+    "type": "project"
+  },
+  {
+    "id": "proj_ml_pipeline",
+    "title": "End-to-End ML Pipeline",
+    "domain": "machine_learning",
+    "level": "intermediate",
+    "duration_hours": 40,
+    "description": "Build a complete ML pipeline from data preprocessing to model deployment.",
+    "skills_practiced": ["machine_learning", "model_evaluation", "feature_engineering", "model_deployment"],
+    "prerequisites": ["ml201"],
+    "type": "project"
+  },
+  {
+    "id": "proj_api_backend",
+    "title": "RESTful API Backend Service",
+    "domain": "web_development",
+    "level": "intermediate",
+    "duration_hours": 25,
+    "description": "Build a RESTful API with authentication, CRUD operations, and database integration.",
+    "skills_practiced": ["nodejs", "express", "mongodb", "rest_api", "authentication"],
+    "prerequisites": ["nodejs201", "db201"],
+    "type": "project"
+  },
+  {
+    "id": "proj_chatbot",
+    "title": "NLP Chatbot Project",
+    "domain": "machine_learning",
+    "level": "advanced",
+    "duration_hours": 35,
+    "description": "Build an intelligent chatbot using NLP techniques and transformer models.",
+    "skills_practiced": ["nlp", "transformers", "text_processing", "sentiment_analysis"],
+    "prerequisites": ["nlp301"],
+    "type": "project"
+  },
+  {
+    "id": "proj_deep_learning",
+    "title": "Image Classification with Deep Learning",
+    "domain": "machine_learning",
+    "level": "intermediate",
+    "duration_hours": 30,
+    "description": "Build and train a CNN model for image classification with transfer learning.",
+    "skills_practiced": ["deep_learning", "cnn", "model_evaluation", "transfer_learning"],
+    "prerequisites": ["dl301"],
+    "type": "project"
+  }
+]

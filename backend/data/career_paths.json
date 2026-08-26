@@ -1,0 +1,100 @@
+{
+  "career_paths": {
+    "data_scientist": {
+      "display_name": "Data Scientist",
+      "required_skills": ["python", "statistics", "machine_learning", "data_analysis", "data_visualization", "pandas", "numpy", "sql"],
+      "nice_to_have": ["deep_learning", "nlp", "scikit_learn", "matplotlib"],
+      "description": "Analyze complex data sets to extract insights and build predictive models.",
+      "avg_salary": "$120,000",
+      "growth_rate": "36%"
+    },
+    "ml_engineer": {
+      "display_name": "ML Engineer",
+      "required_skills": ["python", "machine_learning", "deep_learning", "model_evaluation", "neural_networks", "transformers"],
+      "nice_to_have": ["mlops", "model_deployment", "docker", "cloud_basics"],
+      "description": "Design and deploy machine learning systems at scale.",
+      "avg_salary": "$130,000",
+      "growth_rate": "40%"
+    },
+    "full_stack_developer": {
+      "display_name": "Full Stack Developer",
+      "required_skills": ["html", "css", "javascript", "react", "nodejs", "express", "mongodb", "rest_api", "sql"],
+      "nice_to_have": ["docker", "git", "testing", "authentication"],
+      "description": "Build complete web applications from frontend to backend.",
+      "avg_salary": "$105,000",
+      "growth_rate": "25%"
+    },
+    "frontend_developer": {
+      "display_name": "Frontend Developer",
+      "required_skills": ["html", "css", "javascript", "react", "responsive_design", "state_management"],
+      "nice_to_have": ["testing", "ui_design"],
+      "description": "Build user interfaces and interactive web experiences.",
+      "avg_salary": "$95,000",
+      "growth_rate": "22%"
+    },
+    "backend_developer": {
+      "display_name": "Backend Developer",
+      "required_skills": ["python", "nodejs", "express", "sql", "mongodb", "rest_api", "database_design"],
+      "nice_to_have": ["docker", "aws", "ci_cd", "authentication"],
+      "description": "Build server-side logic, APIs, and database systems.",
+      "avg_salary": "$110,000",
+      "growth_rate": "28%"
+    },
+    "cloud_engineer": {
+      "display_name": "Cloud Engineer",
+      "required_skills": ["aws", "cloud_basics", "docker", "kubernetes", "ci_cd", "terraform", "devops"],
+      "nice_to_have": ["python", "linux", "security_basics"],
+      "description": "Design and manage cloud infrastructure and deployments.",
+      "avg_salary": "$125,000",
+      "growth_rate": "35%"
+    },
+    "data_analyst": {
+      "display_name": "Data Analyst",
+      "required_skills": ["sql", "data_analysis", "statistics", "data_visualization", "pandas", "matplotlib"],
+      "nice_to_have": ["python", "excel", "tableau"],
+      "description": "Transform raw data into actionable business insights.",
+      "avg_salary": "$85,000",
+      "growth_rate": "25%"
+    },
+    "devops_engineer": {
+      "display_name": "DevOps Engineer",
+      "required_skills": ["docker", "kubernetes", "ci_cd", "terraform", "aws", "linux", "git"],
+      "nice_to_have": ["python", "monitoring", "security_basics"],
+      "description": "Automate and streamline software delivery and infrastructure.",
+      "avg_salary": "$120,000",
+      "growth_rate": "32%"
+    },
+    "mobile_developer": {
+      "display_name": "Mobile Developer",
+      "required_skills": ["flutter", "dart", "mobile_development", "ui_design", "rest_api"],
+      "nice_to_have": ["sql", "authentication", "testing"],
+      "description": "Build mobile applications for iOS and Android.",
+      "avg_salary": "$100,000",
+      "growth_rate": "22%"
+    },
+    "cybersecurity_analyst": {
+      "display_name": "Cybersecurity Analyst",
+      "required_skills": ["network_security", "cryptography", "security_frameworks", "linux"],
+      "nice_to_have": ["python", "cloud_basics", "security_basics"],
+      "description": "Protect organizations from cyber threats and vulnerabilities.",
+      "avg_salary": "$100,000",
+      "growth_rate": "33%"
+    },
+    "ai_product_manager": {
+      "display_name": "AI Product Manager",
+      "required_skills": ["ai_literacy", "ai_strategy", "business_ai", "ethics"],
+      "nice_to_have": ["machine_learning", "data_analysis", "statistics"],
+      "description": "Lead AI-powered product development and strategy.",
+      "avg_salary": "$140,000",
+      "growth_rate": "30%"
+    },
+    "software_engineer": {
+      "display_name": "Software Engineer",
+      "required_skills": ["python", "programming_basics", "algorithms", "data_structures", "git", "linux"],
+      "nice_to_have": ["sql", "docker", "testing"],
+      "description": "Design, build, and maintain software systems.",
+      "avg_salary": "$115,000",
+      "growth_rate": "25%"
+    }
+  }
+}

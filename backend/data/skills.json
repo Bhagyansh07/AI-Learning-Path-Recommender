@@ -1,0 +1,478 @@
+{
+  "skills": {
+    "python": {
+      "category": "programming",
+      "level": "beginner",
+      "related": ["python_advanced", "data_structures", "basic_programming"],
+      "demand_score": 0.95
+    },
+    "python_advanced": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["python", "oop", "decorators"],
+      "demand_score": 0.9
+    },
+    "javascript": {
+      "category": "web",
+      "level": "beginner",
+      "related": ["html", "css", "react", "nodejs"],
+      "demand_score": 0.93
+    },
+    "javascript_advanced": {
+      "category": "web",
+      "level": "intermediate",
+      "related": ["javascript", "react", "state_management"],
+      "demand_score": 0.88
+    },
+    "html": {
+      "category": "web",
+      "level": "beginner",
+      "related": ["css", "javascript", "responsive_design"],
+      "demand_score": 0.85
+    },
+    "css": {
+      "category": "web",
+      "level": "beginner",
+      "related": ["html", "javascript", "responsive_design"],
+      "demand_score": 0.82
+    },
+    "react": {
+      "category": "web",
+      "level": "intermediate",
+      "related": ["javascript", "state_management", "testing"],
+      "demand_score": 0.91
+    },
+    "nodejs": {
+      "category": "web",
+      "level": "intermediate",
+      "related": ["express", "mongodb", "rest_api"],
+      "demand_score": 0.87
+    },
+    "express": {
+      "category": "web",
+      "level": "intermediate",
+      "related": ["nodejs", "mongodb", "rest_api"],
+      "demand_score": 0.84
+    },
+    "machine_learning": {
+      "category": "ai",
+      "level": "intermediate",
+      "related": ["linear_regression", "neural_networks", "model_evaluation"],
+      "demand_score": 0.94
+    },
+    "deep_learning": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["cnn", "rnn", "transformers", "neural_networks"],
+      "demand_score": 0.92
+    },
+    "nlp": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["text_processing", "transformers", "sentiment_analysis"],
+      "demand_score": 0.89
+    },
+    "data_analysis": {
+      "category": "data",
+      "level": "beginner",
+      "related": ["statistics", "data_visualization", "pandas"],
+      "demand_score": 0.88
+    },
+    "statistics": {
+      "category": "data",
+      "level": "beginner",
+      "related": ["data_analysis", "machine_learning", "probability"],
+      "demand_score": 0.86
+    },
+    "pandas": {
+      "category": "data",
+      "level": "intermediate",
+      "related": ["numpy", "matplotlib", "data_analysis"],
+      "demand_score": 0.87
+    },
+    "numpy": {
+      "category": "data",
+      "level": "intermediate",
+      "related": ["pandas", "matplotlib", "scikit_learn"],
+      "demand_score": 0.85
+    },
+    "sql": {
+      "category": "data",
+      "level": "beginner",
+      "related": ["database_design", "normalization", "query_optimization"],
+      "demand_score": 0.9
+    },
+    "docker": {
+      "category": "devops",
+      "level": "intermediate",
+      "related": ["kubernetes", "ci_cd", "terraform"],
+      "demand_score": 0.88
+    },
+    "kubernetes": {
+      "category": "devops",
+      "level": "advanced",
+      "related": ["docker", "ci_cd", "terraform"],
+      "demand_score": 0.86
+    },
+    "aws": {
+      "category": "cloud",
+      "level": "beginner",
+      "related": ["cloud_basics", "deployment", "security_basics"],
+      "demand_score": 0.92
+    },
+    "cloud_basics": {
+      "category": "cloud",
+      "level": "beginner",
+      "related": ["aws", "deployment", "security_basics"],
+      "demand_score": 0.85
+    },
+    "network_security": {
+      "category": "security",
+      "level": "beginner",
+      "related": ["cryptography", "security_frameworks"],
+      "demand_score": 0.83
+    },
+    "flutter": {
+      "category": "mobile",
+      "level": "intermediate",
+      "related": ["dart", "mobile_development", "ui_design"],
+      "demand_score": 0.84
+    },
+    "git": {
+      "category": "tools",
+      "level": "beginner",
+      "related": ["linux", "ci_cd"],
+      "demand_score": 0.9
+    },
+    "linux": {
+      "category": "tools",
+      "level": "beginner",
+      "related": ["git", "docker", "devops"],
+      "demand_score": 0.82
+    },
+    "ai_literacy": {
+      "category": "ai",
+      "level": "beginner",
+      "related": ["ai_strategy", "ethics", "business_ai"],
+      "demand_score": 0.88
+    },
+    "mlops": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["model_deployment", "feature_engineering", "model_monitoring"],
+      "demand_score": 0.87
+    },
+    "responsive_design": {
+      "category": "web",
+      "level": "beginner",
+      "related": ["html", "css", "javascript"],
+      "demand_score": 0.8
+    },
+    "state_management": {
+      "category": "web",
+      "level": "intermediate",
+      "related": ["react", "javascript_advanced"],
+      "demand_score": 0.83
+    },
+    "testing": {
+      "category": "tools",
+      "level": "intermediate",
+      "related": ["react", "javascript_advanced"],
+      "demand_score": 0.85
+    },
+    "rest_api": {
+      "category": "web",
+      "level": "intermediate",
+      "related": ["nodejs", "express", "mongodb"],
+      "demand_score": 0.86
+    },
+    "mongodb": {
+      "category": "data",
+      "level": "intermediate",
+      "related": ["nodejs", "express", "rest_api"],
+      "demand_score": 0.82
+    },
+    "linear_regression": {
+      "category": "ai",
+      "level": "intermediate",
+      "related": ["machine_learning", "model_evaluation", "statistics"],
+      "demand_score": 0.84
+    },
+    "neural_networks": {
+      "category": "ai",
+      "level": "intermediate",
+      "related": ["machine_learning", "deep_learning", "cnn"],
+      "demand_score": 0.9
+    },
+    "model_evaluation": {
+      "category": "ai",
+      "level": "intermediate",
+      "related": ["machine_learning", "linear_regression"],
+      "demand_score": 0.85
+    },
+    "transformers": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["nlp", "deep_learning", "text_processing"],
+      "demand_score": 0.91
+    },
+    "cnn": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["deep_learning", "neural_networks"],
+      "demand_score": 0.88
+    },
+    "rnn": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["deep_learning", "neural_networks", "nlp"],
+      "demand_score": 0.85
+    },
+    "matplotlib": {
+      "category": "data",
+      "level": "intermediate",
+      "related": ["pandas", "numpy", "data_visualization"],
+      "demand_score": 0.83
+    },
+    "scikit_learn": {
+      "category": "ai",
+      "level": "intermediate",
+      "related": ["machine_learning", "pandas", "numpy"],
+      "demand_score": 0.87
+    },
+    "database_design": {
+      "category": "data",
+      "level": "beginner",
+      "related": ["sql", "normalization", "query_optimization"],
+      "demand_score": 0.84
+    },
+    "normalization": {
+      "category": "data",
+      "level": "beginner",
+      "related": ["database_design", "sql"],
+      "demand_score": 0.78
+    },
+    "query_optimization": {
+      "category": "data",
+      "level": "intermediate",
+      "related": ["sql", "database_design"],
+      "demand_score": 0.82
+    },
+    "ci_cd": {
+      "category": "devops",
+      "level": "intermediate",
+      "related": ["docker", "kubernetes", "terraform"],
+      "demand_score": 0.86
+    },
+    "terraform": {
+      "category": "devops",
+      "level": "advanced",
+      "related": ["docker", "kubernetes", "ci_cd"],
+      "demand_score": 0.84
+    },
+    "devops": {
+      "category": "devops",
+      "level": "intermediate",
+      "related": ["docker", "kubernetes", "ci_cd"],
+      "demand_score": 0.87
+    },
+    "deployment": {
+      "category": "devops",
+      "level": "intermediate",
+      "related": ["aws", "docker", "ci_cd"],
+      "demand_score": 0.85
+    },
+    "security_basics": {
+      "category": "security",
+      "level": "beginner",
+      "related": ["network_security", "cryptography"],
+      "demand_score": 0.8
+    },
+    "cryptography": {
+      "category": "security",
+      "level": "intermediate",
+      "related": ["network_security", "security_frameworks"],
+      "demand_score": 0.83
+    },
+    "security_frameworks": {
+      "category": "security",
+      "level": "intermediate",
+      "related": ["network_security", "cryptography"],
+      "demand_score": 0.81
+    },
+    "mobile_development": {
+      "category": "mobile",
+      "level": "intermediate",
+      "related": ["flutter", "dart", "ui_design"],
+      "demand_score": 0.86
+    },
+    "dart": {
+      "category": "mobile",
+      "level": "intermediate",
+      "related": ["flutter", "mobile_development"],
+      "demand_score": 0.79
+    },
+    "ui_design": {
+      "category": "design",
+      "level": "beginner",
+      "related": ["responsive_design", "html", "css"],
+      "demand_score": 0.81
+    },
+    "ai_strategy": {
+      "category": "ai",
+      "level": "beginner",
+      "related": ["ai_literacy", "business_ai"],
+      "demand_score": 0.85
+    },
+    "ethics": {
+      "category": "ai",
+      "level": "beginner",
+      "related": ["ai_literacy", "ai_strategy"],
+      "demand_score": 0.75
+    },
+    "business_ai": {
+      "category": "ai",
+      "level": "beginner",
+      "related": ["ai_literacy", "ai_strategy"],
+      "demand_score": 0.83
+    },
+    "model_deployment": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["mlops", "feature_engineering"],
+      "demand_score": 0.88
+    },
+    "feature_engineering": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["mlops", "model_deployment", "machine_learning"],
+      "demand_score": 0.86
+    },
+    "model_monitoring": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["mlops", "model_deployment"],
+      "demand_score": 0.82
+    },
+    "full_stack": {
+      "category": "web",
+      "level": "advanced",
+      "related": ["system_design", "authentication", "deployment"],
+      "demand_score": 0.9
+    },
+    "system_design": {
+      "category": "engineering",
+      "level": "advanced",
+      "related": ["full_stack", "algorithms"],
+      "demand_score": 0.89
+    },
+    "authentication": {
+      "category": "security",
+      "level": "intermediate",
+      "related": ["rest_api", "security_basics"],
+      "demand_score": 0.84
+    },
+    "programming_basics": {
+      "category": "programming",
+      "level": "beginner",
+      "related": ["python", "basic_programming"],
+      "demand_score": 0.92
+    },
+    "computational_thinking": {
+      "category": "programming",
+      "level": "beginner",
+      "related": ["problem_solving", "algorithms"],
+      "demand_score": 0.85
+    },
+    "problem_solving": {
+      "category": "programming",
+      "level": "beginner",
+      "related": ["algorithms", "computational_thinking"],
+      "demand_score": 0.9
+    },
+    "basic_programming": {
+      "category": "programming",
+      "level": "beginner",
+      "related": ["python", "programming_basics"],
+      "demand_score": 0.91
+    },
+    "data_structures": {
+      "category": "programming",
+      "level": "beginner",
+      "related": ["algorithms", "python"],
+      "demand_score": 0.88
+    },
+    "algorithms": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["data_structures", "dynamic_programming", "graph_theory"],
+      "demand_score": 0.89
+    },
+    "dynamic_programming": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["algorithms", "graph_theory"],
+      "demand_score": 0.85
+    },
+    "graph_theory": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["algorithms", "dynamic_programming"],
+      "demand_score": 0.82
+    },
+    "complexity_analysis": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["algorithms", "data_structures"],
+      "demand_score": 0.83
+    },
+    "data_visualization": {
+      "category": "data",
+      "level": "beginner",
+      "related": ["matplotlib", "data_analysis", "statistics"],
+      "demand_score": 0.84
+    },
+    "critical_thinking": {
+      "category": "soft_skills",
+      "level": "beginner",
+      "related": ["problem_solving"],
+      "demand_score": 0.8
+    },
+    "text_processing": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["nlp", "transformers"],
+      "demand_score": 0.84
+    },
+    "sentiment_analysis": {
+      "category": "ai",
+      "level": "intermediate",
+      "related": ["nlp", "text_processing"],
+      "demand_score": 0.81
+    },
+    "gan": {
+      "category": "ai",
+      "level": "advanced",
+      "related": ["deep_learning", "neural_networks"],
+      "demand_score": 0.83
+    },
+    "oop": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["python_advanced", "decorators"],
+      "demand_score": 0.87
+    },
+    "decorators": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["python_advanced", "oop"],
+      "demand_score": 0.78
+    },
+    "context_managers": {
+      "category": "programming",
+      "level": "intermediate",
+      "related": ["python_advanced"],
+      "demand_score": 0.75
+    }
+  }
+}
