@@ -32,7 +32,7 @@ function FeedbackButtons({ skillId, onFeedback }) {
   if (given) return <div className="feedback-thanks">Thanks for your feedback!</div>;
   return (
     <>
-      {toast && <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--primary)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--color-accent)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{toast}</div>}
       <div className="feedback-buttons">
         <span className="feedback-label">How was this?</span>
         {FEEDBACK_OPTIONS.map(o => <button key={o.value} className="feedback-btn" style={{ borderColor: o.color, color: o.color }} onClick={() => handle(o.value)}>{o.label}</button>)}
@@ -62,27 +62,27 @@ function ScoringBreakdown({ recs }) {
   if (!recs.length) return null;
 
   return (
-    <div style={{ padding: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24 }}>
+    <div style={{ padding: 20, background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, marginBottom: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div>
           <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Scoring Breakdown</h3>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>How each recommendation is scored</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--color-ink-3)' }}>How each recommendation is scored</p>
         </div>
-        <Link href="/algorithm" style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>See Algorithm →</Link>
+        <Link href="/algorithm" style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontWeight: 600 }}>See Algorithm →</Link>
       </div>
 
       {recs.slice(0, 3).map((rec, ri) => (
-        <div key={ri} style={{ marginBottom: ri < 2 ? 14 : 0, padding: 12, background: 'var(--bg-secondary)', borderRadius: 8 }}>
+        <div key={ri} style={{ marginBottom: ri < 2 ? 14 : 0, padding: 12, background: 'var(--color-paper-2)', borderRadius: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{rec.course.title}</span>
-            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--primary)' }}>{Math.round(rec.score * 100)}%</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-accent)' }}>{Math.round(rec.score * 100)}%</span>
           </div>
           <div style={{ display: 'flex', gap: 3 }}>
             {factors.map(f => {
               const val = rec.breakdown?.[f.key] || 0;
               return (
                 <div key={f.key} style={{ flex: 1, position: 'relative' }} title={`${f.label}: ${Math.round(val * 100)}%`}>
-                  <div style={{ height: 6, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: 6, background: 'var(--color-paper-3)', borderRadius: 3, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${val * 100}%`, background: f.color, borderRadius: 3, transition: 'width 0.5s ease' }} />
                   </div>
                 </div>
@@ -101,7 +101,7 @@ function ScoringBreakdown({ recs }) {
 
       <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
         {factors.map(f => (
-          <div key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+          <div key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', color: 'var(--color-ink-3)' }}>
             <div style={{ width: 6, height: 6, borderRadius: 2, background: f.color, flexShrink: 0 }} />
             {f.label} {f.weight}
           </div>
@@ -125,29 +125,29 @@ function ProjectsTracker({ profile, path }) {
   const completedProjects = allSkills.filter(s => s.completed).length;
 
   return (
-    <div style={{ padding: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, marginTop: 24 }}>
+    <div style={{ padding: 20, background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, marginTop: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div>
           <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Projects & Assessments</h3>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{completedProjects}/{allSkills.length} projects completed</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--color-ink-3)' }}>{completedProjects}/{allSkills.length} projects completed</p>
         </div>
         <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-          <div style={{ width: 80, height: 5, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${allSkills.length ? (completedProjects / allSkills.length) * 100 : 0}%`, background: 'var(--skill-acquired)', borderRadius: 3 }} />
+          <div style={{ width: 80, height: 5, background: 'var(--color-paper-3)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${allSkills.length ? (completedProjects / allSkills.length) * 100 : 0}%`, background: 'var(--color-success)', borderRadius: 3 }} />
           </div>
-          <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--skill-acquired)' }}>{allSkills.length ? Math.round((completedProjects / allSkills.length) * 100) : 0}%</span>
+          <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-success)' }}>{allSkills.length ? Math.round((completedProjects / allSkills.length) * 100) : 0}%</span>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
         {allSkills.slice(0, 12).map((s, i) => (
-          <div key={i} style={{ padding: '10px 12px', background: s.completed ? 'rgba(5,150,105,0.04)' : 'var(--bg-secondary)', borderRadius: 8, border: '1px solid ' + (s.completed ? 'rgba(5,150,105,0.15)' : 'var(--border)'), opacity: s.completed ? 0.7 : 1 }}>
+          <div key={i} style={{ padding: '10px 12px', background: s.completed ? 'rgba(5,150,105,0.04)' : 'var(--color-paper-2)', borderRadius: 8, border: '1px solid ' + (s.completed ? 'rgba(5,150,105,0.15)' : 'var(--color-border)'), opacity: s.completed ? 0.7 : 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)' }}>{s.project.title}</span>
-              {s.completed && <span style={{ fontSize: '0.65rem', color: 'var(--skill-acquired)', fontWeight: 600 }}>✓</span>}
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-ink)' }}>{s.project.title}</span>
+              {s.completed && <span style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 600 }}>✓</span>}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-              <span style={{ padding: '1px 4px', borderRadius: 3, background: 'var(--primary-subtle)', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase' }}>Project</span>
-              <span style={{ color: DOMAIN_COLORS[s.domain] || 'var(--text-muted)' }}>{DOMAIN_NAMES[s.domain] || s.domain}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.65rem', color: 'var(--color-ink-3)' }}>
+              <span style={{ padding: '1px 4px', borderRadius: 3, background: 'var(--color-accent-subtle)', color: 'var(--color-accent)', fontWeight: 700, textTransform: 'uppercase' }}>Project</span>
+              <span style={{ color: DOMAIN_COLORS[s.domain] || 'var(--color-ink-3)' }}>{DOMAIN_NAMES[s.domain] || s.domain}</span>
               <span>· Level {s.project.difficulty || 1}</span>
             </div>
           </div>
@@ -167,29 +167,29 @@ function ProgressChart({ path, profile }) {
   const circumference = 2 * Math.PI * 42;
   const offset = circumference - (pct / 100) * circumference;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 24, padding: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 24, padding: 20, background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12 }}>
       <div style={{ position: 'relative', width: 100, height: 100, flexShrink: 0 }}>
         <svg width="100" height="100" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bg-tertiary)" strokeWidth="6" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--primary)" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-paper-3)" strokeWidth="6" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-accent)" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
         </svg>
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>{pct}%</div>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-accent)' }}>{pct}%</div>
         </div>
       </div>
       <div style={{ flex: 1 }}>
-        <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>Progress Overview</h3>
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-ink)', marginBottom: 8 }}>Progress Overview</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {phases.map((p, i) => {
             const phaseCompleted = p.courses.filter(c => completedSet.has(c.skill_id)).length;
             const phasePct = Math.round((phaseCompleted / Math.max(p.courses.length, 1)) * 100);
             return (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', width: 80, flexShrink: 0 }}>Phase {p.phase}</span>
-                <div style={{ flex: 1, height: 6, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${phasePct}%`, background: 'var(--primary)', borderRadius: 3, transition: 'width 0.5s ease' }} />
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-ink-3)', width: 80, flexShrink: 0 }}>Phase {p.phase}</span>
+                <div style={{ flex: 1, height: 6, background: 'var(--color-paper-3)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${phasePct}%`, background: 'var(--color-accent)', borderRadius: 3, transition: 'width 0.5s ease' }} />
                 </div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: 30, textAlign: 'right' }}>{phaseCompleted}/{p.courses.length}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)', width: 30, textAlign: 'right' }}>{phaseCompleted}/{p.courses.length}</span>
               </div>
             );
           })}
@@ -203,22 +203,22 @@ function NextActionCard({ profile, recs }) {
   if (!recs.length) return null;
   const top = recs[0];
   return (
-    <div style={{ padding: 20, background: 'var(--primary-subtle)', border: '1px solid var(--primary)', borderRadius: 12, marginBottom: 24 }}>
+    <div style={{ padding: 20, background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent)', borderRadius: 12, marginBottom: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <span style={{ fontSize: '1.2rem' }}>🎯</span>
-        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--primary)' }}>Next Recommended Action</h3>
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-accent)' }}>Next Recommended Action</h3>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{top.course.title}</p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{top.course.provider} · {top.course.duration_hours}h · {top.course.level}</p>
+          <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-ink)', marginBottom: 4 }}>{top.course.title}</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--color-ink-2)' }}>{top.course.provider} · {top.course.duration_hours}h · {top.course.level}</p>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{Math.round(top.score * 100)}%</div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>match</div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-accent)' }}>{Math.round(top.score * 100)}%</div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)' }}>match</div>
         </div>
       </div>
-      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>{top.explanation}</p>
+      <p style={{ fontSize: '0.8rem', color: 'var(--color-ink-2)', marginTop: 8, lineHeight: 1.5 }}>{top.explanation}</p>
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
         <Link href="/learning-path" className="btn btn-primary btn-sm">Start Learning</Link>
         <Link href="/chat" className="btn btn-secondary btn-sm">Ask AI Assistant</Link>
@@ -312,7 +312,7 @@ export default function Dashboard() {
         <div className="dashboard-grid" style={{ marginTop: 24 }}>
           <section className="dashboard-section">
             <h2 className="section-title">Recommended Skills</h2>
-            {recs.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Complete your profile to get recommendations.</p>}
+            {recs.length === 0 && <p style={{ color: 'var(--color-ink-3)', fontSize: '0.85rem' }}>Complete your profile to get recommendations.</p>}
             {recs.map((r, i) => (
               <div key={i} className="rec-card">
                 <div className="rec-header">

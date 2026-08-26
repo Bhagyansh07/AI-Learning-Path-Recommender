@@ -32,9 +32,9 @@ export default function Profile() {
                 <div className="card" style={{ marginBottom: 16 }}>
                   <h3>Basic Info</h3>
                   <div className="grid-2">
-                    <div><div className="form-label">Name</div><div style={{ fontWeight: 600, color: 'var(--text)' }}>{profile.name}</div></div>
+                    <div><div className="form-label">Name</div><div style={{ fontWeight: 600, color: 'var(--color-ink)' }}>{profile.name}</div></div>
                     <div><div className="form-label">Experience Level</div><span className="badge badge-primary">{profile.experience_level}</span></div>
-                    <div><div className="form-label">Time Commitment</div><div style={{ color: 'var(--text-secondary)' }}>{profile.time_commitment}</div></div>
+                    <div><div className="form-label">Time Commitment</div><div style={{ color: 'var(--color-ink-2)' }}>{profile.time_commitment}</div></div>
                   </div>
                 </div>
                 <div className="card" style={{ marginBottom: 16 }}>
@@ -52,24 +52,24 @@ export default function Profile() {
                   <h3>Completed Courses</h3>
                   {completedCourses.length > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {completedCourses.map((c, i) => <div key={i} style={{ padding: '8px 12px', background: 'var(--bg-tertiary)', borderRadius: 6, fontSize: '0.85rem', color: 'var(--text)' }}>{c}</div>)}
+                      {completedCourses.map((c, i) => <div key={i} style={{ padding: '8px 12px', background: 'var(--color-paper-3)', borderRadius: 6, fontSize: '0.85rem', color: 'var(--color-ink)' }}>{c}</div>)}
                     </div>
-                  ) : <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No courses completed yet.</p>}
+                  ) : <p style={{ color: 'var(--color-ink-3)', fontSize: '0.85rem' }}>No courses completed yet.</p>}
                 </div>
               </div>
               <div>
                 <div className="card" style={{ marginBottom: 16 }}>
                   <h3>Progress Stats</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Courses Completed</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{completedCourses.length}</span></div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Hours Learned</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{progress.total_hours_learned}h</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--color-ink-2)' }}>Courses Completed</span><span style={{ fontWeight: 600, color: 'var(--color-ink)' }}>{completedCourses.length}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--color-ink-2)' }}>Hours Learned</span><span style={{ fontWeight: 600, color: 'var(--color-ink)' }}>{progress.total_hours_learned}h</span></div>
                   </div>
                 </div>
                 <div className="card">
                   <h3>Current Skills ({currentSkills.length})</h3>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {currentSkills.map((s, i) => <span key={i} className="skill-tag acquired">{typeof s === 'string' ? s : s.skill}</span>)}
-                    {currentSkills.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Complete courses to acquire new skills</p>}
+                    {currentSkills.length === 0 && <p style={{ color: 'var(--color-ink-3)', fontSize: '0.85rem' }}>Complete courses to acquire new skills</p>}
                   </div>
                 </div>
               </div>
