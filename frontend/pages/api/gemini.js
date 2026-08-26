@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     let prompt;
     if (mode === 'chat') {
       const ctx = context ? `\nLearner level: ${context.level}, interests: ${context.interests?.join(', ')}, skills: ${context.skills?.join(', ')}` : '';
-      prompt = `You are Pragya AI, a friendly learning assistant for a course recommendation platform.\n${ctx}\n\nUser: ${message}\n\nRespond in 2-3 sentences max. Be helpful and encouraging. If recommending something, explain why briefly.`;
+      prompt = `You are LearnPath AI, a friendly learning assistant for a course recommendation platform.\n${ctx}\n\nUser: ${message}\n\nRespond in 2-3 sentences max. Be helpful and encouraging. If recommending something, explain why briefly.`;
     } else if (mode === 'explain') {
       prompt = `Explain why this course is recommended in 2-3 sentences. Be concise and encouraging.\nCourse: ${message}\n\nExplanation:`;
     } else {
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 function getFallback(msg, mode) {
   const m = msg.toLowerCase();
   if (mode === 'explain') return 'This course is recommended because it aligns with your interests and matches your skill level. It will help you build practical, in-demand skills.';
-  if (m.includes('hello') || m.includes('hi') || m.includes('hey')) return "Hello! I'm Pragya AI. Tell me your learning goals and I'll create a personalized roadmap for you!";
+  if (m.includes('hello') || m.includes('hi') || m.includes('hey')) return "Hello! I'm LearnPath AI. Tell me your learning goals and I'll create a personalized roadmap for you!";
   if (m.includes('recommend') || m.includes('suggest') || m.includes('what should')) return "Set up your profile through the onboarding, and I'll suggest the best courses tailored for you!";
   if (m.includes('skill') || m.includes('gap')) return "Check the Dashboard Skills tab to see your acquired skills and gaps. Focus on high-priority skills first!";
   if (m.includes('career') || m.includes('job')) return "Our system maps courses to career paths with salary data. Complete onboarding to see which careers match you!";
