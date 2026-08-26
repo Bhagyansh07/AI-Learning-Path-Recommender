@@ -8,6 +8,7 @@ const ONBOARDING_STEPS = [
   { q: "What's your current experience level?", field: 'experience_level', opts: ['Beginner (New to the field)', 'Intermediate (Some experience)', 'Advanced (Experienced professional)'] },
   { q: 'How much time can you dedicate per week?', field: 'time_commitment', opts: ['Less than 5 hours', '5-10 hours', '10-20 hours', 'More than 20 hours'] },
   { q: "What's your primary goal?", field: 'career_goal', opts: ['Career change to tech', 'Get a promotion', 'Start freelancing', 'Build personal projects', 'Academic/research', 'Just learning for fun'] },
+  { q: 'What skills do you already know? (Select all that apply, or type your own)', field: 'current_skills', opts: ['Python', 'JavaScript', 'HTML & CSS', 'React', 'SQL', 'Git', 'Java', 'C++', 'None — I\'m a complete beginner'], multi: true },
 ];
 
 function buildProfile(data) {
@@ -16,12 +17,24 @@ function buildProfile(data) {
   const level = lvl ? lvl[1] : 'beginner';
   const map = { 'Data Science & Analytics': 'data_science', 'Web Development': 'web_development', 'Machine Learning & AI': 'machine_learning', 'Cloud Computing & DevOps': 'cloud_computing', 'Cybersecurity': 'cybersecurity', 'Mobile Development': 'mobile_development', 'Software Engineering': 'programming' };
   const interests = [data.primary_interest || 'programming'].map(i => map[i] || i.toLowerCase().replace(/\s+/g, '_'));
-  return createProfile({ name: 'Learner', interests, experience_level: level, time_commitment: data.time_commitment || '5-10 hours', career_goals: [data.career_goal || 'career change to tech'] });
+
+  const skillMap = {
+    'Python': 'python-basics', 'JavaScript': 'javascript-basics', 'HTML & CSS': 'html-css',
+    'React': 'react-basics', 'SQL': 'sql-databases', 'Git': 'git-version-control',
+    'Java': 'java-basics', 'C++': 'data-structures-algorithms', 'None — I\'m a complete beginner': '',
+  };
+  const currentSkills = (Array.isArray(data.current_skills) ? data.current_skills : [data.current_skills])
+    .filter(Boolean)
+    .map(s => skillMap[s] || s.toLowerCase().replace(/\s+/g, '-'))
+    .filter(Boolean);
+
+  return createProfile({ name: 'Learner', interests, experience_level: level, time_commitment: data.time_commitment || '5-10 hours', career_goals: [data.career_goal || 'career change to tech'], current_skills: currentSkills.map(s => ({ skill: s })) });
 }
 
 function formatProfileSummary(profile, path) {
   if (!profile) return '';
-  const lines = [`Level: ${profile.experience_level}`, `Interests: ${profile.interests.map(i => i.replace(/_/g, ' ')).join(', ')}`, `Current skills: ${profile.current_skills.map(s => typeof s === 'object' ? s.skill : s).join(', ') || 'None yet'}`];
+  const skills = profile.current_skills.map(s => typeof s === 'object' ? s.skill : s);
+  const lines = [`Level: ${profile.experience_level}`, `Interests: ${profile.interests.map(i => i.replace(/_/g, ' ')).join(', ')}`, `Current skills: ${skills.join(', ') || 'None yet'}`];
   if (path) lines.push(`Path: ${path.total_courses} skills across ${path.phases.length} phases (~${path.estimated_weeks} weeks)`);
   return lines.join('\n');
 }
@@ -85,6 +98,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [onboarding, setOnboarding] = useState(null);
   const [onbData, setOnbData] = useState({});
+  const [selectedSkills, setSelectedSkills] = useState([]);
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -119,7 +133,33 @@ export default function Chat() {
 
   const handleOnboardingChoice = (choice) => {
     const step = ONBOARDING_STEPS[onboarding];
+    const isMulti = step.multi;
+
+    if (isMulti) {
+      if (choice === 'None — I\'m a complete beginner') {
+        const newData = { ...onbData, [step.field]: [] };
+        setOnbData(newData);
+        const userMsg = { id: Date.now(), type: 'user', text: choice };
+        const next = onboarding + 1;
+        if (next < ONBOARDING_STEPS.length) {
+          setOnboarding(next);
+          setMessages(prev => [...prev, userMsg, { id: Date.now() + 1, type: 'ai', text: ONBOARDING_STEPS[next].q, suggestions: ONBOARDING_STEPS[next].opts }]);
+        } else {
+          setMessages(prev => [...prev, userMsg]);
+          completeOnboarding(newData);
+        }
+        return;
+      }
+      const newSelected = selectedSkills.includes(choice) ? selectedSkills.filter(s => s !== choice) : [...selectedSkills, choice];
+      setSelectedSkills(newSelected);
+      const confirmMsg = { id: Date.now(), type: 'user', text: newSelected.join(', ') || 'None selected' };
+      const aiMsg = { id: Date.now() + 1, type: 'ai', text: `Selected: ${newSelected.join(', ') || 'None'}\n\nClick "Done" when finished, or keep selecting skills.`, suggestions: [...newSelected, 'Done — proceed'] };
+      setMessages(prev => [...prev, confirmMsg, aiMsg]);
+      return;
+    }
+
     const newD = { ...onbData, [step.field]: choice };
+    if (isMulti) newD[step.field] = selectedSkills;
     setOnbData(newD);
     const userMsg = { id: Date.now(), type: 'user', text: choice };
     const next = onboarding + 1;
@@ -128,7 +168,7 @@ export default function Chat() {
       setMessages(prev => [...prev, userMsg, { id: Date.now() + 1, type: 'ai', text: ONBOARDING_STEPS[next].q, suggestions: ONBOARDING_STEPS[next].opts }]);
     } else {
       setMessages(prev => [...prev, userMsg]);
-      completeOnboarding(newD);
+      completeOnboarding({ ...newD, current_skills: selectedSkills.length ? selectedSkills : [] });
     }
   };
 
@@ -139,11 +179,23 @@ export default function Chat() {
     setLoading(true);
     const profile = getProfile();
 
-    // If during onboarding, try to match text to a valid option first
     if (onboarding !== null) {
       const step = ONBOARDING_STEPS[onboarding];
+      if (step.multi && text.toLowerCase() === 'done') {
+        const newD = { ...onbData, [step.field]: selectedSkills };
+        setOnbData(newD);
+        const next = onboarding + 1;
+        if (next < ONBOARDING_STEPS.length) {
+          setOnboarding(next);
+          setMessages(prev => [...prev, { id: Date.now() + 1, type: 'ai', text: ONBOARDING_STEPS[next].q, suggestions: ONBOARDING_STEPS[next].opts }]);
+        } else {
+          completeOnboarding({ ...newD, current_skills: selectedSkills });
+        }
+        setLoading(false);
+        return;
+      }
       const match = step.opts.find(o => o.toLowerCase().includes(text.toLowerCase()) || text.toLowerCase().includes(o.toLowerCase().split(' ')[0]));
-      if (match) { handleOnboardingChoice(match); return; }
+      if (match) { handleOnboardingChoice(match); setLoading(false); return; }
     }
 
     let aiResponse = profile ? processMessage(text, profile) : null;
@@ -184,7 +236,7 @@ export default function Chat() {
             <div ref={endRef} />
           </div>
           <form className="chat-input-area" onSubmit={(e) => { e.preventDefault(); sendMessage(input); }}>
-            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={onboarding !== null ? "Type your answer or click a suggestion above (English or Hindi)..." : "Ask me anything about learning... (English or Hindi)"} disabled={false} />
+            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={onboarding !== null ? "Type your answer or click a suggestion above..." : "Ask me anything about learning..."} disabled={false} />
             <button type="submit" className="chat-send" disabled={loading || !input.trim()}>{loading ? '...' : 'Send'}</button>
           </form>
         </div>

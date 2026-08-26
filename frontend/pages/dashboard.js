@@ -33,13 +33,24 @@ function WhyThisPanel({ rec }) {
 
 function FeedbackButtons({ skillId, onFeedback }) {
   const [given, setGiven] = useState(null);
-  const handle = (val) => { setGiven(val); submitFeedback(skillId, val, 0); onFeedback?.(); };
+  const [toast, setToast] = useState(null);
+  const handle = (val) => {
+    setGiven(val);
+    submitFeedback(skillId, val, 0);
+    const msgs = { easy: 'Advanced project added to your path.', good: 'Great progress! Keep going.', hard: 'Foundational warm-up added before this skill.' };
+    setToast(msgs[val]);
+    setTimeout(() => setToast(null), 3000);
+    onFeedback?.();
+  };
   if (given) return <div className="feedback-thanks">Thanks for your feedback!</div>;
   return (
-    <div className="feedback-buttons">
-      <span className="feedback-label">How was this?</span>
-      {FEEDBACK_OPTIONS.map(o => <button key={o.value} className="feedback-btn" style={{ borderColor: o.color, color: o.color }} onClick={() => handle(o.value)}>{o.label}</button>)}
-    </div>
+    <>
+      {toast && <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--primary)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{toast}</div>}
+      <div className="feedback-buttons">
+        <span className="feedback-label">How was this?</span>
+        {FEEDBACK_OPTIONS.map(o => <button key={o.value} className="feedback-btn" style={{ borderColor: o.color, color: o.color }} onClick={() => handle(o.value)}>{o.label}</button>)}
+      </div>
+    </>
   );
 }
 
@@ -143,10 +154,12 @@ export default function Dashboard() {
   }, []);
 
   const refresh = () => {
-    if (profile) {
-      setRecs(getRecommendations(profile, 5));
-      setPath(getLearningPath(profile));
-      setGap(getSkillGaps(profile));
+    const p = getProfile();
+    if (p) {
+      setProfile(p);
+      setRecs(getRecommendations(p, 5));
+      setPath(getLearningPath(p));
+      setGap(getSkillGaps(p));
     }
   };
 

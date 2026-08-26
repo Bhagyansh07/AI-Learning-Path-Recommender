@@ -2,22 +2,40 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
-import { getProfile, getLearningPath, getSkillGaps, submitFeedback } from '../lib/engine';
+import { getProfile, getLearningPath, getSkillGaps, submitFeedback, getRecommendations } from '../lib/engine';
+
+function Toast({ msg, onClose }) {
+  useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);
+  return <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--primary)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{msg}</div>;
+}
 
 function SkillCard({ skill, index, onFeedback }) {
   const [showWhy, setShowWhy] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [completed, setCompleted] = useState(skill.completed);
+  const [toast, setToast] = useState(null);
 
   const handleFeedback = (val) => {
     setFeedback(val);
     setCompleted(true);
     submitFeedback(skill.skill_id, val, skill.duration_hours);
+    const msgs = {
+      easy: `"${skill.title}" marked complete. Advanced project added to your path.`,
+      good: `"${skill.title}" marked complete. Great progress!`,
+      hard: `"${skill.title}" marked complete. Foundational warm-up added before this skill.`,
+    };
+    setToast(msgs[val]);
     onFeedback?.();
   };
 
+  const prereqs = skill.prerequisites || [];
+  const userSkills = new Set((getProfile()?.current_skills || []).map(s => typeof s === 'object' ? s.skill : s));
+  const metPrereqs = prereqs.filter(p => userSkills.has(p));
+  const unmetPrereqs = prereqs.filter(p => !userSkills.has(p));
+
   return (
     <div className={`skill-card ${completed ? 'completed' : ''}`}>
+      {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
       <div className="skill-card-number" style={completed ? { background: 'rgba(5,150,105,0.1)', color: 'var(--skill-acquired)' } : {}}>
         {completed ? '✓' : index + 1}
       </div>
@@ -36,12 +54,15 @@ function SkillCard({ skill, index, onFeedback }) {
               <button className="feedback-btn-sm" style={{ borderColor: '#ef4444', color: '#ef4444' }} onClick={() => handleFeedback('hard')}>Too Hard</button>
             </div>
           )}
-          {completed && <span className="feedback-thanks-sm">{feedback ? 'Thanks!' : 'Completed'}</span>}
+          {completed && <span className="feedback-thanks-sm">{feedback ? 'Completed ✓' : 'Completed'}</span>}
         </div>
         {showWhy && (
           <div className="why-panel">
             <p><strong>Why this skill:</strong> {skill.explanation || 'Recommended for your learning path.'}</p>
-            {skill.prerequisites?.length > 0 && <p><strong>Prerequisites:</strong> {skill.prerequisites.join(', ')}</p>}
+            {prereqs.length > 0 && (
+              <p><strong>Prerequisites:</strong> {metPrereqs.length}/{prereqs.length} met {unmetPrereqs.length > 0 ? `(missing: ${unmetPrereqs.join(', ')})` : '(all met ✓)'}</p>
+            )}
+            <p><strong>Estimated time:</strong> {skill.duration_hours}h · <strong>Difficulty:</strong> {skill.level}</p>
           </div>
         )}
       </div>
@@ -72,14 +93,14 @@ export default function LearningPath() {
     if (!path || !profile) return { completed: 0, total: 1, pct: 0 };
     const completedSet = new Set(profile.completed_courses || []);
     const allPathSkillIds = path.phases.flatMap(ph => ph.courses.map(c => c.skill_id));
-    const total = allPathSkillIds.length || 1;
+    if (allPathSkillIds.length === 0) return { completed: 0, total: 0, pct: 0 };
     const completed = allPathSkillIds.filter(id => completedSet.has(id)).length;
-    return { completed, total, pct: Math.min(Math.round((completed / total) * 100), 100) };
+    return { completed, total: allPathSkillIds.length, pct: Math.min(Math.round((completed / allPathSkillIds.length) * 100), 100) };
   }, [path, profile]);
 
   if (loading) return <div className="page-wrapper"><NavBar active="path" /><main className="container" style={{ paddingTop: 64 }}><div className="loading-text">Loading...</div></main></div>;
 
-  if (!profile || !path) return (
+  if (!profile || !path || path.phases.length === 0) return (
     <div className="page-wrapper">
       <Head><title>Learning Path — LearnPath AI</title></Head>
       <NavBar active="path" />
@@ -93,7 +114,7 @@ export default function LearningPath() {
     </div>
   );
 
-  const totalSkills = path.total_courses || 1;
+  const totalSkills = progress.total;
   const circumference = 2 * Math.PI * 42;
   const offset = circumference - (progress.pct / 100) * circumference;
 
@@ -132,7 +153,7 @@ export default function LearningPath() {
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Completed</div>
           </div>
           <div style={{ flex: 1, padding: '10px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>{progress.total - progress.completed}</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>{totalSkills - progress.completed}</div>
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Remaining</div>
           </div>
           <div style={{ flex: 1, padding: '10px 14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, textAlign: 'center' }}>
@@ -176,13 +197,6 @@ export default function LearningPath() {
             );
           })}
         </div>
-
-        {path.phases.length === 0 && (
-          <div className="empty-state">
-            <h3>No skills to learn</h3>
-            <p>Your profile matches the target career path. Try exploring advanced topics.</p>
-          </div>
-        )}
       </main>
     </div>
   );
