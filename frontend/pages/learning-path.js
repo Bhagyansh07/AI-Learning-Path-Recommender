@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
+import ExplanationModal from '../components/ExplanationModal';
 import { getProfile, getLearningPath, getSkillGaps, submitFeedback, getRecommendations } from '../lib/engine';
 
 function Toast({ msg, onClose }) {
@@ -9,7 +10,7 @@ function Toast({ msg, onClose }) {
   return <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--primary)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{msg}</div>;
 }
 
-function SkillCard({ skill, index, onFeedback }) {
+function SkillCard({ skill, index, onFeedback, profile }) {
   const [showWhy, setShowWhy] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [completed, setCompleted] = useState(skill.completed);
@@ -28,11 +29,6 @@ function SkillCard({ skill, index, onFeedback }) {
     onFeedback?.();
   };
 
-  const prereqs = skill.prerequisites || [];
-  const userSkills = new Set((getProfile()?.current_skills || []).map(s => typeof s === 'object' ? s.skill : s));
-  const metPrereqs = prereqs.filter(p => userSkills.has(p));
-  const unmetPrereqs = prereqs.filter(p => !userSkills.has(p));
-
   return (
     <div className={`skill-card ${completed ? 'completed' : ''}`}>
       {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
@@ -46,7 +42,7 @@ function SkillCard({ skill, index, onFeedback }) {
           <span className={`level-badge ${skill.level}`}>{skill.level}</span>
         </div>
         <div className="skill-card-actions">
-          <button className="btn-outline" style={{ fontSize: '0.75rem', padding: '3px 8px' }} onClick={() => setShowWhy(!showWhy)}>{showWhy ? 'Hide' : 'Why this?'}</button>
+          <button className="btn-outline" style={{ fontSize: '0.75rem', padding: '3px 8px' }} onClick={() => setShowWhy(true)}>Why this?</button>
           {!feedback && !completed && (
             <div className="feedback-inline">
               <button className="feedback-btn-sm" style={{ borderColor: '#22c55e', color: '#22c55e' }} onClick={() => handleFeedback('easy')}>Too Easy</button>
@@ -56,16 +52,8 @@ function SkillCard({ skill, index, onFeedback }) {
           )}
           {completed && <span className="feedback-thanks-sm">{feedback ? 'Completed ✓' : 'Completed'}</span>}
         </div>
-        {showWhy && (
-          <div className="why-panel">
-            <p><strong>Why this skill:</strong> {skill.explanation || 'Recommended for your learning path.'}</p>
-            {prereqs.length > 0 && (
-              <p><strong>Prerequisites:</strong> {metPrereqs.length}/{prereqs.length} met {unmetPrereqs.length > 0 ? `(missing: ${unmetPrereqs.join(', ')})` : '(all met ✓)'}</p>
-            )}
-            <p><strong>Estimated time:</strong> {skill.duration_hours}h · <strong>Difficulty:</strong> {skill.level}</p>
-          </div>
-        )}
       </div>
+      <ExplanationModal skill={skill} profile={profile} isOpen={showWhy} onClose={() => setShowWhy(false)} />
     </div>
   );
 }
@@ -191,7 +179,7 @@ export default function LearningPath() {
                   </div>
                 </div>
                 <div className="skills-list">
-                  {phase.courses.map((skill, j) => <SkillCard key={skill.skill_id || j} skill={skill} index={j} onFeedback={refresh} />)}
+                  {phase.courses.map((skill, j) => <SkillCard key={skill.skill_id || j} skill={skill} index={j} onFeedback={refresh} profile={profile} />)}
                 </div>
               </div>
             );

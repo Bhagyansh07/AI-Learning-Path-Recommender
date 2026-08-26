@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
+import ExplanationModal from '../components/ExplanationModal';
 import { getProfile, getRecommendations, getLearningPath, getSkillGaps, getDemoProfiles, submitFeedback, createProfile } from '../lib/engine';
 
 const FEEDBACK_OPTIONS = [
@@ -9,27 +10,6 @@ const FEEDBACK_OPTIONS = [
   { value: 'good', label: 'Just Right', color: '#3b82f6' },
   { value: 'hard', label: 'Too Hard', color: '#ef4444' },
 ];
-
-function WhyThisPanel({ rec }) {
-  if (!rec) return null;
-  return (
-    <div className="why-this-panel">
-      <div className="panel-header"><span>💡</span><h4>Why this recommendation?</h4></div>
-      <p className="panel-text">{rec.why_this}</p>
-      <div className="panel-details">
-        <div className="detail-row"><span className="detail-label">Difficulty</span><span className="detail-value">{rec.difficulty_reason}</span></div>
-        <div className="detail-row"><span className="detail-label">Prerequisites</span><span className="detail-value">{rec.prerequisite_info.message}</span></div>
-        {rec.breakdown && (
-          <div className="breakdown-row">
-            {Object.entries(rec.breakdown).map(([k, v]) => (
-              <div key={k} className="breakdown-item"><span className="breakdown-label">{k.replace(/_/g, ' ')}</span><span className="breakdown-value">{Math.round(v * 100)}%</span></div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function FeedbackButtons({ skillId, onFeedback }) {
   const [given, setGiven] = useState(null);
@@ -229,7 +209,7 @@ export default function Dashboard() {
                   <button className="btn-outline" onClick={() => setShowWhy(showWhy === i ? null : i)}>{showWhy === i ? 'Hide' : 'Why this?'}</button>
                   <Link href="/learning-path" className="btn-outline">View Path</Link>
                 </div>
-                {showWhy === i && <WhyThisPanel rec={r} />}
+                {showWhy === i && <ExplanationModal skill={r} profile={profile} isOpen={true} onClose={() => setShowWhy(null)} />}
                 <FeedbackButtons skillId={r.skill_id} onFeedback={refresh} />
               </div>
             ))}

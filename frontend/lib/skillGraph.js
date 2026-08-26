@@ -166,6 +166,28 @@ export const SKILL_DEMAND = {
   'frontend-testing': 0.6, 'nodejs-express': 0.8,
 };
 
+// ── Helper Functions ──
+
+export function getSkillById(id) {
+  return SKILL_GRAPH.skills.find(s => s.id === id);
+}
+
+export function getDownstreamSkills(skillId) {
+  return SKILL_GRAPH.skills
+    .filter(s => s.prerequisites.includes(skillId))
+    .map(s => ({ id: s.id, name: s.name }));
+}
+
+export function getCareerRelevance(skillId) {
+  const careers = [];
+  for (const [key, path] of Object.entries(SKILL_GRAPH.career_paths)) {
+    if (path.target_skills.includes(skillId)) {
+      careers.push({ id: key, name: path.display_name });
+    }
+  }
+  return careers;
+}
+
 // Domain display names
 export const DOMAIN_NAMES = {
   programming: 'Programming', web_development: 'Web Development',
