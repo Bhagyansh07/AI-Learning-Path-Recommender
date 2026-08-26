@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getProfile, getLearningPath, getRecommendations } from '../lib/engine';
+import { getProfile, getLearningPath, getSkillGaps, submitFeedback } from '../lib/engine';
 
 const NavBar = ({ active }) => (
   <nav className="navbar">
     <div className="container navbar-inner">
       <div className="navbar-brand">
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #0ea5e9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>LP</div>
+        <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: 'white' }}>LP</div>
         <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}><span>LearnPath AI</span></Link>
       </div>
       <div className="navbar-links">
@@ -20,98 +20,147 @@ const NavBar = ({ active }) => (
   </nav>
 );
 
+const FEEDBACK_OPTS = [
+  { value: 'easy', label: 'Too Easy', color: '#22c55e' },
+  { value: 'good', label: 'Just Right', color: '#3b82f6' },
+  { value: 'hard', label: 'Too Hard', color: '#ef4444' },
+];
+
+function SkillCard({ skill, index }) {
+  const [showWhy, setShowWhy] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+
+  const handleFeedback = (val) => {
+    setFeedback(val);
+    submitFeedback(skill.skill_id, val, skill.duration_hours);
+  };
+
+  return (
+    <div className={`skill-card ${skill.completed ? 'completed' : ''}`}>
+      <div className="skill-card-number">{index + 1}</div>
+      <div className="skill-card-content">
+        <h4 className="skill-card-title">{skill.title}</h4>
+        <div className="skill-card-meta">
+          <span>{skill.provider}</span>
+          <span>·</span>
+          <span>{skill.duration_hours}h</span>
+          <span>·</span>
+          <span className={`level-badge ${skill.level}`}>{skill.level}</span>
+        </div>
+        <div className="skill-card-actions">
+          <button className="btn-xs btn-outline" onClick={() => setShowWhy(!showWhy)}>
+            {showWhy ? 'Hide' : 'Why this?'}
+          </button>
+          {!feedback && !skill.completed && (
+            <div className="feedback-inline">
+              {FEEDBACK_OPTS.map(o => (
+                <button key={o.value} className="feedback-btn-sm" style={{ borderColor: o.color, color: o.color }} onClick={() => handleFeedback(o.value)}>{o.label}</button>
+              ))}
+            </div>
+          )}
+          {feedback && <span className="feedback-thanks-sm">Thanks!</span>}
+        </div>
+        {showWhy && (
+          <div className="why-panel">
+            <p><strong>Why this skill:</strong> {skill.explanation || 'Recommended for your learning path.'}</p>
+            {skill.prerequisites?.length > 0 && (
+              <p><strong>Prerequisites:</strong> {skill.prerequisites.join(', ')}</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function LearningPath() {
   const [path, setPath] = useState(null);
+  const [gap, setGap] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const p = getProfile();
-    if (p) setPath(getLearningPath(p));
+    setProfile(p);
+    if (p) {
+      setPath(getLearningPath(p));
+      setGap(getSkillGaps(p));
+    }
     setLoading(false);
   }, []);
 
-  if (loading) return <div className="page-wrapper"><NavBar active="path" /><main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><div className="loading-spinner" style={{ width: 40, height: 40 }} /></main></div>;
+  if (loading) return <div className="page-wrapper"><NavBar active="path" /><main className="container" style={{ paddingTop: 64 }}><div className="loading-text">Loading...</div></main></div>;
 
-  if (!path) return (
+  if (!profile || !path) return (
     <div className="page-wrapper">
-      <Head><title>Learning Path - LearnPath AI</title></Head>
+      <Head><title>Learning Path — LearnPath AI</title></Head>
       <NavBar active="path" />
-      <div className="bg-glow" />
-      <main className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
-        <div style={{ fontSize: '3rem', marginBottom: 20 }}>&#128506;</div>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 12 }}>No Learning Path Yet</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 32, fontSize: '1.05rem' }}>Complete the onboarding to generate your personalized learning path.</p>
-        <Link href="/chat" className="btn btn-primary" style={{ padding: '14px 28px' }}>Start with AI Assistant</Link>
+      <main className="container" style={{ paddingTop: 64 }}>
+        <div className="empty-state">
+          <h2>No learning path yet</h2>
+          <p>Complete the AI assistant onboarding to generate your personalized path.</p>
+          <Link href="/chat" className="btn btn-primary">Start AI Assistant</Link>
+        </div>
       </main>
     </div>
   );
 
   return (
     <div className="page-wrapper">
-      <Head><title>Learning Path - LearnPath AI</title></Head>
+      <Head><title>My Learning Path — LearnPath AI</title></Head>
       <NavBar active="path" />
-      <div className="bg-glow" />
-      <main className="container main-content">
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.5px' }}>Your Learning Path</h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>
-            <span className="badge badge-primary" style={{ marginRight: 6 }}>{path.target_level}</span>
-            {path.total_courses} courses &middot; ~{path.estimated_hours}h &middot; ~{path.estimated_weeks} weeks
-          </p>
+      <main className="container" style={{ paddingTop: 64, paddingBottom: 40 }}>
+        <div className="path-header">
+          <div>
+            <h1 className="page-title">My Learning Path</h1>
+            <p className="page-subtitle">{gap?.career_title || 'Personalized'} — {path.total_courses} skills · ~{path.estimated_weeks} weeks · {path.estimated_hours}h total</p>
+          </div>
+          {gap && (
+            <div className="readiness-badge">
+              <div className="readiness-circle">
+                <span className="readiness-value">{gap.readiness_score}%</span>
+              </div>
+              <span className="readiness-label">Ready</span>
+            </div>
+          )}
         </div>
-        <div className="grid-4" style={{ marginBottom: 32 }}>
-          {[
-            { val: path.total_courses, label: 'Courses', icon: '&#128218;' },
-            { val: path.phases.length, label: 'Phases', icon: '&#128200;' },
-            { val: `${path.estimated_hours}h`, label: 'Total Hours', icon: '&#128337;' },
-            { val: path.milestones.length, label: 'Milestones', icon: '&#127919;' },
-          ].map((s, i) => (
-            <div key={i} className="stat-card">
-              <div style={{ fontSize: '1.3rem', marginBottom: 8 }} dangerouslySetInnerHTML={{ __html: s.icon }} />
-              <div className="stat-value">{s.val}</div>
-              <div className="stat-label">{s.label}</div>
+
+        {/* Milestones */}
+        {path.milestones && path.milestones.length > 0 && (
+          <div className="milestones-bar">
+            {path.milestones.map((m, i) => (
+              <div key={i} className={`milestone ${m.type}`}>
+                <div className="milestone-dot" />
+                <span className="milestone-text">{m.title}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Phases */}
+        <div className="path-phases">
+          {path.phases.map((phase, i) => (
+            <div key={i} className="phase-section">
+              <div className="phase-header">
+                <div className="phase-badge">Phase {phase.phase}</div>
+                <div>
+                  <h2 className="phase-title">{phase.name}</h2>
+                  <p className="phase-desc">{phase.description} — {phase.duration_weeks} weeks</p>
+                </div>
+              </div>
+              <div className="skills-list">
+                {phase.courses.map((skill, j) => (
+                  <SkillCard key={j} skill={skill} index={j} />
+                ))}
+              </div>
             </div>
           ))}
         </div>
-        {path.phases.map((phase, pi) => (
-          <div key={pi} style={{ marginBottom: 40 }}>
-            <div className="phase-header">
-              <div className="phase-number">{phase.phase}</div>
-              <div style={{ flex: 1 }}>
-                <h3 style={{ fontSize: '1rem', margin: 0, fontWeight: 700 }}>{phase.name}</h3>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0' }}>{phase.description}</p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary-light)' }}>~{phase.duration_weeks} weeks</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{phase.courses.length} courses</div>
-              </div>
-            </div>
-            <div className="path-timeline">
-              {phase.courses.map((c, i) => (
-                <div key={i} className={`path-node ${c.completed ? 'completed' : i === 0 ? 'active' : ''}`}>
-                  <div className="course-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                          <span className={`badge ${c.completed ? 'badge-success' : 'badge-primary'}`}>{c.completed ? 'Completed' : 'Course'}</span>
-                          <span className={`badge ${c.level === 'beginner' ? 'badge-success' : c.level === 'intermediate' ? 'badge-warning' : 'badge-danger'}`}>{c.level}</span>
-                        </div>
-                        <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: 4 }}>{c.title}</h4>
-                        <div className="course-meta"><span>{c.duration_hours}h</span><span>&middot;</span><span>{c.provider || 'Self-paced'}</span><span>&middot;</span><span>{c.skills.slice(0, 3).join(', ')}</span></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-        {path.skill_gaps?.length > 0 && (
-          <div className="card" style={{ marginTop: 32 }}>
-            <h3 style={{ marginBottom: 16, fontWeight: 700 }}>Skills to Develop ({path.skill_gaps.length})</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {path.skill_gaps.map((s, i) => <span key={i} className="skill-tag missing">{s.replace(/_/g, ' ')}</span>)}
-            </div>
+
+        {path.phases.length === 0 && (
+          <div className="empty-state">
+            <h3>No skills to learn</h3>
+            <p>Your profile matches the target career path. Try exploring advanced topics.</p>
           </div>
         )}
       </main>
