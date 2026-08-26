@@ -1,7 +1,7 @@
 const RATE_LIMIT = new Map();
 const RATE_WINDOW = 60000;
 const RATE_MAX = 15;
-const ALLOWED_ORIGINS = ['https://frontend-mu-jet-18.vercel.app', 'http://localhost:3000'];
+const ALLOWED_ORIGINS = ['https://frontend-eq853m3v5-bhagyansh.vercel.app', 'https://frontend-mu-jet-18.vercel.app', 'http://localhost:3000'];
 
 function isRateLimited(ip) {
   const now = Date.now();

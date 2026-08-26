@@ -5,9 +5,9 @@ import NavBar from '../components/NavBar';
 import { SKILL_GRAPH, DOMAIN_NAMES } from '../lib/skillGraph';
 
 const DOMAIN_COLORS = {
-  programming: '#6366f1', web_development: '#a855f7', data_science: '#06b6d4',
-  machine_learning: '#f59e0b', cloud_computing: '#22c55e', cybersecurity: '#ef4444',
-  mobile_development: '#ec4899', math: '#818cf8', mlops: '#f97316',
+  programming: '#7c5cfc', web_development: '#c084fc', data_science: '#22d3ee',
+  machine_learning: '#fbbf24', cloud_computing: '#34d399', cybersecurity: '#f87171',
+  mobile_development: '#fb7185', math: '#9b80ff', mlops: '#2dd4bf',
 };
 
 function CountUp({ end, suffix = '', duration = 1200 }) {
@@ -51,8 +51,7 @@ export default function Home() {
       <NavBar active="home" />
 
       <main>
-        {/* HERO — Asymmetric: left text, right stats */}
-        <section className="container hero" style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(6px)', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+        <section className="container hero" style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(8px)', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}>
           <div className="hero-grid">
             <div>
               <div className="hero-badge">
@@ -67,33 +66,31 @@ export default function Home() {
             </div>
             <div className="hero-stats">
               <div className="hero-stat-row">
-                <div className="hero-stat"><div className="hero-stat-val"><CountUp end={65} /></div><div className="hero-stat-lbl">Skills in DAG</div></div>
-                <div className="hero-stat"><div className="hero-stat-val"><CountUp end={8} /></div><div className="hero-stat-lbl">Career Paths</div></div>
+                <div className="hero-stat"><div className="hero-stat-val t-num"><CountUp end={65} /></div><div className="hero-stat-lbl">Skills in DAG</div></div>
+                <div className="hero-stat"><div className="hero-stat-val t-num"><CountUp end={8} /></div><div className="hero-stat-lbl">Career Paths</div></div>
               </div>
               <div className="hero-divider" />
               <div className="hero-stat-row">
-                <div className="hero-stat"><div className="hero-stat-val"><CountUp end={5} /></div><div className="hero-stat-lbl">Scoring Factors</div></div>
-                <div className="hero-stat"><div className="hero-stat-val">100%</div><div className="hero-stat-lbl">Works Offline</div></div>
+                <div className="hero-stat"><div className="hero-stat-val t-num"><CountUp end={5} /></div><div className="hero-stat-lbl">Scoring Factors</div></div>
+                <div className="hero-stat"><div className="hero-stat-val t-num">100%</div><div className="hero-stat-lbl">Client-Side</div></div>
               </div>
               <div className="hero-divider" />
-              <p className="hero-note">Built for HCLTech AMPlified Round 2. Every algorithm runs client-side — no API dependency for core logic.</p>
+              <p className="hero-note">Built for HCLTech AMPlified Round 2. Every algorithm runs in your browser — zero API dependency for core logic.</p>
             </div>
           </div>
         </section>
 
-        {/* DOMAINS */}
-        <section className="container" style={{ paddingBottom: 48 }}>
+        <section className="container" style={{ paddingBottom: 56 }}>
           <div className="domain-pills">
             {domains.map((d, i) => (
               <div key={i} className="domain-pill">
                 <div className="domain-dot" style={{ background: d.color }} />
-                {d.name} <span style={{ opacity: 0.5 }}>({d.count})</span>
+                {d.name} <span style={{ opacity: 0.4 }}>({d.count})</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* HOW IT WORKS — 3 steps, horizontal */}
         <section className="container section">
           <div className="section-header">
             <div className="t-label">Process</div>
@@ -101,9 +98,9 @@ export default function Home() {
           </div>
           <div className="feature-row">
             {[
-              { n: '01', title: 'Tell us your goals', desc: 'Chat with our AI assistant in natural language. Describe what you want to learn.' },
-              { n: '02', title: 'AI analyzes your profile', desc: 'Our engine identifies skill gaps and recommends the best courses and projects.' },
-              { n: '03', title: 'Follow your roadmap', desc: 'Get a structured path with milestones, prerequisites, and progress tracking.' },
+              { n: '01', title: 'Tell us your goals', desc: 'Chat with our AI assistant in natural language. Describe what you want to learn — in English or Hindi.' },
+              { n: '02', title: 'AI analyzes your profile', desc: 'Our engine identifies skill gaps using topological sort and 5-factor hybrid scoring.' },
+              { n: '03', title: 'Follow your roadmap', desc: 'Get a structured path with prerequisites, milestones, and progress tracking.' },
             ].map((s, i) => (
               <div key={i} className="feature-cell">
                 <div className="feature-num">{s.n}</div>
@@ -114,7 +111,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* FEATURES — 2-column alternating */}
         <section className="container section">
           <div className="section-header">
             <div className="t-label">Capabilities</div>
@@ -122,7 +118,7 @@ export default function Home() {
           </div>
           <div className="feature-row">
             {[
-              { n: '01', title: 'Conversational AI', desc: 'Describe your goals naturally. Our AI understands what you need and recommends the best path.' },
+              { n: '01', title: 'Conversational AI', desc: 'Describe your goals naturally. Hindi and English supported. Our AI understands what you need.' },
               { n: '02', title: 'Smart Profiling', desc: 'Captures your interests, experience level, and learning patterns automatically.' },
               { n: '03', title: 'Hybrid Scoring', desc: '5-factor scoring: skill gap, career relevance, demand, difficulty, prerequisites.' },
               { n: '04', title: 'Learning Roadmaps', desc: 'Structured paths with prerequisites, milestones, and estimated timelines.' },
@@ -140,7 +136,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA */}
         <section className="cta-section">
           <div className="container">
             <div className="cta-box">

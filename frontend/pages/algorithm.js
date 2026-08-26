@@ -40,23 +40,23 @@ function TopoDemo() {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
         <button className="btn btn-primary btn-sm" onClick={startSort} disabled={running}>Run Topological Sort</button>
         <button className="btn btn-secondary btn-sm" onClick={() => { setSorted([]); setQueue([]); setStep(0); setRunning(false); }}>Reset</button>
       </div>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>Input Queue</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          <div className="form-label" style={{ marginBottom: 8 }}>Input Queue</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
             {queue.length === 0 && !running && sorted.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--text-3)' }}>Click "Run" to start</span>}
-            {queue.map(id => <span key={id} style={{ padding: '4px 8px', background: 'var(--accent-dim)', border: '1px solid var(--accent)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent)' }}>{skillMap[id]?.name || id}</span>)}
+            {queue.map(id => <span key={id} className="skill-tag" style={{ borderColor: 'var(--accent)', color: 'var(--accent-2)', background: 'var(--accent-dim)' }}>{skillMap[id]?.name || id}</span>)}
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>Sorted Output (Step {step})</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          <div className="form-label" style={{ marginBottom: 8 }}>Sorted Output (Step {step})</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
             {sorted.map((id, i) => (
-              <span key={id} style={{ padding: '4px 8px', background: i === sorted.length - 1 ? '#22c55e' : 'var(--bg-4)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: i === sorted.length - 1 ? '#fff' : 'var(--text)' }}>
+              <span key={id} className="skill-tag" style={i === sorted.length - 1 ? { background: 'var(--green)', color: '#fff', borderColor: 'var(--green)' } : {}}>
                 {i + 1}. {skillMap[id]?.name || id}
               </span>
             ))}
@@ -77,32 +77,42 @@ function ScoringDemo() {
 
   return (
     <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 16 }}>
         {[
-          { label: 'Skill Gap', value: skillGap, set: setSkillGap, color: '#3b82f6', max: 50 },
-          { label: 'Career Match', value: careerMatch, set: setCareerMatch, color: '#22c55e', max: 40 },
-          { label: 'Job Demand', value: demand, set: setDemand, color: '#f59e0b', max: 30 },
-          { label: 'Difficulty Fit', value: difficulty, set: setDifficulty, color: '#8b5cf6', max: 20 },
-          { label: 'Prerequisites', value: prereqs, set: setPrereqs, color: '#06b6d4', max: 20 },
+          { label: 'Skill Gap', value: skillGap, set: setSkillGap, color: '#7c5cfc', max: 50 },
+          { label: 'Career Match', value: careerMatch, set: setCareerMatch, color: '#34d399', max: 40 },
+          { label: 'Job Demand', value: demand, set: setDemand, color: '#fbbf24', max: 30 },
+          { label: 'Difficulty Fit', value: difficulty, set: setDifficulty, color: '#c084fc', max: 20 },
+          { label: 'Prerequisites', value: prereqs, set: setPrereqs, color: '#22d3ee', max: 20 },
         ].map(f => (
-          <div key={f.label} style={{ background: 'var(--bg-3)', borderRadius: 8, padding: 10, border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 4 }}>{f.label}</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: f.color }}>{f.value}%</div>
-            <input type="range" min={0} max={f.max} value={f.value} onChange={e => f.set(parseInt(e.target.value))} style={{ width: '100%', accentColor: f.color, marginTop: 4 }} />
+          <div key={f.label} style={{ background: 'var(--bg-3)', borderRadius: 'var(--r-md)', padding: 12, border: '1px solid var(--border)' }}>
+            <div className="form-label" style={{ marginBottom: 6 }}>{f.label}</div>
+            <div className="t-num" style={{ fontSize: '1.3rem', fontWeight: 800, color: f.color }}>{f.value}%</div>
+            <input type="range" min={0} max={f.max} value={f.value} onChange={e => f.set(parseInt(e.target.value))} style={{ width: '100%', accentColor: f.color }} />
           </div>
         ))}
       </div>
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>Final Score</span>
-          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent)' }}>{total}%</span>
+      <div className="card" style={{ padding: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>Final Score</span>
+          <span className="t-num" style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--accent-2)' }}>{total}%</span>
         </div>
-        <div style={{ height: 20, background: 'var(--bg-4)', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
-          <div style={{ width: `${(skillGap/total)*100}%`, background: '#3b82f6', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(careerMatch/total)*100}%`, background: '#22c55e', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(demand/total)*100}%`, background: '#f59e0b', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(difficulty/total)*100}%`, background: '#8b5cf6', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(prereqs/total)*100}%`, background: '#06b6d4', transition: 'width 0.3s' }} />
+        <div style={{ height: 24, background: 'var(--bg-4)', borderRadius: 'var(--r-sm)', overflow: 'hidden', display: 'flex' }}>
+          <div style={{ width: `${(skillGap/total)*100}%`, background: '#7c5cfc', transition: 'width 0.3s' }} />
+          <div style={{ width: `${(careerMatch/total)*100}%`, background: '#34d399', transition: 'width 0.3s' }} />
+          <div style={{ width: `${(demand/total)*100}%`, background: '#fbbf24', transition: 'width 0.3s' }} />
+          <div style={{ width: `${(difficulty/total)*100}%`, background: '#c084fc', transition: 'width 0.3s' }} />
+          <div style={{ width: `${(prereqs/total)*100}%`, background: '#22d3ee', transition: 'width 0.3s' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {[
+            { label: 'Skill Gap', color: '#7c5cfc' }, { label: 'Career', color: '#34d399' },
+            { label: 'Demand', color: '#fbbf24' }, { label: 'Difficulty', color: '#c084fc' }, { label: 'Prereqs', color: '#22d3ee' },
+          ].map(f => (
+            <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', color: 'var(--text-3)' }}>
+              <div style={{ width: 6, height: 6, borderRadius: 2, background: f.color }} />{f.label}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -119,20 +129,20 @@ function GapDemo() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <span style={{ fontSize: '0.85rem', color: 'var(--text-2)' }}>Target: ML Engineer (demo profile)</span>
-        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--accent)' }}>{pct}% ready</span>
+        <span className="t-num" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--accent-2)' }}>{pct}% ready</span>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 8 }}>
         {gaps.map(g => (
-          <div key={g.id} style={{ padding: '8px 12px', background: g.acquired ? 'rgba(5,150,105,0.08)' : 'rgba(239,68,68,0.05)', border: `1px solid ${g.acquired ? 'rgba(5,150,105,0.3)' : 'rgba(239,68,68,0.2)'}`, borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text)' }}>{g.name}</span>
-            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: g.acquired ? '#059669' : '#dc2626' }}>{g.acquired ? '✓ Acquired' : '✗ Missing'}</span>
+          <div key={g.id} className={g.acquired ? '' : ''} style={{ padding: '10px 14px', background: g.acquired ? 'var(--green-dim)' : 'var(--red-dim)', border: `1px solid ${g.acquired ? 'color-mix(in srgb, var(--green) 25%, transparent)' : 'color-mix(in srgb, var(--red) 25%, transparent)'}`, borderRadius: 'var(--r-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 500 }}>{g.name}</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: g.acquired ? 'var(--green)' : 'var(--red)', fontFamily: "'JetBrains Mono', monospace" }}>{g.acquired ? 'Acquired' : 'Missing'}</span>
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 12, padding: 10, background: 'var(--bg-3)', borderRadius: 8, border: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--text-2)' }}>
-        Algorithm: Set Difference — <code>target_skills ∩ ¬ user_skills</code> → {gaps.filter(g => !g.acquired).length} skills to learn
+      <div className="algo-code" style={{ marginTop: 14 }}>
+        Algorithm: Set Difference — <span className="kw">target_skills</span> ∩ ¬ <span className="kw">user_skills</span> → <span className="num">{gaps.filter(g => !g.acquired).length}</span> skills to learn
       </div>
     </div>
   );
@@ -143,26 +153,49 @@ export default function AlgorithmPage() {
     <div className="page-wrapper">
       <Head><title>Algorithm Transparency — LearnPath AI</title></Head>
       <NavBar active="algorithm" />
-      <main className="container" style={{ paddingTop: 64, paddingBottom: 40 }}>
-        <h1 className="page-title">Algorithm Transparency</h1>
-        <p className="page-subtitle">See exactly how our AI works. Every algorithm is deterministic, explainable, and runs client-side.</p>
+      <main className="container" style={{ paddingTop: 72, paddingBottom: 48 }}>
+        <div className="page-header">
+          <h1 className="page-title">Algorithm Transparency</h1>
+          <p className="page-subtitle">See exactly how our AI works. Every algorithm is deterministic, explainable, and runs client-side.</p>
+        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>1. Topological Sort (DAG Traversal)</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginBottom: 16 }}>Kahn's algorithm ensures prerequisites are always learned before dependent skills. Watch nodes with zero in-degree get processed first.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <section className="algo-section">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+              <h2>1. Topological Sort (DAG Traversal)</h2>
+              <span className="algo-tag">O(V + E)</span>
+            </div>
+            <p>Kahn's algorithm ensures prerequisites are always learned before dependent skills. Watch nodes with zero in-degree get processed first.</p>
             <TopoDemo />
+            <div className="algo-code">
+              <span className="kw">function</span> <span className="fn">topologicalSort</span>(skillIds) {'{\n'}
+              {'  '}<span className="kw">const</span> inDeg = <span className="fn">computeInDegrees</span>(skillIds);{'\n'}
+              {'  '}<span className="kw">const</span> queue = <span className="fn">getZeroInDegreeNodes</span>(inDeg);{'\n'}
+              {'  '}<span className="kw">while</span> (queue.length) {'{\n'}
+              {'    '}<span className="kw">const</span> node = queue.<span className="fn">shift</span>();{'\n'}
+              {'    '}sorted.<span className="fn">push</span>(node);{'\n'}
+              {'    '}<span className="fn">decrementNeighbors</span>(node, inDeg, queue);{'\n'}
+              {'  }'}{'}\n'}
+              {'  '}<span className="kw">return</span> sorted; <span className="str">// Valid learning order</span>
+              {'\n}'}
+            </div>
           </section>
 
-          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>2. 5-Factor Hybrid Scoring</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginBottom: 16 }}>Each skill is scored on 5 weighted factors. Adjust the sliders to see how the final score changes.</p>
+          <section className="algo-section">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+              <h2>2. 5-Factor Hybrid Scoring</h2>
+              <span className="algo-tag">Weighted</span>
+            </div>
+            <p>Each skill is scored on 5 weighted factors. Adjust the sliders to see how the final score changes.</p>
             <ScoringDemo />
           </section>
 
-          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>3. Skill Gap Analysis (Set Difference)</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginBottom: 16 }}>Compares your current skills against career path requirements using set operations.</p>
+          <section className="algo-section">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+              <h2>3. Skill Gap Analysis (Set Difference)</h2>
+              <span className="algo-tag">Set Theory</span>
+            </div>
+            <p>Compares your current skills against career path requirements using set operations.</p>
             <GapDemo />
           </section>
         </div>

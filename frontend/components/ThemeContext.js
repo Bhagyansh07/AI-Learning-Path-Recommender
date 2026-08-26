@@ -8,7 +8,7 @@ function getInitialTheme() {
     const saved = localStorage.getItem('lp_theme');
     if (saved === 'dark' || saved === 'light') return saved;
   } catch {}
-  return 'light';
+  return 'dark';
 }
 
 export function ThemeProvider({ children }) {

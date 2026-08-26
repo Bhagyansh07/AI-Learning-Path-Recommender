@@ -23,23 +23,26 @@ export default function Profile() {
     <div className="page-wrapper">
       <Head><title>Profile — LearnPath AI</title></Head>
       <NavBar />
-      <main className="container" style={{ padding: '32px 0 40px' }}>
+      <main className="container" style={{ padding: '40px 0 48px' }}>
         {profile ? (
           <>
-            <h1 className="page-title" style={{ marginBottom: 24 }}>Learner Profile</h1>
+            <div className="page-header">
+              <h1 className="page-title">Learner Profile</h1>
+              <p className="page-subtitle">{profile.name} · {profile.experience_level}</p>
+            </div>
             <div className="dashboard-grid">
               <div>
                 <div className="card" style={{ marginBottom: 16 }}>
                   <h3>Basic Info</h3>
                   <div className="grid-2">
                     <div><div className="form-label">Name</div><div style={{ fontWeight: 600, color: 'var(--text)' }}>{profile.name}</div></div>
-                    <div><div className="form-label">Experience Level</div><span className="badge badge-accent">{profile.experience_level}</span></div>
-                    <div><div className="form-label">Time Commitment</div><div style={{ color: 'var(--text-2)' }}>{profile.time_commitment}</div></div>
+                    <div><div className="form-label">Level</div><span className="badge badge-accent">{profile.experience_level}</span></div>
+                    <div><div className="form-label">Time</div><div style={{ color: 'var(--text-2)' }}>{profile.time_commitment}</div></div>
                   </div>
                 </div>
                 <div className="card" style={{ marginBottom: 16 }}>
                   <h3>Interests & Goals</h3>
-                  <div className="form-label">Interests</div>
+                  <div className="form-label" style={{ marginTop: 4 }}>Interests</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
                     {(profile.interests || []).map((i, idx) => <span key={idx} className="badge badge-accent">{i.replace(/_/g, ' ')}</span>)}
                   </div>
@@ -51,8 +54,8 @@ export default function Profile() {
                 <div className="card">
                   <h3>Completed Courses</h3>
                   {completedCourses.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {completedCourses.map((c, i) => <div key={i} style={{ padding: '8px 12px', background: 'var(--bg-4)', borderRadius: 6, fontSize: '0.85rem', color: 'var(--text)' }}>{c}</div>)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {completedCourses.map((c, i) => <div key={i} style={{ padding: '8px 12px', background: 'var(--bg-3)', borderRadius: 'var(--r-sm)', fontSize: '0.82rem', color: 'var(--text)', border: '1px solid var(--border)' }}>{c}</div>)}
                     </div>
                   ) : <p style={{ color: 'var(--text-3)', fontSize: '0.85rem' }}>No courses completed yet.</p>}
                 </div>
@@ -60,9 +63,9 @@ export default function Profile() {
               <div>
                 <div className="card" style={{ marginBottom: 16 }}>
                   <h3>Progress Stats</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-2)' }}>Courses Completed</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{completedCourses.length}</span></div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-2)' }}>Hours Learned</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{progress.total_hours_learned}h</span></div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-2)' }}>Courses Completed</span><span className="t-num" style={{ fontWeight: 700, color: 'var(--accent-2)' }}>{completedCourses.length}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-2)' }}>Hours Learned</span><span className="t-num" style={{ fontWeight: 700, color: 'var(--accent-2)' }}>{progress.total_hours_learned}h</span></div>
                   </div>
                 </div>
                 <div className="card">
