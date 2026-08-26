@@ -17,7 +17,7 @@ export default function ExplanationModal({ skill, profile, isOpen, onClose }) {
   const skillData = getSkillById(skillId);
   const userSkills = new Set((profile?.current_skills || []).map(s => typeof s === 'object' ? s.skill : s));
 
-  const prerequisites = skill.prerequisites || skillData?.prerequisites || [];
+  const prerequisites = Array.isArray(skill.prerequisites) ? skill.prerequisites : Array.isArray(skillData?.prerequisites) ? skillData.prerequisites : [];
   const metPrereqs = prerequisites.filter(p => userSkills.has(p));
   const unmetPrereqs = prerequisites.filter(p => !userSkills.has(p));
 

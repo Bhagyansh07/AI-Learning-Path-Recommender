@@ -36,16 +36,16 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') { setCors(res, origin); return res.status(405).json({ error: 'Method not allowed' }); }
 
-  const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
-  if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) { setCors(res, origin); return res.status(429).json({ error: 'Too many requests. Please wait a moment.' }); }
 
   setCors(res, origin);
 
   const { message, context, mode } = req.body;
-  if (!message || typeof message !== 'string' || message.trim().length === 0) return res.status(400).json({ error: 'Valid message required' });
-  if (message.length > 2000) return res.status(400).json({ error: 'Message too long (max 2000 characters)' });
+  if (!message || typeof message !== 'string' || message.trim().length === 0) { setCors(res, origin); return res.status(400).json({ error: 'Valid message required' }); }
+  if (message.length > 2000) { setCors(res, origin); return res.status(400).json({ error: 'Message too long (max 2000 characters)' }); }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.length < 10) {

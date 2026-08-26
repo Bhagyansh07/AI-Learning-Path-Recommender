@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
 import ExplanationModal from '../components/ExplanationModal';
-import { getProfile, getLearningPath, getSkillGaps, submitFeedback, getRecommendations } from '../lib/engine';
+import { getProfile, getLearningPath, getSkillGaps, submitFeedback } from '../lib/engine';
 
 function Toast({ msg, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);

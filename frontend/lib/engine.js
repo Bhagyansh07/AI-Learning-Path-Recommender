@@ -6,7 +6,7 @@
 // Golden Rule: Remove every LLM call → system still works.
 // ============================================================
 
-import { SKILL_GRAPH, SKILL_DEMAND, DOMAIN_NAMES } from './skillGraph';
+import { SKILL_GRAPH, SKILL_DEMAND, getSkillById } from './skillGraph';
 
 const LEVEL_MAP = { beginner: 0, intermediate: 1, advanced: 2 };
 const TIME_MULTIPLIER = { 'Less than 5 hours': 0.5, '5-10 hours': 1, '10-20 hours': 1.5, 'More than 20 hours': 2 };
@@ -54,6 +54,7 @@ export function updateProfile(updates) {
 // Rule-based extraction from free text. LLM polishes the output.
 
 export function analyzeText(text) {
+  if (!text || typeof text !== 'string') return { interests: [], level: 'beginner', skills: [], goal: '' };
   const t = text.toLowerCase();
   const interests = [];
   const domainMap = {
@@ -75,7 +76,7 @@ export function analyzeText(text) {
 
   const skills = [];
   const skillKeywords = {
-    'python-basics': ['python'], 'javascript-basics': ['javascript', 'js'], 'java-basics': ['java'],
+    'python-basics': ['python'], 'javascript-basics': ['javascript', 'js'], 'java-basics': [' java '],
     'html-css': ['html', 'css'], 'react-basics': ['react'], 'sql-databases': ['sql', 'database'],
     'docker': ['docker'], 'aws-ec2-s3': ['aws', 'amazon'], 'git-version-control': ['git', 'github'],
     'linux-basics': ['linux'], 'nodejs-express': ['node', 'express'], 'mongodb': ['mongodb', 'mongo'],
@@ -110,10 +111,6 @@ export function analyzeText(text) {
 // ─── SKILL GRAPH TRAVERSAL ────────────────────────────────
 // Pure algorithmic DAG traversal. No LLM.
 
-function getSkillById(id) {
-  return SKILL_GRAPH.skills.find(s => s.id === id);
-}
-
 function getPrerequisites(skillId, visited = new Set()) {
   if (visited.has(skillId)) return [];
   visited.add(skillId);
@@ -145,9 +142,10 @@ function getAllDescendants(skillId, visited = new Set()) {
 
 export function getSkillGaps(profile, targetCareer) {
   const userSkills = getUserSkills(profile);
-  let career;
+  let career, careerId;
   if (targetCareer && SKILL_GRAPH.career_paths[targetCareer]) {
     career = SKILL_GRAPH.career_paths[targetCareer];
+    careerId = targetCareer;
   } else {
     let best = null, bestScore = -1;
     const interests = new Set(profile.interests || []);
@@ -157,8 +155,10 @@ export function getSkillGaps(profile, targetCareer) {
       const bonus = [...interests].some(i => id.includes(i.split('_')[0])) ? 0.2 : 0;
       if (overlap + bonus > bestScore) { bestScore = overlap + bonus; best = id; }
     }
-    career = SKILL_GRAPH.career_paths[best] || Object.values(SKILL_GRAPH.career_paths)[0];
+    careerId = best || Object.keys(SKILL_GRAPH.career_paths)[0];
+    career = SKILL_GRAPH.career_paths[careerId];
   }
+  if (!career) return { career_path: '', career_title: 'General', description: '', avg_salary: 'N/A', growth_rate: 'N/A', readiness_score: 0, acquired_skills: [], missing_skills: [], total_required: 0, total_acquired: 0 };
 
   const required = new Set(career.target_skills || []);
   const acquired = [...required].filter(s => userSkills.has(s));
@@ -179,7 +179,7 @@ export function getSkillGaps(profile, targetCareer) {
 
   const coverage = required.size > 0 ? acquired.length / required.size : 0;
   return {
-    career_path: '', career_title: career.display_name || '', description: career.description || '',
+    career_path: careerId, career_title: career.display_name || '', description: career.description || '',
     avg_salary: career.avg_salary || 'N/A', growth_rate: career.growth_rate || 'N/A',
     readiness_score: Math.round(coverage * 100),
     acquired_skills: acquired, missing_skills: missing,

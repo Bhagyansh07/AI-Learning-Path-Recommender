@@ -229,6 +229,8 @@ a { color: inherit; text-decoration: none; }
 }
 .rec-explanation { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
 .rec-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+.rec-info { flex: 1; }
+.skill-gaps-list { display: flex; flex-direction: column; gap: 8px; }
 
 /* ═══ WHY THIS PANEL ═══ */
 .why-this-panel {
