@@ -24,7 +24,8 @@ export default async function handler(req, res) {
       prompt = `Extract a learning profile from this text. Return ONLY valid JSON with: interests (array of domains), experience_level (beginner/intermediate/advanced), skills (array), goals (array).\nText: "${message}"\nJSON:`;
     }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+    const model = 'gemini-2.5-flash';
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.5, maxOutputTokens: 300 } }),
