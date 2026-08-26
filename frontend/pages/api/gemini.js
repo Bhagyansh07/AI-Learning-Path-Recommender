@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   if (!message) return res.status(400).json({ error: 'Message required' });
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!apiKey || apiKey.length < 10) {
     return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
   }
 
@@ -31,11 +31,17 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
+      const errText = await response.text();
+      console.error('Gemini API error:', response.status, errText);
       return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
     }
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+    if (!text) {
+      console.error('Gemini empty response:', JSON.stringify(data).slice(0, 200));
+      return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
+    }
 
     if (mode === 'chat') return res.status(200).json({ source: 'gemini', response: text });
     if (mode === 'explain') return res.status(200).json({ source: 'gemini', explanation: text });
@@ -45,7 +51,8 @@ export default async function handler(req, res) {
     } catch {
       return res.status(200).json({ source: 'fallback', data: getFallbackProfile(message) });
     }
-  } catch {
+  } catch (err) {
+    console.error('Gemini fetch error:', err.message);
     return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
   }
 }
