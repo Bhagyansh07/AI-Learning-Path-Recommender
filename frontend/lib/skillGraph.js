@@ -63,7 +63,7 @@ export const SKILL_GRAPH = {
     // ── Cybersecurity ──
     { id: 'networking-basics', name: 'Networking Fundamentals', domain: 'cybersecurity', difficulty: 2, estimated_hours: 20, prerequisites: ['linux-basics'], resources: [{ type: 'course', title: 'Networking Basics', platform: 'Coursera', free: true }, { type: 'project', title: 'Network Scanner', difficulty: 2 }] },
     { id: 'web-security', name: 'Web Application Security', domain: 'cybersecurity', difficulty: 3, estimated_hours: 25, prerequisites: ['networking-basics', 'javascript-basics'], resources: [{ type: 'course', title: 'Web Security', platform: 'OWASP', free: true }, { type: 'project', title: 'SQL Injection Demo', difficulty: 3 }] },
-    { id: 'cryptography', name: 'Cryptography Basics', domain: 'cybersecurity', difficulty: 3, estimated_hours: 20, prerequisites: ['python-basics', 'math'], resources: [{ type: 'course', title: 'Cryptography I', platform: 'Coursera', free: true }, { type: 'project', title: 'Encryption Tool', difficulty: 3 }] },
+    { id: 'cryptography', name: 'Cryptography Basics', domain: 'cybersecurity', difficulty: 3, estimated_hours: 20, prerequisites: ['python-basics', 'linear-algebra'], resources: [{ type: 'course', title: 'Cryptography I', platform: 'Coursera', free: true }, { type: 'project', title: 'Encryption Tool', difficulty: 3 }] },
 
     // ── Mobile Development ──
     { id: 'flutter-basics', name: 'Flutter Basics', domain: 'mobile_development', difficulty: 2, estimated_hours: 30, prerequisites: ['dart-basics'], resources: [{ type: 'course', title: 'Flutter Crash Course', platform: 'YouTube', free: true }, { type: 'project', title: 'Calculator App', difficulty: 2 }] },

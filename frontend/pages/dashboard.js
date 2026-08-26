@@ -52,6 +52,74 @@ function SkillGapBar({ name, acquired }) {
   );
 }
 
+function ProgressChart({ path, gap, completedCount }) {
+  const phases = path?.phases || [];
+  const totalSkills = path?.total_courses || 1;
+  const completed = completedCount || 0;
+  const pct = Math.round((completed / Math.max(totalSkills, 1)) * 100);
+  const circumference = 2 * Math.PI * 42;
+  const offset = circumference - (pct / 100) * circumference;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 24, padding: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12 }}>
+      <div style={{ position: 'relative', width: 100, height: 100, flexShrink: 0 }}>
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bg-tertiary)" strokeWidth="6" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--primary)" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+        </svg>
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>{pct}%</div>
+        </div>
+      </div>
+      <div style={{ flex: 1 }}>
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>Progress Overview</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {phases.map((p, i) => {
+            const phaseCompleted = Math.min(p.courses.length, Math.max(0, completed - phases.slice(0, i).reduce((s, ph) => s + ph.courses.length, 0)));
+            const phasePct = Math.round((phaseCompleted / Math.max(p.courses.length, 1)) * 100);
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', width: 80, flexShrink: 0 }}>Phase {p.phase}</span>
+                <div style={{ flex: 1, height: 6, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${phasePct}%`, background: 'var(--primary)', borderRadius: 3, transition: 'width 0.5s ease' }} />
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: 30, textAlign: 'right' }}>{phaseCompleted}/{p.courses.length}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NextActionCard({ profile, recs }) {
+  if (!recs.length) return null;
+  const top = recs[0];
+  return (
+    <div style={{ padding: 20, background: 'var(--primary-subtle)', border: '1px solid var(--primary)', borderRadius: 12, marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+        <span style={{ fontSize: '1.2rem' }}>🎯</span>
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--primary)' }}>Next Recommended Action</h3>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{top.course.title}</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{top.course.provider} · {top.course.duration_hours}h · {top.course.level}</p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{Math.round(top.score * 100)}%</div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>match</div>
+        </div>
+      </div>
+      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>{top.explanation}</p>
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        <Link href="/learning-path" className="btn btn-primary btn-sm">Start Learning</Link>
+        <Link href="/chat" className="btn btn-secondary btn-sm">Ask AI Assistant</Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [recs, setRecs] = useState([]);
@@ -110,6 +178,9 @@ export default function Dashboard() {
           <p className="page-subtitle">Profile: <strong>{profile.name}</strong> — Level: <strong>{profile.experience_level}</strong></p>
         </div>
 
+        {/* Next Action */}
+        <NextActionCard profile={profile} recs={recs} />
+
         <div className="stats-grid">
           <div className="stat-card"><div className="stat-value">{path ? path.total_courses : 0}</div><div className="stat-label">Skills to Learn</div></div>
           <div className="stat-card"><div className="stat-value">{path ? path.estimated_weeks : 0}w</div><div className="stat-label">Est. Duration</div></div>
@@ -117,7 +188,10 @@ export default function Dashboard() {
           <div className="stat-card"><div className="stat-value">{profile.progress?.total_courses_completed || 0}</div><div className="stat-label">Completed</div></div>
         </div>
 
-        <div className="dashboard-grid">
+        {/* Progress Chart */}
+        {path && <ProgressChart path={path} gap={gap} completedCount={profile.progress?.total_courses_completed || 0} />}
+
+        <div className="dashboard-grid" style={{ marginTop: 24 }}>
           <section className="dashboard-section">
             <h2 className="section-title">Recommended Skills</h2>
             {recs.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Complete your profile to get recommendations.</p>}

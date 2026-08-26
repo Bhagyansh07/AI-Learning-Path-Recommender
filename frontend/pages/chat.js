@@ -26,6 +26,12 @@ function formatProfileSummary(profile, path) {
   return lines.join('\n');
 }
 
+function getNextAction(profile) {
+  const recs = getRecommendations(profile, 1);
+  if (recs.length > 0) return `Start with: ${recs[0].course.title} (${recs[0].course.duration_hours}h)`;
+  return 'All caught up! Check your dashboard for next steps.';
+}
+
 function processMessage(text, profile) {
   const lower = text.toLowerCase();
   if (lower.includes('recommend') || lower.includes('suggest') || lower.includes('what should')) {
@@ -43,6 +49,21 @@ function processMessage(text, profile) {
   if (lower.includes('why') || lower.includes('explain')) {
     const recs = getRecommendations(profile, 1);
     if (recs[0]) return `Why ${recs[0].course.title}?\n\n${recs[0].why_this}\n\nDifficulty: ${recs[0].difficulty_reason}\n${recs[0].prerequisite_info.message}`;
+  }
+  if (lower.includes('skip') || lower.includes('can i skip')) {
+    const recs = getRecommendations(profile, 1);
+    if (recs[0]) {
+      const prereqInfo = recs[0].prerequisite_info;
+      if (!prereqInfo.met) return `Skipping "${recs[0].course.title}" is not recommended.\n\n${prereqInfo.message}\n\nYou need these prerequisites first before moving to this skill.`;
+      return `You can skip "${recs[0].course.title}" if you already know the material, but it's recommended for your path. The ${recs[0].difficulty_reason}.`;
+    }
+  }
+  if (lower.includes('how long') || lower.includes('time') || lower.includes('duration') || lower.includes('weeks')) {
+    const path = getLearningPath(profile);
+    return `Based on your ${profile.time_commitment} commitment:\n\nTotal time: ~${path.estimated_hours} hours\nEstimated duration: ${path.estimated_weeks} weeks\nSkills to learn: ${path.total_courses}\n\nThis adjusts automatically if you change your time commitment.`;
+  }
+  if (lower.includes('next') || lower.includes('what now') || lower.includes('start')) {
+    return `Here's what you should do next:\n\n${getNextAction(profile)}\n\nOr check your dashboard for the full overview.`;
   }
   return null;
 }
@@ -68,10 +89,11 @@ export default function Chat() {
     const existing = getProfile();
     if (existing) {
       const path = getLearningPath(existing);
-      setMessages([{ id: 1, type: 'ai', text: `Welcome back! Here's your profile:\n\n${formatProfileSummary(existing, path)}\n\nWhat would you like to explore?`, suggestions: ['Recommend courses', 'Show my learning path', 'What skills do I need?', 'Explain my path'] }]);
+      const nextAction = getNextAction(existing);
+      setMessages([{ id: 1, type: 'ai', text: `Welcome back! Here's your profile:\n\n${formatProfileSummary(existing, path)}\n\nNext action: ${nextAction}\n\nWhat would you like to explore?`, suggestions: ['Recommend courses', 'Show my learning path', 'What skills do I need?', 'How long will this take?'] }]);
     } else {
       setOnboarding(0);
-      setMessages([{ id: 1, type: 'ai', text: "Welcome to LearnPath AI! I'll build your personalized learning path.\n\n" + ONBOARDING_STEPS[0].q, suggestions: ONBOARDING_STEPS[0].opts }]);
+      setMessages([{ id: 1, type: 'ai', text: "Welcome to LearnPath AI! I'll build your personalized learning path.\n\nYou can click a suggestion below OR type your own answer.\n\n" + ONBOARDING_STEPS[0].q, suggestions: ONBOARDING_STEPS[0].opts }]);
     }
   }, []);
 
@@ -82,10 +104,11 @@ export default function Chat() {
     const profile = buildProfile(data);
     const path = getLearningPath(profile);
     const recs = getRecommendations(profile);
-    let summary = "Your profile is ready!\n\n" + formatProfileSummary(profile, path) + "\n\nTop recommendations:\n";
+    const nextAction = getNextAction(profile);
+    let summary = "Your profile is ready!\n\n" + formatProfileSummary(profile, path) + "\n\nNext action: " + nextAction + "\n\nTop recommendations:\n";
     recs.slice(0, 3).forEach((r, i) => { summary += `\n${i + 1}. ${r.course.title} (${r.course.duration_hours}h) — ${Math.round(r.score * 100)}% match\n   ${r.explanation}`; });
     summary += "\n\nAsk me anything about your learning journey!";
-    setMessages(prev => [...prev, { id: Date.now() + 100, type: 'ai', text: summary, suggestions: ['Recommend courses for me', 'Show my learning path', 'What skills do I need?', 'Why these recommendations?'] }]);
+    setMessages(prev => [...prev, { id: Date.now() + 100, type: 'ai', text: summary, suggestions: ['Recommend courses for me', 'Show my learning path', 'How long will this take?', 'What should I start with?'] }]);
     setOnboarding(null);
     setLoading(false);
   };
@@ -113,9 +136,17 @@ export default function Chat() {
     setInput('');
     setLoading(true);
     const profile = getProfile();
+
+    // If during onboarding, try to match text to a valid option first
+    if (onboarding !== null) {
+      const step = ONBOARDING_STEPS[onboarding];
+      const match = step.opts.find(o => o.toLowerCase().includes(text.toLowerCase()) || text.toLowerCase().includes(o.toLowerCase().split(' ')[0]));
+      if (match) { handleOnboardingChoice(match); return; }
+    }
+
     let aiResponse = profile ? processMessage(text, profile) : null;
     if (!aiResponse) aiResponse = await callLLM(text, profile);
-    setMessages(prev => [...prev, { id: Date.now() + 1, type: 'ai', text: aiResponse || "I can help with course recommendations, learning paths, skill gaps, and career guidance.", suggestions: [] }]);
+    setMessages(prev => [...prev, { id: Date.now() + 1, type: 'ai', text: aiResponse || "I can help with course recommendations, learning paths, skill gaps, and career guidance. Try asking about your learning path, skill gaps, or what to study next!", suggestions: ['Recommend courses', 'Show my learning path', 'What skills do I need?', 'How long will this take?'] }]);
     setLoading(false);
   };
 
@@ -151,7 +182,7 @@ export default function Chat() {
             <div ref={endRef} />
           </div>
           <form className="chat-input-area" onSubmit={(e) => { e.preventDefault(); sendMessage(input); }}>
-            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={onboarding !== null ? "Type your answer or click a suggestion above..." : "Ask me anything about learning..."} />
+            <input type="text" className="chat-input" value={input} onChange={(e) => setInput(e.target.value)} placeholder={onboarding !== null ? "Type your answer or click a suggestion above..." : "Ask me anything about learning..."} disabled={false} />
             <button type="submit" className="chat-send" disabled={loading || !input.trim()}>{loading ? '...' : 'Send'}</button>
           </form>
         </div>
