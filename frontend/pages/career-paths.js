@@ -49,7 +49,7 @@ export default function CareerPathsPage() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
           {paths.map(p => (
-            <button key={p.id} className={`btn btn-sm`} style={{ background: selected.includes(p.id) ? 'var(--color-accent)' : 'var(--color-card)', color: selected.includes(p.id) ? '#fff' : 'var(--color-ink)', border: '1px solid var(--color-border)' }} onClick={() => togglePath(p.id)}>
+            <button key={p.id} className={`btn btn-sm`} style={{ background: selected.includes(p.id) ? 'var(--accent)' : 'var(--surface)', color: selected.includes(p.id) ? '#fff' : 'var(--text)', border: '1px solid var(--border)' }} onClick={() => togglePath(p.id)}>
               {p.display_name} ({p.target_skills.length})
             </button>
           ))}
@@ -57,15 +57,15 @@ export default function CareerPathsPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(selectedPaths.length, 3)}, 1fr)`, gap: 16, marginBottom: 24 }}>
           {selectedPaths.map(p => (
-            <div key={p.id} style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, padding: 20 }}>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: 4 }}>{p.display_name}</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--color-ink-2)', marginBottom: 12 }}>{p.description}</p>
+            <div key={p.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 20 }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>{p.display_name}</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-2)', marginBottom: 12 }}>{p.description}</p>
               <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-                <div><div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase' }}>Salary</div><div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-accent)' }}>{p.avg_salary}</div></div>
-                <div><div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase' }}>Growth</div><div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#22c55e' }}>{p.growth_rate}</div></div>
-                <div><div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase' }}>Skills</div><div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-ink)' }}>{p.target_skills.length}</div></div>
+                <div><div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase' }}>Salary</div><div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)' }}>{p.avg_salary}</div></div>
+                <div><div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase' }}>Growth</div><div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#22c55e' }}>{p.growth_rate}</div></div>
+                <div><div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase' }}>Skills</div><div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)' }}>{p.target_skills.length}</div></div>
               </div>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase', marginBottom: 6 }}>Required Skills</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>Required Skills</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {p.target_skills.map(s => {
                   const sk = skillMap[s];
@@ -77,17 +77,17 @@ export default function CareerPathsPage() {
         </div>
 
         {Object.keys(overlap).length > 0 && (
-          <section style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, padding: 20, marginBottom: 24 }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: 12 }}>Skill Overlap Analysis</h2>
+          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 20, marginBottom: 24 }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 12 }}>Skill Overlap Analysis</h2>
             {Object.entries(overlap).map(([pair, skills]) => (
               <div key={pair} style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-ink)', marginBottom: 4 }}>{pair} — {skills.length} shared skills ({Math.round((skills.length / Math.max(...selectedPaths.map(p => p.target_skills.length))) * 100)}% overlap)</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>{pair} — {skills.length} shared skills ({Math.round((skills.length / Math.max(...selectedPaths.map(p => p.target_skills.length))) * 100)}% overlap)</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {skills.map(s => <span key={s} style={{ padding: '3px 8px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 6, fontSize: '0.7rem', fontWeight: 600, color: '#22c55e' }}>{skillMap[s]?.name || s}</span>)}
                 </div>
               </div>
             ))}
-            <div style={{ marginTop: 8, padding: 10, background: 'var(--color-paper-2)', borderRadius: 8, border: '1px solid var(--color-border)', fontSize: '0.8rem', color: 'var(--color-ink-2)' }}>
+            <div style={{ marginTop: 8, padding: 10, background: 'var(--bg-3)', borderRadius: 8, border: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--text-2)' }}>
               💡 Learning shared skills first maximizes transferability across career paths.
             </div>
           </section>

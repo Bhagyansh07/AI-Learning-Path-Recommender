@@ -84,20 +84,20 @@ function RecommendationCard({ rec, index }) {
   const color = DOMAIN_COLORS[domain] || '#6b7280';
 
   return (
-    <div style={{ margin: '8px 0', padding: 12, background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 10, borderLeft: `3px solid ${color}` }}>
+    <div style={{ margin: '8px 0', padding: 12, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, borderLeft: `3px solid ${color}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
         <div>
           <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{rec.course.title}</div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)' }}>{rec.course.provider} · {rec.course.duration_hours}h · {rec.course.level}</div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-3)' }}>{rec.course.provider} · {rec.course.duration_hours}h · {rec.course.level}</div>
         </div>
         <div style={{ padding: '3px 8px', borderRadius: 6, background: `${color}15`, color, fontSize: '0.75rem', fontWeight: 700 }}>
           {Math.round(rec.score * 100)}%
         </div>
       </div>
-      <div style={{ fontSize: '0.75rem', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>{rec.explanation}</div>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-2)', lineHeight: 1.5 }}>{rec.explanation}</div>
       {rec.why_this && (
-        <div style={{ marginTop: 6, padding: '6px 8px', background: 'var(--color-paper-2)', borderRadius: 6, fontSize: '0.7rem', color: 'var(--color-ink-3)', lineHeight: 1.5 }}>
-          <strong style={{ color: 'var(--color-ink-2)' }}>Why:</strong> {rec.why_this}
+        <div style={{ marginTop: 6, padding: '6px 8px', background: 'var(--bg-3)', borderRadius: 6, fontSize: '0.7rem', color: 'var(--text-3)', lineHeight: 1.5 }}>
+          <strong style={{ color: 'var(--text-2)' }}>Why:</strong> {rec.why_this}
         </div>
       )}
     </div>
@@ -116,18 +116,18 @@ function RichResponse({ type, data, profile }) {
     return (
       <div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--color-accent-subtle)', color: 'var(--color-accent)', fontSize: '0.75rem', fontWeight: 600 }}>{data.total_courses} skills</div>
-          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--color-paper-3)', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-ink-2)' }}>{data.phases.length} phases</div>
-          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--color-paper-3)', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-ink-2)' }}>~{data.estimated_weeks} weeks</div>
+          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--accent-dim)', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600 }}>{data.total_courses} skills</div>
+          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--bg-4)', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-2)' }}>{data.phases.length} phases</div>
+          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--bg-4)', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-2)' }}>~{data.estimated_weeks} weeks</div>
         </div>
         {data.phases.map((p, i) => (
-          <div key={i} style={{ padding: '8px 0', borderBottom: i < data.phases.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
+          <div key={i} style={{ padding: '8px 0', borderBottom: i < data.phases.length - 1 ? '1px solid var(--border)' : 'none' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: 4 }}>Phase {p.phase}: {p.name} ({p.duration_weeks}w)</div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {p.courses.slice(0, 5).map((c, j) => (
-                <span key={j} style={{ padding: '2px 6px', borderRadius: 4, fontSize: '0.65rem', fontWeight: 600, background: 'var(--color-paper-3)', color: 'var(--color-ink-2)' }}>{c.title}</span>
+                <span key={j} style={{ padding: '2px 6px', borderRadius: 4, fontSize: '0.65rem', fontWeight: 600, background: 'var(--bg-4)', color: 'var(--text-2)' }}>{c.title}</span>
               ))}
-              {p.courses.length > 5 && <span style={{ fontSize: '0.65rem', color: 'var(--color-ink-3)' }}>+{p.courses.length - 5} more</span>}
+              {p.courses.length > 5 && <span style={{ fontSize: '0.65rem', color: 'var(--text-3)' }}>+{p.courses.length - 5} more</span>}
             </div>
           </div>
         ))}
@@ -139,26 +139,26 @@ function RichResponse({ type, data, profile }) {
     const acquired = data.acquired_skills.slice(0, 4);
     return (
       <div>
-        <div style={{ padding: 10, background: 'var(--color-accent-subtle)', borderRadius: 8, marginBottom: 8, textAlign: 'center' }}>
-          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-accent)' }}>{data.readiness_score}%</span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-ink-3)', marginLeft: 6 }}>Ready for {data.career_title}</span>
+        <div style={{ padding: 10, background: 'var(--accent-dim)', borderRadius: 8, marginBottom: 8, textAlign: 'center' }}>
+          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent)' }}>{data.readiness_score}%</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-3)', marginLeft: 6 }}>Ready for {data.career_title}</span>
         </div>
         {missing.length > 0 && (
           <div style={{ marginBottom: 6 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-ink-3)', marginBottom: 4 }}>Missing Skills</div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-3)', marginBottom: 4 }}>Missing Skills</div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {missing.map((s, i) => (
-                <span key={i} style={{ padding: '3px 8px', borderRadius: 4, fontSize: '0.7rem', fontWeight: 600, background: 'rgba(245,158,11,0.08)', color: 'var(--color-warning)' }}>{s.name}</span>
+                <span key={i} style={{ padding: '3px 8px', borderRadius: 4, fontSize: '0.7rem', fontWeight: 600, background: 'rgba(245,158,11,0.08)', color: 'var(--amber)' }}>{s.name}</span>
               ))}
             </div>
           </div>
         )}
         {acquired.length > 0 && (
           <div>
-            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-ink-3)', marginBottom: 4 }}>Acquired</div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-3)', marginBottom: 4 }}>Acquired</div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {acquired.map((s, i) => (
-                <span key={i} style={{ padding: '3px 8px', borderRadius: 4, fontSize: '0.7rem', fontWeight: 600, background: 'rgba(5,150,105,0.08)', color: 'var(--color-success)' }}>{typeof s === 'string' ? (getSkillById(s)?.name || s) : s}</span>
+                <span key={i} style={{ padding: '3px 8px', borderRadius: 4, fontSize: '0.7rem', fontWeight: 600, background: 'rgba(5,150,105,0.08)', color: 'var(--green)' }}>{typeof s === 'string' ? (getSkillById(s)?.name || s) : s}</span>
               ))}
             </div>
           </div>
@@ -478,7 +478,7 @@ export default function Chat() {
                 <div className="chat-avatar ai">AI</div>
                 <div className="chat-bubble" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div className="loading-spinner" />
-                  <span style={{ color: 'var(--color-ink-3)', fontSize: '0.8rem' }}>Thinking...</span>
+                  <span style={{ color: 'var(--text-3)', fontSize: '0.8rem' }}>Thinking...</span>
                 </div>
               </div>
             )}

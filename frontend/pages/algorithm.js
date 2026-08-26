@@ -46,17 +46,17 @@ function TopoDemo() {
       </div>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase', marginBottom: 6 }}>Input Queue</div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>Input Queue</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {queue.length === 0 && !running && sorted.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--color-ink-3)' }}>Click "Run" to start</span>}
-            {queue.map(id => <span key={id} style={{ padding: '4px 8px', background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-accent)' }}>{skillMap[id]?.name || id}</span>)}
+            {queue.length === 0 && !running && sorted.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--text-3)' }}>Click "Run" to start</span>}
+            {queue.map(id => <span key={id} style={{ padding: '4px 8px', background: 'var(--accent-dim)', border: '1px solid var(--accent)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent)' }}>{skillMap[id]?.name || id}</span>)}
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase', marginBottom: 6 }}>Sorted Output (Step {step})</div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>Sorted Output (Step {step})</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
             {sorted.map((id, i) => (
-              <span key={id} style={{ padding: '4px 8px', background: i === sorted.length - 1 ? '#22c55e' : 'var(--color-paper-3)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: i === sorted.length - 1 ? '#fff' : 'var(--color-ink)' }}>
+              <span key={id} style={{ padding: '4px 8px', background: i === sorted.length - 1 ? '#22c55e' : 'var(--bg-4)', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: i === sorted.length - 1 ? '#fff' : 'var(--text)' }}>
                 {i + 1}. {skillMap[id]?.name || id}
               </span>
             ))}
@@ -85,19 +85,19 @@ function ScoringDemo() {
           { label: 'Difficulty Fit', value: difficulty, set: setDifficulty, color: '#8b5cf6', max: 20 },
           { label: 'Prerequisites', value: prereqs, set: setPrereqs, color: '#06b6d4', max: 20 },
         ].map(f => (
-          <div key={f.label} style={{ background: 'var(--color-paper-2)', borderRadius: 8, padding: 10, border: '1px solid var(--color-border)' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-ink-3)', textTransform: 'uppercase', marginBottom: 4 }}>{f.label}</div>
+          <div key={f.label} style={{ background: 'var(--bg-3)', borderRadius: 8, padding: 10, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 4 }}>{f.label}</div>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: f.color }}>{f.value}%</div>
             <input type="range" min={0} max={f.max} value={f.value} onChange={e => f.set(parseInt(e.target.value))} style={{ width: '100%', accentColor: f.color, marginTop: 4 }} />
           </div>
         ))}
       </div>
-      <div style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 10, padding: 16 }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-ink)' }}>Final Score</span>
-          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-accent)' }}>{total}%</span>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>Final Score</span>
+          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent)' }}>{total}%</span>
         </div>
-        <div style={{ height: 20, background: 'var(--color-paper-3)', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
+        <div style={{ height: 20, background: 'var(--bg-4)', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
           <div style={{ width: `${(skillGap/total)*100}%`, background: '#3b82f6', transition: 'width 0.3s' }} />
           <div style={{ width: `${(careerMatch/total)*100}%`, background: '#22c55e', transition: 'width 0.3s' }} />
           <div style={{ width: `${(demand/total)*100}%`, background: '#f59e0b', transition: 'width 0.3s' }} />
@@ -120,18 +120,18 @@ function GapDemo() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: '0.85rem', color: 'var(--color-ink-2)' }}>Target: ML Engineer (demo profile)</span>
-        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-accent)' }}>{pct}% ready</span>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-2)' }}>Target: ML Engineer (demo profile)</span>
+        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--accent)' }}>{pct}% ready</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
         {gaps.map(g => (
           <div key={g.id} style={{ padding: '8px 12px', background: g.acquired ? 'rgba(5,150,105,0.08)' : 'rgba(239,68,68,0.05)', border: `1px solid ${g.acquired ? 'rgba(5,150,105,0.3)' : 'rgba(239,68,68,0.2)'}`, borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-ink)' }}>{g.name}</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text)' }}>{g.name}</span>
             <span style={{ fontSize: '0.7rem', fontWeight: 700, color: g.acquired ? '#059669' : '#dc2626' }}>{g.acquired ? '✓ Acquired' : '✗ Missing'}</span>
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 12, padding: 10, background: 'var(--color-paper-2)', borderRadius: 8, border: '1px solid var(--color-border)', fontSize: '0.8rem', color: 'var(--color-ink-2)' }}>
+      <div style={{ marginTop: 12, padding: 10, background: 'var(--bg-3)', borderRadius: 8, border: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--text-2)' }}>
         Algorithm: Set Difference — <code>target_skills ∩ ¬ user_skills</code> → {gaps.filter(g => !g.acquired).length} skills to learn
       </div>
     </div>
@@ -148,21 +148,21 @@ export default function AlgorithmPage() {
         <p className="page-subtitle">See exactly how our AI works. Every algorithm is deterministic, explainable, and runs client-side.</p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <section style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, padding: 24 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: 4 }}>1. Topological Sort (DAG Traversal)</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-ink-2)', marginBottom: 16 }}>Kahn's algorithm ensures prerequisites are always learned before dependent skills. Watch nodes with zero in-degree get processed first.</p>
+          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>1. Topological Sort (DAG Traversal)</h2>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginBottom: 16 }}>Kahn's algorithm ensures prerequisites are always learned before dependent skills. Watch nodes with zero in-degree get processed first.</p>
             <TopoDemo />
           </section>
 
-          <section style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, padding: 24 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: 4 }}>2. 5-Factor Hybrid Scoring</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-ink-2)', marginBottom: 16 }}>Each skill is scored on 5 weighted factors. Adjust the sliders to see how the final score changes.</p>
+          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>2. 5-Factor Hybrid Scoring</h2>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginBottom: 16 }}>Each skill is scored on 5 weighted factors. Adjust the sliders to see how the final score changes.</p>
             <ScoringDemo />
           </section>
 
-          <section style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, padding: 24 }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: 4 }}>3. Skill Gap Analysis (Set Difference)</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-ink-2)', marginBottom: 16 }}>Compares your current skills against career path requirements using set operations.</p>
+          <section style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>3. Skill Gap Analysis (Set Difference)</h2>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-2)', marginBottom: 16 }}>Compares your current skills against career path requirements using set operations.</p>
             <GapDemo />
           </section>
         </div>

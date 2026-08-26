@@ -14,7 +14,7 @@ const DOMAIN_COLORS = {
 
 function Toast({ msg, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);
-  return <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--color-accent)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{msg}</div>;
+  return <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'var(--accent)', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 9999, boxShadow: 'var(--shadow-lg)', animation: 'fadeIn 0.2s ease' }}>{msg}</div>;
 }
 
 function SkillCard({ skill, index, onFeedback, profile }) {
@@ -45,7 +45,7 @@ function SkillCard({ skill, index, onFeedback, profile }) {
   return (
     <div className={`skill-card ${completed ? 'completed' : ''}`}>
       {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
-      <div className="skill-card-number" style={completed ? { background: 'rgba(5,150,105,0.1)', color: 'var(--color-success)' } : {}}>
+      <div className="skill-card-number" style={completed ? { background: 'rgba(5,150,105,0.1)', color: 'var(--green)' } : {}}>
         {completed ? '✓' : index + 1}
       </div>
       <div className="skill-card-content">
@@ -59,14 +59,14 @@ function SkillCard({ skill, index, onFeedback, profile }) {
           <span>{skill.provider}</span><span>·</span><span>{skill.duration_hours}h</span><span>·</span>
           <span className={`level-badge ${skill.level}`}>{skill.level}</span>
           {domain && <span>·</span>}
-          {domain && <span style={{ fontSize: '0.7rem', color: DOMAIN_COLORS[domain] || 'var(--color-ink-3)' }}>{DOMAIN_NAMES[domain] || domain}</span>}
+          {domain && <span style={{ fontSize: '0.7rem', color: DOMAIN_COLORS[domain] || 'var(--text-3)' }}>{DOMAIN_NAMES[domain] || domain}</span>}
         </div>
 
         {project && (
-          <div style={{ padding: '6px 8px', background: 'var(--color-paper-2)', borderRadius: 6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.7rem' }}>
-            <span style={{ padding: '1px 4px', borderRadius: 3, background: 'var(--color-accent-subtle)', color: 'var(--color-accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.6rem' }}>Project</span>
-            <span style={{ color: 'var(--color-ink-2)' }}>{project.title}</span>
-            <span style={{ color: 'var(--color-ink-3)' }}>Level {project.difficulty || 1}</span>
+          <div style={{ padding: '6px 8px', background: 'var(--bg-3)', borderRadius: 6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.7rem' }}>
+            <span style={{ padding: '1px 4px', borderRadius: 3, background: 'var(--accent-dim)', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.6rem' }}>Project</span>
+            <span style={{ color: 'var(--text-2)' }}>{project.title}</span>
+            <span style={{ color: 'var(--text-3)' }}>Level {project.difficulty || 1}</span>
           </div>
         )}
 
@@ -93,13 +93,13 @@ function TimelineView({ path, profile }) {
   let cumWeeks = 0;
 
   return (
-    <div style={{ padding: 16, background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 12, marginBottom: 24, overflowX: 'auto' }}>
+    <div style={{ padding: 16, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24, overflowX: 'auto' }}>
       <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 12 }}>Timeline Overview</h3>
       <div style={{ position: 'relative', minWidth: 500 }}>
         {/* Week markers */}
         <div style={{ display: 'flex', marginBottom: 4 }}>
           {Array.from({ length: Math.min(totalWeeks, 20) }, (_, i) => (
-            <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: '0.55rem', color: 'var(--color-ink-3)', borderRight: '1px solid var(--color-border)' }}>
+            <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: '0.55rem', color: 'var(--text-3)', borderRight: '1px solid var(--border)' }}>
               W{i + 1}
             </div>
           ))}
@@ -118,8 +118,8 @@ function TimelineView({ path, profile }) {
 
           return (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              <div style={{ width: 70, fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-ink-2)', flexShrink: 0 }}>Phase {phase.phase}</div>
-              <div style={{ flex: 1, position: 'relative', height: 28, background: 'var(--color-paper-3)', borderRadius: 6 }}>
+              <div style={{ width: 70, fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-2)', flexShrink: 0 }}>Phase {phase.phase}</div>
+              <div style={{ flex: 1, position: 'relative', height: 28, background: 'var(--bg-4)', borderRadius: 6 }}>
                 <div style={{ position: 'absolute', left: `${startPct}%`, width: `${widthPct}%`, height: '100%', borderRadius: 6, overflow: 'hidden', border: `1px solid ${color}40` }}>
                   <div style={{ height: '100%', width: `${phasePct}%`, background: color, opacity: 0.8, transition: 'width 0.5s ease' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', paddingLeft: 8 }}>
@@ -199,11 +199,11 @@ export default function LearningPath() {
           <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
             <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
               <svg width="80" height="80" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-paper-3)" strokeWidth="6" />
-                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-accent)" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bg-4)" strokeWidth="6" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
               </svg>
               <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-accent)' }}>{progress.pct}%</div>
+                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent)' }}>{progress.pct}%</div>
               </div>
             </div>
             {gap && (
@@ -216,17 +216,17 @@ export default function LearningPath() {
         </div>
 
         <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-          <div style={{ flex: 1, padding: '10px 14px', background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 8, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-accent)' }}>{progress.completed}</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)', textTransform: 'uppercase' }}>Completed</div>
+          <div style={{ flex: 1, padding: '10px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, textAlign: 'center' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent)' }}>{progress.completed}</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-3)', textTransform: 'uppercase' }}>Completed</div>
           </div>
-          <div style={{ flex: 1, padding: '10px 14px', background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 8, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-ink)' }}>{totalSkills - progress.completed}</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)', textTransform: 'uppercase' }}>Remaining</div>
+          <div style={{ flex: 1, padding: '10px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, textAlign: 'center' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>{totalSkills - progress.completed}</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-3)', textTransform: 'uppercase' }}>Remaining</div>
           </div>
-          <div style={{ flex: 1, padding: '10px 14px', background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: 8, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-ink)' }}>{path.estimated_weeks}w</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)', textTransform: 'uppercase' }}>Duration</div>
+          <div style={{ flex: 1, padding: '10px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, textAlign: 'center' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)' }}>{path.estimated_weeks}w</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-3)', textTransform: 'uppercase' }}>Duration</div>
           </div>
         </div>
 
@@ -255,10 +255,10 @@ export default function LearningPath() {
                     <h2 className="phase-title">{phase.name}</h2>
                     <p className="phase-desc">{phase.description} — {phase.duration_weeks} weeks</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-                      <div style={{ flex: 1, height: 4, background: 'var(--color-paper-3)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ flex: 1, height: 4, background: 'var(--bg-4)', borderRadius: 2, overflow: 'hidden' }}>
                         <div style={{ height: '100%', width: `${phasePct}%`, background: phaseColor, borderRadius: 2, transition: 'width 0.4s ease' }} />
                       </div>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--color-ink-3)', fontWeight: 600 }}>{phaseCompleted}/{phase.courses.length}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-3)', fontWeight: 600 }}>{phaseCompleted}/{phase.courses.length}</span>
                     </div>
                   </div>
                 </div>
