@@ -19,6 +19,9 @@ export default function NavBar({ active }) {
             <Link href="/chat" className={`nav-link ${active === 'chat' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Assistant</Link>
             <Link href="/dashboard" className={`nav-link ${active === 'dashboard' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Dashboard</Link>
             <Link href="/learning-path" className={`nav-link ${active === 'path' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Path</Link>
+            <Link href="/skill-graph" className={`nav-link ${active === 'graph' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Graph</Link>
+            <Link href="/algorithm" className={`nav-link ${active === 'algorithm' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Algorithm</Link>
+            <Link href="/career-paths" className={`nav-link ${active === 'career' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Careers</Link>
           </div>
           <button className="theme-toggle" onClick={toggle} aria-label="Toggle theme" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
             {theme === 'light' ? (

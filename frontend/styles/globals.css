@@ -462,6 +462,79 @@ a { color: inherit; text-decoration: none; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes typing { from { opacity: 0; } to { opacity: 1; } }
+
+.typing-cursor {
+  display: inline-block;
+  animation: typing 0.6s infinite alternate;
+  color: var(--primary);
+  font-weight: 700;
+  margin-left: 1px;
+}
+
+/* Feature card staggered animation */
+.feature-card { animation: slideUp 0.4s ease both; }
+.feature-card:nth-child(1) { animation-delay: 0.05s; }
+.feature-card:nth-child(2) { animation-delay: 0.1s; }
+.feature-card:nth-child(3) { animation-delay: 0.15s; }
+.feature-card:nth-child(4) { animation-delay: 0.2s; }
+.feature-card:nth-child(5) { animation-delay: 0.25s; }
+.feature-card:nth-child(6) { animation-delay: 0.3s; }
+.feature-card:nth-child(7) { animation-delay: 0.35s; }
+.feature-card:nth-child(8) { animation-delay: 0.4s; }
+.feature-card:nth-child(9) { animation-delay: 0.45s; }
+
+/* Stat card hover */
+.stat-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+/* Skill card slide in */
+.skill-card { animation: fadeIn 0.25s ease both; }
+
+/* Rec card */
+.rec-card { animation: slideUp 0.3s ease both; }
+.rec-card:nth-child(1) { animation-delay: 0.05s; }
+.rec-card:nth-child(2) { animation-delay: 0.1s; }
+.rec-card:nth-child(3) { animation-delay: 0.15s; }
+.rec-card:nth-child(4) { animation-delay: 0.2s; }
+.rec-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* Button press effect */
+.btn:active, .btn-outline:active, .chat-suggestion:active, .demo-card:active {
+  transform: scale(0.97);
+}
+
+/* Chat suggestion hover glow */
+.chat-suggestion { transition: all 0.2s ease; }
+.chat-suggestion:hover { box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15); }
+
+/* Feedback button hover effect */
+.feedback-btn-sm { transition: all 0.15s ease; }
+.feedback-btn-sm:hover { transform: scale(1.05); }
+
+/* Phase card border animation on hover */
+.phase-card { transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.phase-card:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+/* Milestone dot pulse */
+.milestone .milestone-dot { transition: all 0.2s ease; }
+.milestone:hover .milestone-dot { transform: scale(1.3); }
+
+/* Score badge subtle glow */
+.rec-score { transition: box-shadow 0.15s ease; }
+.rec-score:hover { box-shadow: 0 0 12px rgba(37, 99, 235, 0.2); }
+
+/* Coverage bar animation */
+.coverage-fill { animation: slideWidth 0.8s ease both; }
+@keyframes slideWidth { from { width: 0 !important; } }
+
+/* Loading spinner ring color */
+.loading-spinner { border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+
+/* Selection color */
+::selection { background: var(--primary); color: #fff; }
 
 /* ═══ EXPLANATION MODAL ═══ */
 .modal-overlay {

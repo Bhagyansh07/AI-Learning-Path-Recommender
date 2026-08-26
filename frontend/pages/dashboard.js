@@ -1,15 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
 import ExplanationModal from '../components/ExplanationModal';
 import { getProfile, getRecommendations, getLearningPath, getSkillGaps, getDemoProfiles, submitFeedback, createProfile } from '../lib/engine';
+import { getSkillById, SKILL_DEMAND, DOMAIN_NAMES } from '../lib/skillGraph';
 
 const FEEDBACK_OPTIONS = [
   { value: 'easy', label: 'Too Easy', color: '#22c55e' },
   { value: 'good', label: 'Just Right', color: '#3b82f6' },
   { value: 'hard', label: 'Too Hard', color: '#ef4444' },
 ];
+
+const DOMAIN_COLORS = {
+  programming: '#3b82f6', web_development: '#8b5cf6', data_science: '#06b6d4',
+  machine_learning: '#f59e0b', cloud_computing: '#10b981', cybersecurity: '#ef4444',
+  mobile_development: '#ec4899', math: '#6366f1', mlops: '#f97316',
+};
 
 function FeedbackButtons({ skillId, onFeedback }) {
   const [given, setGiven] = useState(null);
@@ -39,6 +46,113 @@ function SkillGapBar({ name, acquired }) {
     <div className="skill-gap-item">
       <div className="skill-gap-header"><span className="skill-name">{name}</span><span className={`skill-status ${acquired ? 'acquired' : 'missing'}`}>{acquired ? 'Acquired' : 'Missing'}</span></div>
       <div className="skill-gap-bar"><div className={`skill-gap-fill ${acquired ? 'acquired' : 'missing'}`} style={{ width: acquired ? '100%' : '40%' }} /></div>
+    </div>
+  );
+}
+
+function ScoringBreakdown({ recs }) {
+  const factors = [
+    { key: 'skill_gap', label: 'Skill Gap', weight: '35%', color: '#3b82f6' },
+    { key: 'career_relevance', label: 'Career', weight: '25%', color: '#8b5cf6' },
+    { key: 'ml_similarity', label: 'Demand', weight: '20%', color: '#06b6d4' },
+    { key: 'difficulty_fit', label: 'Difficulty', weight: '10%', color: '#10b981' },
+    { key: 'prerequisite_fit', label: 'Prereqs', weight: '10%', color: '#f59e0b' },
+  ];
+
+  if (!recs.length) return null;
+
+  return (
+    <div style={{ padding: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Scoring Breakdown</h3>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>How each recommendation is scored</p>
+        </div>
+        <Link href="/algorithm" style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>See Algorithm →</Link>
+      </div>
+
+      {recs.slice(0, 3).map((rec, ri) => (
+        <div key={ri} style={{ marginBottom: ri < 2 ? 14 : 0, padding: 12, background: 'var(--bg-secondary)', borderRadius: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{rec.course.title}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--primary)' }}>{Math.round(rec.score * 100)}%</span>
+          </div>
+          <div style={{ display: 'flex', gap: 3 }}>
+            {factors.map(f => {
+              const val = rec.breakdown?.[f.key] || 0;
+              return (
+                <div key={f.key} style={{ flex: 1, position: 'relative' }} title={`${f.label}: ${Math.round(val * 100)}%`}>
+                  <div style={{ height: 6, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${val * 100}%`, background: f.color, borderRadius: 3, transition: 'width 0.5s ease' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', gap: 3, marginTop: 4 }}>
+            {factors.map(f => (
+              <div key={f.key} style={{ flex: 1, textAlign: 'center' }}>
+                <span style={{ fontSize: '0.55rem', color: f.color, fontWeight: 600 }}>{Math.round((rec.breakdown?.[f.key] || 0) * 100)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+        {factors.map(f => (
+          <div key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+            <div style={{ width: 6, height: 6, borderRadius: 2, background: f.color, flexShrink: 0 }} />
+            {f.label} {f.weight}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProjectsTracker({ profile, path }) {
+  const completedSet = new Set(profile?.completed_courses || []);
+  const allSkills = useMemo(() => {
+    if (!path) return [];
+    return path.phases.flatMap(ph => ph.courses.map(c => {
+      const skillData = getSkillById(c.skill_id);
+      const project = skillData?.resources?.find(r => r.type === 'project');
+      return { ...c, project, completed: completedSet.has(c.skill_id) };
+    })).filter(s => s.project);
+  }, [path, completedSet]);
+
+  const completedProjects = allSkills.filter(s => s.completed).length;
+
+  return (
+    <div style={{ padding: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, marginTop: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Projects & Assessments</h3>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{completedProjects}/{allSkills.length} projects completed</p>
+        </div>
+        <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+          <div style={{ width: 80, height: 5, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${allSkills.length ? (completedProjects / allSkills.length) * 100 : 0}%`, background: 'var(--skill-acquired)', borderRadius: 3 }} />
+          </div>
+          <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--skill-acquired)' }}>{allSkills.length ? Math.round((completedProjects / allSkills.length) * 100) : 0}%</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
+        {allSkills.slice(0, 12).map((s, i) => (
+          <div key={i} style={{ padding: '10px 12px', background: s.completed ? 'rgba(5,150,105,0.04)' : 'var(--bg-secondary)', borderRadius: 8, border: '1px solid ' + (s.completed ? 'rgba(5,150,105,0.15)' : 'var(--border)'), opacity: s.completed ? 0.7 : 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)' }}>{s.project.title}</span>
+              {s.completed && <span style={{ fontSize: '0.65rem', color: 'var(--skill-acquired)', fontWeight: 600 }}>✓</span>}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+              <span style={{ padding: '1px 4px', borderRadius: 3, background: 'var(--primary-subtle)', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase' }}>Project</span>
+              <span style={{ color: DOMAIN_COLORS[s.domain] || 'var(--text-muted)' }}>{DOMAIN_NAMES[s.domain] || s.domain}</span>
+              <span>· Level {s.project.difficulty || 1}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -182,7 +296,6 @@ export default function Dashboard() {
           <p className="page-subtitle">Profile: <strong>{profile.name}</strong> — Level: <strong>{profile.experience_level}</strong></p>
         </div>
 
-        {/* Next Action */}
         <NextActionCard profile={profile} recs={recs} />
 
         <div className="stats-grid">
@@ -193,6 +306,8 @@ export default function Dashboard() {
         </div>
 
         {path && <ProgressChart path={path} profile={profile} />}
+
+        <ScoringBreakdown recs={recs} />
 
         <div className="dashboard-grid" style={{ marginTop: 24 }}>
           <section className="dashboard-section">
@@ -230,6 +345,8 @@ export default function Dashboard() {
             </section>
           )}
         </div>
+
+        <ProjectsTracker profile={profile} path={path} />
 
         {path && (
           <section className="dashboard-section" style={{ marginTop: 24 }}>

@@ -1,7 +1,14 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
 import { createProfile, getProfile, getRecommendations, getLearningPath, getSkillGaps } from '../lib/engine';
+import { getSkillById, DOMAIN_NAMES } from '../lib/skillGraph';
+
+const DOMAIN_COLORS = {
+  programming: '#3b82f6', web_development: '#8b5cf6', data_science: '#06b6d4',
+  machine_learning: '#f59e0b', cloud_computing: '#10b981', cybersecurity: '#ef4444',
+  mobile_development: '#ec4899', math: '#6366f1', mlops: '#f97316',
+};
 
 const ONBOARDING_STEPS = [
   { q: 'What field or career are you interested in?', field: 'primary_interest', opts: ['Data Science & Analytics', 'Web Development', 'Machine Learning & AI', 'Cloud Computing & DevOps', 'Cybersecurity', 'Mobile Development', 'Software Engineering'] },
@@ -17,7 +24,6 @@ function buildProfile(data) {
   const level = lvl ? lvl[1] : 'beginner';
   const map = { 'Data Science & Analytics': 'data_science', 'Web Development': 'web_development', 'Machine Learning & AI': 'machine_learning', 'Cloud Computing & DevOps': 'cloud_computing', 'Cybersecurity': 'cybersecurity', 'Mobile Development': 'mobile_development', 'Software Engineering': 'programming' };
   const interests = [data.primary_interest || 'programming'].map(i => map[i] || i.toLowerCase().replace(/\s+/g, '_'));
-
   const skillMap = {
     'Python': 'python-basics', 'JavaScript': 'javascript-basics', 'HTML & CSS': 'html-css',
     'React': 'react-basics', 'SQL': 'sql-databases', 'Git': 'git-version-control',
@@ -28,7 +34,6 @@ function buildProfile(data) {
     .filter(s => s && !SKIP.has(s))
     .map(s => skillMap[s] || s.toLowerCase().replace(/\s+/g, '-'))
     .filter(Boolean);
-
   return createProfile({ name: 'Learner', interests, experience_level: level, time_commitment: data.time_commitment || '5-10 hours', career_goals: [data.career_goal || 'career change to tech'], current_skills: currentSkills.map(s => ({ skill: s })) });
 }
 
@@ -48,27 +53,135 @@ function getNextAction(profile) {
   return 'Check your learning path for next steps.';
 }
 
+function TypingText({ text, speed = 12, onDone }) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      if (i >= text.length) {
+        setDisplayed(text);
+        setDone(true);
+        clearInterval(interval);
+        onDone?.();
+        return;
+      }
+      setDisplayed(text.substring(0, i));
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return <span style={{ whiteSpace: 'pre-wrap' }}>{displayed}{!done && <span className="typing-cursor">|</span>}</span>;
+}
+
+function RecommendationCard({ rec, index }) {
+  const skill = getSkillById(rec.skill_id);
+  const domain = skill?.domain || 'programming';
+  const color = DOMAIN_COLORS[domain] || '#6b7280';
+
+  return (
+    <div style={{ margin: '8px 0', padding: 12, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, borderLeft: `3px solid ${color}` }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+        <div>
+          <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{rec.course.title}</div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{rec.course.provider} · {rec.course.duration_hours}h · {rec.course.level}</div>
+        </div>
+        <div style={{ padding: '3px 8px', borderRadius: 6, background: `${color}15`, color, fontSize: '0.75rem', fontWeight: 700 }}>
+          {Math.round(rec.score * 100)}%
+        </div>
+      </div>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{rec.explanation}</div>
+      {rec.why_this && (
+        <div style={{ marginTop: 6, padding: '6px 8px', background: 'var(--bg-secondary)', borderRadius: 6, fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+          <strong style={{ color: 'var(--text-secondary)' }}>Why:</strong> {rec.why_this}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RichResponse({ type, data, profile }) {
+  if (type === 'recommendations') {
+    return (
+      <div>
+        {data.map((rec, i) => <RecommendationCard key={i} rec={rec} index={i} />)}
+      </div>
+    );
+  }
+  if (type === 'learning_path') {
+    return (
+      <div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--primary-subtle)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 600 }}>{data.total_courses} skills</div>
+          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--bg-tertiary)', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{data.phases.length} phases</div>
+          <div style={{ padding: '4px 10px', borderRadius: 6, background: 'var(--bg-tertiary)', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>~{data.estimated_weeks} weeks</div>
+        </div>
+        {data.phases.map((p, i) => (
+          <div key={i} style={{ padding: '8px 0', borderBottom: i < data.phases.length - 1 ? '1px solid var(--border)' : 'none' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: 4 }}>Phase {p.phase}: {p.name} ({p.duration_weeks}w)</div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {p.courses.slice(0, 5).map((c, j) => (
+                <span key={j} style={{ padding: '2px 6px', borderRadius: 4, fontSize: '0.65rem', fontWeight: 600, background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>{c.title}</span>
+              ))}
+              {p.courses.length > 5 && <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>+{p.courses.length - 5} more</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (type === 'skill_gaps') {
+    const missing = data.missing_skills.slice(0, 6);
+    const acquired = data.acquired_skills.slice(0, 4);
+    return (
+      <div>
+        <div style={{ padding: 10, background: 'var(--primary-subtle)', borderRadius: 8, marginBottom: 8, textAlign: 'center' }}>
+          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>{data.readiness_score}%</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: 6 }}>Ready for {data.career_title}</span>
+        </div>
+        {missing.length > 0 && (
+          <div style={{ marginBottom: 6 }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Missing Skills</div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {missing.map((s, i) => (
+                <span key={i} style={{ padding: '3px 8px', borderRadius: 4, fontSize: '0.7rem', fontWeight: 600, background: 'rgba(245,158,11,0.08)', color: 'var(--skill-missing)' }}>{s.name}</span>
+              ))}
+            </div>
+          </div>
+        )}
+        {acquired.length > 0 && (
+          <div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Acquired</div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {acquired.map((s, i) => (
+                <span key={i} style={{ padding: '3px 8px', borderRadius: 4, fontSize: '0.7rem', fontWeight: 600, background: 'rgba(5,150,105,0.08)', color: 'var(--skill-acquired)' }}>{typeof s === 'string' ? (getSkillById(s)?.name || s) : s}</span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  return null;
+}
+
 function processMessage(text, profile) {
   const lower = text.toLowerCase();
   try {
-    // ── GREETINGS ──
     if (lower.match(/\b(hello|hi|hey|namaste|hii|helloo|yo|sup|aur bhai|kaise ho|kya haal)\b/)) {
-      return `Hello! I'm your LearnPath AI assistant. I can help you with:\n\n- Course recommendations\n- Learning path details\n- Skill gap analysis\n- Time estimates\n- Career guidance\n\nJust ask me anything!`;
+      return { text: `Hello! I'm your LearnPath AI assistant. I can help you with:\n\n- Course recommendations\n- Learning path details\n- Skill gap analysis\n- Time estimates\n- Career guidance\n\nJust ask me anything!` };
     }
-
-    // ── THANKS / BYE ──
     if (lower.match(/\b(thanks|thank|dhanyavad|shukriya|bye|goodbye|alvida|chalo|theek hai)\b/)) {
-      return lower.match(/\b(bye|goodbye|alvida|chalo)\b/) 
-        ? "Goodbye! Keep up the great work on your learning journey. See you next time!"
-        : "You're welcome! Keep learning and stay consistent. If you need anything else, just ask!";
+      return { text: lower.match(/\b(bye|goodbye|alvida|chalo)\b/) ? "Goodbye! Keep up the great work on your learning journey. See you next time!" : "You're welcome! Keep learning and stay consistent. If you need anything else, just ask!" };
     }
-
-    // ── HELP ──
     if (lower.match(/\b(help|kya kar|kya kar sakta|kya bol|batao)\b/)) {
-      return "Try asking:\n• \"Recommend courses for me\"\n• \"Show my learning path\"\n• \"What skills do I need?\"\n• \"How long will this take?\"\n• \"DSA kaise karu?\"\n• \"2 months mein kya seekhu?\"\n• \"Career options batao\"";
+      return { text: "Try asking:\n• \"Recommend courses for me\"\n• \"Show my learning path\"\n• \"What skills do I need?\"\n• \"How long will this take?\"\n• \"DSA kaise karu?\"\n• \"2 months mein kya seekhu?\"\n• \"Career options batao\"" };
     }
 
-    // ── DSA / SPECIFIC TOPIC + TIME COMBO ──
     const timeMatch = lower.match(/(\d+)\s*(mahine|month|months|hafta|week|weeks|din|day|days|ghante|hour|hours)/);
     const topicKeywords = ['dsa', 'data structure', 'algorithm', 'algorithms', 'coding', 'competitive', 'problem solving', 'cp'];
     const isTopicQuery = topicKeywords.some(k => lower.includes(k));
@@ -78,141 +191,84 @@ function processMessage(text, profile) {
       const months = timeMatch ? parseInt(timeMatch[1]) : null;
       const path = getLearningPath(profile);
       const gapData = getSkillGaps(profile);
-      const allSkills = path.phases.flatMap(p => p.courses);
-      const dsaSkills = allSkills.filter(s => {
-        const t = (s.title || '').toLowerCase();
-        return t.includes('data structure') || t.includes('algorithm') || t.includes('dsa') || t.includes('problem');
-      });
-
       let response = '';
       if (months) {
         const hoursPerWeek = profile.time_commitment.includes('More than 20') ? 25 : profile.time_commitment.includes('10-20') ? 15 : profile.time_commitment.includes('5-10') ? 7 : 4;
         const totalHours = months * 4 * hoursPerWeek;
-        response = `Here's a plan for DSA in ${months} months:\n\n`;
-        response += `Your time: ~${hoursPerWeek} hrs/week → ${totalHours} hours total in ${months} months\n\n`;
-        if (dsaSkills.length > 0) {
-          response += `DSA skills in your path:\n`;
-          dsaSkills.forEach((s, i) => { response += `${i + 1}. ${s.title} (${s.duration_hours}h)\n`; });
-          response += `\n`;
-        }
-        response += `Tips for ${months}-month DSA plan:\n`;
-        response += `1. Start with arrays & strings (Week 1-2)\n`;
-        response += `2. Linked lists & stacks (Week 3-4)\n`;
-        response += `3. Trees & graphs (Month 2)\n`;
-        response += `4. Dynamic programming (Month 2-3)\n`;
-        response += `5. Practice 2-3 problems daily on LeetCode\n\n`;
-        response += `Target: Solve 150-200 problems in ${months} months.\n`;
-        response += `Your current readiness: ${gapData.readiness_score}%\n\n`;
-        response += `Want course recommendations for DSA? Ask me "recommend courses"!`;
+        response = `Here's a plan for DSA in ${months} months:\n\nYour time: ~${hoursPerWeek} hrs/week → ${totalHours} hours total\n\nTips for ${months}-month DSA plan:\n1. Start with arrays & strings (Week 1-2)\n2. Linked lists & stacks (Week 3-4)\n3. Trees & graphs (Month 2)\n4. Dynamic programming (Month 2-3)\n5. Practice 2-3 problems daily on LeetCode\n\nTarget: Solve 150-200 problems in ${months} months.\nYour readiness: ${gapData.readiness_score}%`;
       } else {
-        response = `DSA (Data Structures & Algorithms) is essential for your career in ${gapData.career_title}.\n\n`;
-        if (dsaSkills.length > 0) {
-          response += `In your learning path:\n`;
-          dsaSkills.forEach((s, i) => { response += `${i + 1}. ${s.title} (${s.duration_hours}h)\n`; });
-          response += `\n`;
-        }
-        response += `Key topics to cover:\n• Arrays & Strings\n• Linked Lists\n• Stacks & Queues\n• Trees & Graphs\n• Dynamic Programming\n• Sorting & Searching\n\n`;
-        response += `How many months do you have? Tell me like "2 months mein DSA karna hai" and I'll make a plan!`;
+        response = `DSA is essential for your career in ${gapData.career_title}.\n\nKey topics to cover:\n• Arrays & Strings\n• Linked Lists\n• Stacks & Queues\n• Trees & Graphs\n• Dynamic Programming\n\nHow many months do you have? Tell me like "2 months mein DSA karna hai"!`;
       }
-      return response;
+      return { text: response };
     }
 
-    // ── TIME + FIELD COMBO (e.g. "2 months mein data science") ──
     if (timeMatch && lower.match(/\b(data science|machine learning|web dev|full stack|cloud|devops|cyber|mobile|android|ios|flutter|ai|nlp|deep learning)\b/)) {
       const months = parseInt(timeMatch[1]);
-      const hoursPerWeek = profile.time_commitment.includes('More than 20') ? 25 : profile.time_commitment.includes('10-20') ? 15 : profile.time_commitment.includes('5-10') ? 7 : 4;
-      const totalHours = months * 4 * hoursPerWeek;
       const path = getLearningPath(profile);
       const gapData = getSkillGaps(profile);
-      return `Here's your ${months}-month plan for ${gapData.career_title}:\n\n` +
-        `Time: ~${hoursPerWeek} hrs/week → ${totalHours} hours total\n` +
-        `Skills in path: ${path.total_courses}\n` +
-        `Your readiness: ${gapData.readiness_score}%\n\n` +
-        `Path breakdown:\n` +
-        path.phases.slice(0, Math.min(months, path.phases.length)).map(p => `Phase ${p.phase}: ${p.name} — ${p.courses.length} skills (${p.duration_weeks}w)`).join('\n') +
-        `\n\nWant specific course recommendations? Ask "recommend courses"!`;
+      return { text: `Here's your ${months}-month plan for ${gapData.career_title}:\n\nSkills in path: ${path.total_courses}\nReadiness: ${gapData.readiness_score}%\n\n` + path.phases.slice(0, Math.min(months, path.phases.length)).map(p => `Phase ${p.phase}: ${p.name} — ${p.courses.length} skills (${p.duration_weeks}w)`).join('\n') };
     }
 
-    // ── RECOMMENDATIONS ──
     if (lower.match(/\b(recommend|suggest|what should|kya padhu|kya seekhe|kya karu|course|courses|padhai|seekhna)\b/)) {
       const recs = getRecommendations(profile, 3);
-      if (recs.length === 0) return "No recommendations available yet. Try completing your onboarding first!";
-      return "Here are your top recommendations:\n\n" + recs.map((r, i) => `${i + 1}. ${r.course.title} (${r.course.duration_hours}h) — ${Math.round(r.score * 100)}% match\n   ${r.explanation}`).join('\n\n');
+      if (recs.length === 0) return { text: "No recommendations available yet. Try completing your onboarding first!" };
+      return { rich: 'recommendations', data: recs, text: `Here are your top ${recs.length} recommendations:` };
     }
 
-    // ── LEARNING PATH ──
     if (lower.match(/\b(path|roadmap|learning path|raasta|plan|kya padhega|kya seekhega)\b/)) {
       const path = getLearningPath(profile);
-      if (path.phases.length === 0) return "Your path is empty. Try completing onboarding first!";
-      return `Your learning path has ${path.total_courses} skills across ${path.phases.length} phases.\n\nEstimated time: ${path.estimated_weeks} weeks (~${path.estimated_hours}h)\n\nPhases:\n` + path.phases.map(p => `${p.phase}. ${p.name} — ${p.courses.length} skills, ~${p.duration_weeks} weeks`).join('\n');
+      if (path.phases.length === 0) return { text: "Your path is empty. Try completing onboarding first!" };
+      return { rich: 'learning_path', data: path, text: `Your personalized learning path:` };
     }
 
-    // ── SKILL GAPS ──
     if (lower.match(/\b(skill|gap|need|kya aata|kya aati|kya nahi aata|missing|acquired)\b/)) {
       const gapData = getSkillGaps(profile);
-      return `Your readiness for ${gapData.career_title}: ${gapData.readiness_score}%\n\nAcquired: ${gapData.acquired_skills.join(', ') || 'None yet'}\nMissing: ${gapData.missing_skills.slice(0, 5).map(s => s.name).join(', ')}`;
+      return { rich: 'skill_gaps', data: gapData, text: `Your skill analysis for ${gapData.career_title}:` };
     }
 
-    // ── WHY / EXPLAIN ──
     if (lower.match(/\b(why|explain|kyun|kyu|kaise|how does|how do)\b/)) {
       const recs = getRecommendations(profile, 1);
-      if (recs[0]) return `Why ${recs[0].course.title}?\n\n${recs[0].why_this}\n\nDifficulty: ${recs[0].difficulty_reason}\n${recs[0].prerequisite_info.message}`;
-      return "No recommendations available yet. Complete the onboarding first!";
+      if (recs[0]) return { text: `Why ${recs[0].course.title}?\n\n${recs[0].why_this}\n\nDifficulty: ${recs[0].difficulty_reason}\n${recs[0].prerequisite_info.message}` };
+      return { text: "No recommendations available yet. Complete the onboarding first!" };
     }
 
-    // ── SKIP ──
     if (lower.match(/\b(skip|can i skip|chhod sakta|skip karu)\b/)) {
       const recs = getRecommendations(profile, 1);
       if (recs[0]) {
         const prereqInfo = recs[0].prerequisite_info;
-        if (!prereqInfo.met) return `Skipping "${recs[0].course.title}" is not recommended.\n\n${prereqInfo.message}\n\nYou need these prerequisites first before moving to this skill.`;
-        return `You can skip "${recs[0].course.title}" if you already know the material, but it's recommended for your path. The ${recs[0].difficulty_reason}.`;
+        if (!prereqInfo.met) return { text: `Skipping "${recs[0].course.title}" is not recommended.\n\n${prereqInfo.message}` };
+        return { text: `You can skip "${recs[0].course.title}" if you already know the material, but it's recommended for your path.` };
       }
-      return "No recommendations available yet. Complete the onboarding first!";
+      return { text: "No recommendations available yet." };
     }
 
-    // ── TIME / DURATION ──
     if (lower.match(/\b(how long|time|duration|weeks|kitna time|mahine|month|hafta|week|kab|when)\b/)) {
       const path = getLearningPath(profile);
-      return `Based on your ${profile.time_commitment} commitment:\n\nTotal time: ~${path.estimated_hours} hours\nEstimated duration: ${path.estimated_weeks} weeks\nSkills to learn: ${path.total_courses}\n\nThis adjusts automatically if you change your time commitment.`;
+      return { text: `Based on your ${profile.time_commitment} commitment:\n\nTotal time: ~${path.estimated_hours} hours\nDuration: ${path.estimated_weeks} weeks\nSkills to learn: ${path.total_courses}` };
     }
 
-    // ── NEXT STEP ──
     if (lower.match(/\b(next|what now|start|aage|shuru|begin)\b/)) {
-      return `Here's what you should do next:\n\n${getNextAction(profile)}\n\nOr check your dashboard for the full overview.`;
+      return { text: `Here's what you should do next:\n\n${getNextAction(profile)}\n\nOr check your dashboard for the full overview.` };
     }
 
-    // ── CAREER ──
     if (lower.match(/\b(career|job|salary|placement|interview|resume|hiring|package|lpa|salary)\b/)) {
       const gapData = getSkillGaps(profile);
-      return `You're targeting: ${gapData.career_title}\n\nReadiness: ${gapData.readiness_score}%\nAvg Salary: ${gapData.avg_salary}\nGrowth Rate: ${gapData.growth_rate}\n\nMissing skills: ${gapData.missing_skills.slice(0, 3).map(s => s.name).join(', ')}`;
+      return { text: `You're targeting: ${gapData.career_title}\n\nReadiness: ${gapData.readiness_score}%\nAvg Salary: ${gapData.avg_salary}\nGrowth Rate: ${gapData.growth_rate}\n\nMissing skills: ${gapData.missing_skills.slice(0, 3).map(s => s.name).join(', ')}` };
     }
 
-    // ── FIELD-SPECIFIC ──
     if (lower.match(/\b(data science|machine learning|web dev|full stack|frontend|backend|cloud|devops|cyber|mobile|android|ios|flutter|ai|nlp|deep learning|python|java|javascript|react|node)\b/)) {
+      const recsLocal = getRecommendations(profile, 3);
       const gapDataLocal = getSkillGaps(profile);
-      const recsLocal = getRecommendations(profile, 5);
-      const pathLocal = getLearningPath(profile);
-      return `For your target field (${gapDataLocal.career_title}), here's what I recommend:\n\n` +
-        recsLocal.slice(0, 3).map((r, i) => `${i + 1}. ${r.course.title} (${r.course.duration_hours}h) — ${Math.round(r.score * 100)}% match`).join('\n') +
-        `\n\nYour path: ${pathLocal.total_courses} skills across ${pathLocal.phases.length} phases (~${pathLocal.estimated_weeks} weeks).\n\nAsk me "recommend courses" for more details!`;
+      return { rich: 'recommendations', data: recsLocal, text: `For ${gapDataLocal.career_title} (${gapDataLocal.readiness_score}% ready):` };
     }
 
-    // ── DASHBOARD ──
     if (lower.match(/\b(dashboard|progress|overview)\b/)) {
-      return "Check your Dashboard for a full overview of your progress, skill coverage, and learning phases. Click the Dashboard link in the navigation above!";
+      return { text: "Check your Dashboard for a full overview of your progress, skill coverage, and learning phases." };
     }
 
-    // ── CATCH-ALL: ALWAYS RESPOND WITH PROFILE DATA ──
     const gapData = getSkillGaps(profile);
     const recs = getRecommendations(profile, 3);
-    const path = getLearningPath(profile);
-    return `I heard you! Here's what I can help with based on your profile:\n\n` +
-      `Your target: ${gapData.career_title} (${gapData.readiness_score}% ready)\n` +
-      `Path: ${path.total_courses} skills, ~${path.estimated_weeks} weeks\n\n` +
-      `Top recommendations:\n` +
-      recs.slice(0, 3).map((r, i) => `${i + 1}. ${r.course.title} (${r.course.duration_hours}h)`).join('\n') +
-      `\n\nTry asking:\n• "DSA kaise karu?"\n• "2 months mein kya seekhu?"\n• "Recommend courses"\n• "Show my learning path"\n• "What skills do I need?"\n• "Career options batao"`;
+    return { rich: 'recommendations', data: recs, text: `I heard you! Here's what I found for ${gapData.career_title} (${gapData.readiness_score}% ready):` };
   } catch (e) {
     console.error('processMessage error:', e.message);
     return null;
@@ -287,21 +343,17 @@ export default function Chat() {
       const recs = getRecommendations(profile);
       const nextAction = getNextAction(profile);
       const skills = profile.current_skills.map(s => typeof s === 'object' ? s.skill : s);
-      
-      // Step 1: "Creating your profile..." message
-      const loadingMsg = { id: Date.now() + 50, type: 'ai', text: '⏳ Creating your personalized learning path...', suggestions: [] };
-      
-      // Step 2: Profile ready card
       const summaryMsg = {
         id: Date.now() + 100, type: 'ai',
-        text: `✅ Your profile is ready!\n\n👤 Level: ${profile.experience_level}\n🎯 Interests: ${profile.interests.map(i => i.replace(/_/g, ' ')).join(', ')}\n🛠 Skills: ${skills.join(', ') || 'None yet'}\n⏰ Time: ${profile.time_commitment}\n\n📊 Your Learning Path:\n• ${path.total_courses} skills to learn\n• ${path.phases.length} phases\n• ~${path.estimated_weeks} weeks (~${path.estimated_hours}h)\n\n🎯 Next: ${nextAction}`,
+        text: `Your profile is ready!\n\nLevel: ${profile.experience_level}\nInterests: ${profile.interests.map(i => i.replace(/_/g, ' ')).join(', ')}\nSkills: ${skills.join(', ') || 'None yet'}\nTime: ${profile.time_commitment}\n\nLearning Path:\n• ${path.total_courses} skills to learn\n• ${path.phases.length} phases\n• ~${path.estimated_weeks} weeks (~${path.estimated_hours}h)\n\nNext: ${nextAction}`,
+        rich: 'recommendations',
+        richData: recs.slice(0, 2),
         suggestions: ['Show my learning path', 'Recommend courses', 'How long will this take?', 'What skills do I need?']
       };
-
-      setMessages(prev => [...prev, loadingMsg, summaryMsg]);
+      setMessages(prev => [...prev, summaryMsg]);
     } catch (e) {
       console.error('completeOnboarding error:', e);
-      setMessages(prev => [...prev, { id: Date.now() + 100, type: 'ai', text: "Profile created! Check your Dashboard for recommendations, or ask me anything.", suggestions: ['Recommend courses', 'Show my learning path'] }]);
+      setMessages(prev => [...prev, { id: Date.now() + 100, type: 'ai', text: "Profile created! Check your Dashboard for recommendations.", suggestions: ['Recommend courses', 'Show my learning path'] }]);
     }
     setOnboarding(null);
     safeSetLoading(false);
@@ -315,28 +367,16 @@ export default function Chat() {
   const handleOnboardingChoice = (choice) => {
     const step = ONBOARDING_STEPS[onboarding];
     const isMulti = step.multi;
-
     if (isMulti) {
-      if (choice === 'None — I\'m a complete beginner') {
-        finishMultiSelect(true);
-        return;
-      }
-      if (choice === 'Done — proceed' || choice === 'Done') {
-        finishMultiSelect(false);
-        return;
-      }
+      if (choice === 'None — I\'m a complete beginner') { finishMultiSelect(true); return; }
+      if (choice === 'Done — proceed' || choice === 'Done') { finishMultiSelect(false); return; }
       const newSelected = selectedSkills.includes(choice) ? selectedSkills.filter(s => s !== choice) : [...selectedSkills, choice];
       setSelectedSkills(newSelected);
       const displaySkills = newSelected.length > 0 ? newSelected.join(', ') : 'None selected yet';
-      const aiMsg = {
-        id: Date.now(), type: 'ai',
-        text: `Selected: ${displaySkills}\n\nClick "Done" when finished, or keep selecting skills.`,
-        suggestions: [...newSelected, 'Done — proceed']
-      };
+      const aiMsg = { id: Date.now(), type: 'ai', text: `Selected: ${displaySkills}\n\nClick "Done" when finished, or keep selecting.`, suggestions: [...newSelected, 'Done — proceed'] };
       setMessages(prev => [...prev, { id: Date.now() - 1, type: 'user', text: newSelected.includes(choice) ? `+ ${choice}` : `- ${choice}` }, aiMsg]);
       return;
     }
-
     const newD = { ...onbData, [step.field]: choice };
     setOnbData(newD);
     const userMsg = { id: Date.now(), type: 'user', text: choice };
@@ -361,34 +401,20 @@ export default function Chat() {
 
       if (onboarding !== null) {
         const step = ONBOARDING_STEPS[onboarding];
-        if (step.multi && (text.toLowerCase() === 'done' || text.toLowerCase() === 'done — proceed')) {
-          finishMultiSelect(false);
-          return;
-        }
-        if (step.multi && text.toLowerCase() === 'none') {
-          finishMultiSelect(true);
-          return;
-        }
+        if (step.multi && (text.toLowerCase() === 'done' || text.toLowerCase() === 'done — proceed')) { finishMultiSelect(false); safeSetLoading(false); return; }
+        if (step.multi && text.toLowerCase() === 'none') { finishMultiSelect(true); safeSetLoading(false); return; }
         if (step.multi) {
           const matched = step.opts.filter(o => o !== 'None — I\'m a complete beginner' && (text.toLowerCase().includes(o.toLowerCase()) || o.toLowerCase().includes(text.toLowerCase())));
-          if (matched.length > 0) {
-            matched.forEach(m => handleOnboardingChoice(m));
-            safeSetLoading(false);
-            return;
-          }
-          const exactMatch = step.opts.find(o => o.toLowerCase().split(' ')[0] === text.toLowerCase().split(' ')[0]);
-          if (exactMatch) { handleOnboardingChoice(exactMatch); safeSetLoading(false); return; }
-          const aiMsg = { id: Date.now() + 1, type: 'ai', text: `I didn't recognize "${text}". Please click one of the skill buttons above, or type the exact skill name.`, suggestions: [...step.opts.filter(o => o !== 'None — I\'m a complete beginner'), 'None — I\'m a complete beginner', 'Done — proceed'] };
+          if (matched.length > 0) { matched.forEach(m => handleOnboardingChoice(m)); safeSetLoading(false); return; }
+          const aiMsg = { id: Date.now() + 1, type: 'ai', text: `I didn't recognize "${text}". Please click one of the buttons above.`, suggestions: [...step.opts.filter(o => o !== 'None — I\'m a complete beginner'), 'None — I\'m a complete beginner', 'Done — proceed'] };
           setMessages(prev => [...prev, aiMsg]);
           safeSetLoading(false);
           return;
         }
-
         const exactMatch = step.opts.find(o => o.toLowerCase() === text.toLowerCase());
         const partialMatch = step.opts.find(o => text.toLowerCase().includes(o.toLowerCase().split(' ')[0].toLowerCase()) && text.toLowerCase().length >= 3);
         const match = exactMatch || partialMatch;
         if (match) { handleOnboardingChoice(match); safeSetLoading(false); return; }
-
         const hint = { id: Date.now() + 1, type: 'ai', text: `Please select from the options above, or type one of:\n${step.opts.map(o => `• ${o}`).join('\n')}`, suggestions: step.opts };
         setMessages(prev => [...prev, hint]);
         safeSetLoading(false);
@@ -397,10 +423,22 @@ export default function Chat() {
 
       let aiResponse = profile ? processMessage(text, profile) : null;
       if (!aiResponse && !profile) {
-        aiResponse = "I need your profile to give personalized answers. Please complete the onboarding first, or try the demo profiles on the Dashboard page.";
+        aiResponse = { text: "I need your profile to give personalized answers. Please complete the onboarding first, or try the demo profiles on the Dashboard page." };
       }
-      if (!aiResponse) aiResponse = await callLLM(text, profile);
-      setMessages(prev => [...prev, { id: Date.now() + 1, type: 'ai', text: aiResponse || "I can help with course recommendations, learning paths, skill gaps, and career guidance. Try asking about your learning path, skill gaps, or what to study next!", suggestions: ['Recommend courses', 'Show my learning path', 'What skills do I need?', 'How long will this take?'] }]);
+      if (!aiResponse) {
+        const llmResponse = await callLLM(text, profile);
+        aiResponse = { text: llmResponse || "I can help with course recommendations, learning paths, skill gaps, and career guidance. Try asking about your learning path, skill gaps, or what to study next!" };
+      }
+
+      const aiMsg = {
+        id: Date.now() + 1,
+        type: 'ai',
+        text: aiResponse.text,
+        rich: aiResponse.rich,
+        richData: aiResponse.data || aiResponse.richData,
+        suggestions: aiResponse.rich ? ['Show my learning path', 'How long will this take?', 'What skills do I need?'] : ['Recommend courses', 'Show my learning path', 'What skills do I need?', 'How long will this take?'],
+      };
+      setMessages(prev => [...prev, aiMsg]);
     } catch (e) {
       console.error('sendMessage error:', e);
       setMessages(prev => [...prev, { id: Date.now() + 1, type: 'ai', text: "Something went wrong. Please try again.", suggestions: ['Recommend courses', 'Show my learning path', 'Help'] }]);
@@ -418,8 +456,15 @@ export default function Chat() {
             {messages.map((msg) => (
               <div key={msg.id} className={`chat-message ${msg.type}`}>
                 <div className={`chat-avatar ${msg.type === 'ai' ? 'ai' : 'human'}`}>{msg.type === 'ai' ? 'AI' : 'You'}</div>
-                <div>
-                  <div className="chat-bubble" style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="chat-bubble">
+                    <TypingText text={msg.text} speed={msg.text.length > 200 ? 4 : 8} />
+                    {msg.rich && msg.richData && (
+                      <div style={{ marginTop: 8 }}>
+                        <RichResponse type={msg.rich} data={msg.richData} profile={getProfile()} />
+                      </div>
+                    )}
+                  </div>
                   {msg.suggestions?.length > 0 && (
                     <div className="chat-suggestions">
                       {msg.suggestions.map((s, i) => <button key={i} className="chat-suggestion" onClick={() => handleSuggestion(s)}>{s}</button>)}

@@ -4,6 +4,13 @@ import Link from 'next/link';
 import NavBar from '../components/NavBar';
 import ExplanationModal from '../components/ExplanationModal';
 import { getProfile, getLearningPath, getSkillGaps, submitFeedback } from '../lib/engine';
+import { getSkillById, SKILL_DEMAND, DOMAIN_NAMES } from '../lib/skillGraph';
+
+const DOMAIN_COLORS = {
+  programming: '#3b82f6', web_development: '#8b5cf6', data_science: '#06b6d4',
+  machine_learning: '#f59e0b', cloud_computing: '#10b981', cybersecurity: '#ef4444',
+  mobile_development: '#ec4899', math: '#6366f1', mlops: '#f97316',
+};
 
 function Toast({ msg, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);
@@ -16,6 +23,11 @@ function SkillCard({ skill, index, onFeedback, profile }) {
   const completedCourses = new Set(profile?.completed_courses || []);
   const [completed, setCompleted] = useState(completedCourses.has(skill.skill_id));
   const [toast, setToast] = useState(null);
+
+  const skillData = getSkillById(skill.skill_id);
+  const domain = skillData?.domain || 'programming';
+  const demand = SKILL_DEMAND[skill.skill_id] || 0.5;
+  const project = skillData?.resources?.find(r => r.type === 'project');
 
   const handleFeedback = (val) => {
     setFeedback(val);
@@ -37,11 +49,27 @@ function SkillCard({ skill, index, onFeedback, profile }) {
         {completed ? '✓' : index + 1}
       </div>
       <div className="skill-card-content">
-        <h4 className="skill-card-title" style={completed ? { textDecoration: 'line-through', opacity: 0.6 } : {}}>{skill.title}</h4>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+          <h4 className="skill-card-title" style={completed ? { textDecoration: 'line-through', opacity: 0.6 } : {}}>{skill.title}</h4>
+          {demand >= 0.85 && (
+            <span style={{ padding: '1px 5px', borderRadius: 3, fontSize: '0.55rem', fontWeight: 700, background: 'rgba(239,68,68,0.08)', color: '#ef4444', textTransform: 'uppercase' }}>High Demand</span>
+          )}
+        </div>
         <div className="skill-card-meta">
           <span>{skill.provider}</span><span>·</span><span>{skill.duration_hours}h</span><span>·</span>
           <span className={`level-badge ${skill.level}`}>{skill.level}</span>
+          {domain && <span>·</span>}
+          {domain && <span style={{ fontSize: '0.7rem', color: DOMAIN_COLORS[domain] || 'var(--text-muted)' }}>{DOMAIN_NAMES[domain] || domain}</span>}
         </div>
+
+        {project && (
+          <div style={{ padding: '6px 8px', background: 'var(--bg-secondary)', borderRadius: 6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.7rem' }}>
+            <span style={{ padding: '1px 4px', borderRadius: 3, background: 'var(--primary-subtle)', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.6rem' }}>Project</span>
+            <span style={{ color: 'var(--text-secondary)' }}>{project.title}</span>
+            <span style={{ color: 'var(--text-muted)' }}>Level {project.difficulty || 1}</span>
+          </div>
+        )}
+
         <div className="skill-card-actions">
           <button className="btn-outline" style={{ fontSize: '0.75rem', padding: '3px 8px' }} onClick={() => setShowWhy(true)}>Why this?</button>
           {!feedback && !completed && (
@@ -55,6 +83,57 @@ function SkillCard({ skill, index, onFeedback, profile }) {
         </div>
       </div>
       <ExplanationModal skill={skill} profile={profile} isOpen={showWhy} onClose={() => setShowWhy(false)} />
+    </div>
+  );
+}
+
+function TimelineView({ path, profile }) {
+  const completedSet = new Set(profile?.completed_courses || []);
+  const totalWeeks = path.phases.reduce((s, p) => s + p.duration_weeks, 0);
+  let cumWeeks = 0;
+
+  return (
+    <div style={{ padding: 16, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, marginBottom: 24, overflowX: 'auto' }}>
+      <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 12 }}>Timeline Overview</h3>
+      <div style={{ position: 'relative', minWidth: 500 }}>
+        {/* Week markers */}
+        <div style={{ display: 'flex', marginBottom: 4 }}>
+          {Array.from({ length: Math.min(totalWeeks, 20) }, (_, i) => (
+            <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: '0.55rem', color: 'var(--text-muted)', borderRight: '1px solid var(--border)' }}>
+              W{i + 1}
+            </div>
+          ))}
+        </div>
+
+        {/* Phase bars */}
+        {path.phases.map((phase, i) => {
+          const startWeek = cumWeeks;
+          cumWeeks += phase.duration_weeks;
+          const startPct = totalWeeks > 0 ? (startWeek / totalWeeks) * 100 : 0;
+          const widthPct = totalWeeks > 0 ? (phase.duration_weeks / totalWeeks) * 100 : 0;
+          const completedInPhase = phase.courses.filter(c => completedSet.has(c.skill_id)).length;
+          const phasePct = Math.round((completedInPhase / Math.max(phase.courses.length, 1)) * 100);
+          const colors = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981'];
+          const color = colors[i % colors.length];
+
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div style={{ width: 70, fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-secondary)', flexShrink: 0 }}>Phase {phase.phase}</div>
+              <div style={{ flex: 1, position: 'relative', height: 28, background: 'var(--bg-tertiary)', borderRadius: 6 }}>
+                <div style={{ position: 'absolute', left: `${startPct}%`, width: `${widthPct}%`, height: '100%', borderRadius: 6, overflow: 'hidden', border: `1px solid ${color}40` }}>
+                  <div style={{ height: '100%', width: `${phasePct}%`, background: color, opacity: 0.8, transition: 'width 0.5s ease' }} />
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', paddingLeft: 8 }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 600, color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                      {phase.name} — {phase.duration_weeks}w
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ width: 40, textAlign: 'right', fontSize: '0.7rem', fontWeight: 600, color }}>{phasePct}%</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -159,21 +238,25 @@ export default function LearningPath() {
           </div>
         )}
 
+        <TimelineView path={path} profile={profile} />
+
         <div className="path-phases">
           {path.phases.map((phase, i) => {
             const completedSet = new Set(profile?.completed_courses || []);
             const phaseCompleted = phase.courses.filter(c => completedSet.has(c.skill_id)).length;
             const phasePct = Math.round((phaseCompleted / Math.max(phase.courses.length, 1)) * 100);
+            const colors = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981'];
+            const phaseColor = colors[i % colors.length];
             return (
-              <div key={i} className="phase-section">
+              <div key={i} className="phase-section" style={{ borderColor: `${phaseColor}30` }}>
                 <div className="phase-header">
-                  <div className="phase-badge">Phase {phase.phase}</div>
+                  <div className="phase-badge" style={{ background: `${phaseColor}15`, color: phaseColor }}>Phase {phase.phase}</div>
                   <div style={{ flex: 1 }}>
                     <h2 className="phase-title">{phase.name}</h2>
                     <p className="phase-desc">{phase.description} — {phase.duration_weeks} weeks</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
                       <div style={{ flex: 1, height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${phasePct}%`, background: 'var(--primary)', borderRadius: 2, transition: 'width 0.4s ease' }} />
+                        <div style={{ height: '100%', width: `${phasePct}%`, background: phaseColor, borderRadius: 2, transition: 'width 0.4s ease' }} />
                       </div>
                       <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>{phaseCompleted}/{phase.courses.length}</span>
                     </div>
