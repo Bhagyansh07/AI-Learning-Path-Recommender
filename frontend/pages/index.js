@@ -52,7 +52,7 @@ export default function Home() {
       </Head>
       <NavBar active="home" />
 
-      <main style={{ paddingTop: 52 }}>
+      <main>
         {/* HERO — asymmetric split, not generic center-aligned */}
         <section className="container" style={{ padding: '64px 24px 48px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 48, alignItems: 'end', opacity: ready ? 1 : 0, transform: ready ? 'none' : 'translateY(12px)', transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
