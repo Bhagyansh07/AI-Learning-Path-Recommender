@@ -341,6 +341,16 @@ ul, ol { list-style: none; }
 .sub-card--assess .sub-card-badge { background: var(--amber); }
 .sub-card-title { font-size: 0.78rem; font-weight: 500; color: var(--text-2); line-height: 1.4; }
 
+/* ═══ PROGRESS TRACKER ═══ */
+.overall-progress { margin: 20px 0 4px; background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r-md); padding: 16px 20px; }
+.overall-progress-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.progress-track { height: 10px; background: var(--bg-4); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 999px; transition: width 0.4s ease; }
+.phase-progress { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-2); background: var(--bg-3); padding: 3px 8px; border-radius: var(--r-sm); border: 1px solid var(--border); }
+.course-card--done { border-color: var(--accent-dim); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, var(--bg-3)), var(--bg-3)); }
+.course-card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.course-complete-btn { flex-shrink: 0; }
+
 /* ═══ ALGORITHM ═══ */
 .algo-section {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);

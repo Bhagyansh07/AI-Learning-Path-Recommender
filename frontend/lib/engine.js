@@ -50,6 +50,33 @@ export function updateProfile(updates) {
   return p;
 }
 
+// ─── PROGRESS TRACKER ──────────────────────────────────────
+// Client-side progress: learners mark courses complete, progress
+// % and readiness recompute. No LLM. Persisted to localStorage.
+
+export function toggleSkillComplete(profile, skillId) {
+  if (!profile) return null;
+  if (!profile.completed_courses) profile.completed_courses = [];
+  const idx = profile.completed_courses.indexOf(skillId);
+  if (idx >= 0) profile.completed_courses.splice(idx, 1);
+  else profile.completed_courses.push(skillId);
+  if (typeof window !== 'undefined') localStorage.setItem('learner_profile', JSON.stringify(profile));
+  return profile;
+}
+
+export function computePathProgress(profile, path) {
+  if (!profile || !path) return { overall: 0, phases: [] };
+  const done = new Set(profile.completed_courses || []);
+  const phases = (path.phases || []).map(p => {
+    const total = p.courses.length || 1;
+    const doneCount = p.courses.filter(c => done.has(c.skill_id)).length;
+    return { phase: p.phase, name: p.name, done: doneCount, total, pct: Math.round((doneCount / total) * 100) };
+  });
+  const allTotal = (path.phases || []).reduce((s, p) => s + (p.courses.length || 0), 0) || 1;
+  const allDone = (path.phases || []).reduce((s, p) => s + p.courses.filter(c => done.has(c.skill_id)).length, 0);
+  return { overall: Math.round((allDone / allTotal) * 100), phases };
+}
+
 // ─── TEXT ANALYZER (NLU without LLM) ──────────────────────
 // Rule-based extraction from free text. LLM polishes the output.
 

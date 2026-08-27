@@ -2,12 +2,13 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
-import { getLearningPath, getProfile } from '../lib/engine';
+import { getLearningPath, getProfile, toggleSkillComplete, computePathProgress } from '../lib/engine';
 import ExplanationModal from '../components/ExplanationModal';
 
 export default function LearningPathPage() {
   const [path, setPath] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [progress, setProgress] = useState({ overall: 0, phases: [] });
   const [expanded, setExpanded] = useState({});
   const [modal, setModal] = useState({ open: false, title: '', content: null });
   const [loading, setLoading] = useState(true);
@@ -15,7 +16,11 @@ export default function LearningPathPage() {
   useEffect(() => {
     const p = getProfile();
     setProfile(p);
-    if (p) setPath(getLearningPath(p));
+    if (p) {
+      const lp = getLearningPath(p);
+      setPath(lp);
+      setProgress(computePathProgress(p, lp));
+    }
     setLoading(false);
   }, []);
 
@@ -43,6 +48,13 @@ export default function LearningPathPage() {
   );
 
   const togglePhase = (idx) => setExpanded(prev => ({ ...prev, [idx]: !prev[idx] }));
+
+  const handleToggle = (skillId) => {
+    const updated = toggleSkillComplete(profile, skillId);
+    if (!updated) return;
+    setProfile({ ...updated });
+    setProgress(computePathProgress(updated, path));
+  };
 
   return (
     <div className="page-wrapper">
@@ -73,6 +85,16 @@ export default function LearningPathPage() {
           </div>
         </div>
 
+        <div className="overall-progress">
+          <div className="overall-progress-head">
+            <span className="t-label">Overall Progress</span>
+            <span className="t-num">{progress.overall}%</span>
+          </div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: `${progress.overall}%` }} />
+          </div>
+        </div>
+
         <div className="path-phases">
           {path.phases.map((phase, i) => (
             <div key={i} className={`phase-section ${expanded[i] ? 'expanded' : ''}`}>
@@ -83,6 +105,7 @@ export default function LearningPathPage() {
                   <p className="phase-desc">{phase.description}</p>
                 </div>
                 <div className="phase-header-meta">
+                  <span className="phase-progress">{progress.phases[i] ? `${progress.phases[i].done}/${progress.phases[i].total}` : '0/0'}</span>
                   <span className="phase-duration">{phase.duration_weeks}w</span>
                   <span className={`phase-chevron ${expanded[i] ? 'open' : ''}`}>&#9662;</span>
                 </div>
@@ -90,10 +113,12 @@ export default function LearningPathPage() {
               {expanded[i] && (
                 <div className="phase-body">
                   <div className="phase-courses">
-                    {phase.courses.map((course, j) => (
+                    {phase.courses.map((course, j) => {
+                      const isDone = (profile.completed_courses || []).includes(course.skill_id);
+                      return (
                       <div
                         key={j}
-                        className="course-card"
+                        className={`course-card ${isDone ? 'course-card--done' : ''}`}
                         onClick={(e) => { e.stopPropagation(); setModal({ open: true, title: course.title, content: course }); }}
                       >
                         <div className="course-card-top">
@@ -101,22 +126,31 @@ export default function LearningPathPage() {
                             <h4 className="course-card-title">{course.title}</h4>
                             <p className="course-card-meta">{course.provider} · {course.duration_hours}h · {course.level}</p>
                           </div>
-                          <span className="badge badge-accent course-type-badge">{course.type}</span>
+                          <span className="badge badge-accent course-type-badge">{isDone ? '✓ Done' : course.type}</span>
                         </div>
                         {course.description && <p className="course-card-desc">{course.description}</p>}
-                        {course.provider_url && (
-                          <a
-                            className="course-card-link"
-                            href={course.provider_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
+                        <div className="course-card-actions">
+                          {course.provider_url && (
+                            <a
+                              className="course-card-link"
+                              href={course.provider_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Open course on {course.provider} ↗
+                            </a>
+                          )}
+                          <button
+                            className={`btn btn-sm ${isDone ? 'btn-ghost' : 'btn-primary'} course-complete-btn`}
+                            onClick={(e) => { e.stopPropagation(); handleToggle(course.skill_id); }}
                           >
-                            Open course on {course.provider} ↗
-                          </a>
-                        )}
+                            {isDone ? 'Mark Incomplete' : 'Mark Complete'}
+                          </button>
+                        </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   {phase.projects && phase.projects.length > 0 && (
                     <div className="phase-sublist">
