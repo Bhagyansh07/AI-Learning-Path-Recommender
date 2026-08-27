@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { useTheme } from './ThemeContext';
 
 const NAV_LINKS = [
@@ -15,26 +17,25 @@ const NAV_LINKS = [
 
 export default function NavBar({ active }) {
   const { theme, toggle } = useTheme();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const navRef = useRef(null);
 
   useEffect(() => {
-    if (!menuOpen) return;
-    function onClickAway(e) {
-      if (navRef.current && !navRef.current.contains(e.target)) setMenuOpen(false);
-    }
-    document.addEventListener('mousedown', onClickAway);
-    document.documentElement.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('mousedown', onClickAway);
-      document.documentElement.style.overflow = '';
-    };
+    const close = () => setMenuOpen(false);
+    router.events.on('routeChangeStart', close);
+    return () => router.events.off('routeChangeStart', close);
+  }, [router.events]);
+
+  useEffect(() => {
+    document.documentElement.style.overflow = menuOpen ? 'hidden' : '';
   }, [menuOpen]);
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <nav className="navbar" ref={navRef}>
+    <nav className="navbar">
       <div className="container navbar-inner">
-        <Link href="/" className="navbar-brand" onClick={() => setMenuOpen(false)}>
+        <Link href="/" className="navbar-brand" onClick={closeMenu}>
           <div className="navbar-logo">LP</div>
           <span>LearnPath AI</span>
         </Link>
@@ -51,8 +52,13 @@ export default function NavBar({ active }) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             )}
           </button>
-          <Link href="/chat" className="btn btn-primary btn-sm navbar-cta" onClick={() => setMenuOpen(false)}>Get Started</Link>
-          <button className="mobile-menu-btn" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
+          <Link href="/chat" className="btn btn-primary btn-sm navbar-cta" onClick={closeMenu}>Get Started</Link>
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+            aria-label="Toggle menu"
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {menuOpen ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></> : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
             </svg>
@@ -63,20 +69,20 @@ export default function NavBar({ active }) {
       {menuOpen && typeof document !== 'undefined' && createPortal(
         <div className="mobile-menu">
           {NAV_LINKS.map((l) => (
-            <Link
+            <a
               key={l.key}
               href={l.href}
               className={`mobile-menu-link ${active === l.key ? 'active' : ''}`}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               {l.label}
-            </Link>
+            </a>
           ))}
           <div className="mobile-menu-divider" />
-          <button className="mobile-menu-link mobile-menu-theme" onClick={toggle}>
+          <button type="button" className="mobile-menu-link mobile-menu-theme" onClick={toggle}>
             {theme === 'light' ? '☾ Light Mode' : '☀ Dark Mode'}
           </button>
-          <Link href="/chat" className="btn btn-primary mobile-menu-cta" onClick={() => setMenuOpen(false)}>Get Started</Link>
+          <a href="/chat" className="btn btn-primary mobile-menu-cta" onClick={closeMenu}>Get Started</a>
         </div>,
         document.body
       )}
