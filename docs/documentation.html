@@ -556,16 +556,37 @@ phases = <span class="fn">assignPhases</span>(sorted, profile);
   <div class="grid-4">
     <div class="stat-box"><div class="stat-val">~1,800</div><div class="stat-label">Total LOC</div></div>
     <div class="stat-box"><div class="stat-val">0</div><div class="stat-label">External ML Libs</div></div>
-    <div class="stat-box"><div class="stat-val">5</div><div class="stat-label">React Pages</div></div>
+    <div class="stat-box"><div class="stat-val">22</div><div class="stat-label">Automated Tests</div></div>
     <div class="stat-box"><div class="stat-val">82 KB</div><div class="stat-label">First Load JS</div></div>
   </div>
+
+  <h3>Testing &amp; Code Quality</h3>
+  <table>
+    <tr><th>Layer</th><th>Framework</th><th>Coverage</th></tr>
+    <tr>
+      <td>Frontend</td>
+      <td><code>node --test</code> (Node built-in)</td>
+      <td>Skill-graph DAG integrity, unique IDs, no dangling prerequisites, <strong>acyclicity (topo-sort)</strong>, lookups, career-path validity, demand scores</td>
+    </tr>
+    <tr>
+      <td>Backend</td>
+      <td>pytest</td>
+      <td>Skill-gap analyzer, rule-based explanation, roadmap generator, hybrid scorer, and Flask HTTP endpoints incl. <strong>CORS allowlist + 404 + validation</strong></td>
+    </tr>
+    <tr>
+      <td>Error Handling</td>
+      <td>React Error Boundary</td>
+      <td>Global boundary wraps every page — a runtime crash shows a graceful fallback instead of a blank UI</td>
+    </tr>
+  </table>
+  <p class="small">Run: <code>cd frontend &amp;&amp; npm test</code> &nbsp;·&nbsp; <code>cd backend &amp;&amp; python -m pytest tests/ -v</code> &nbsp;·&nbsp; 22 / 22 pass.</p>
 
   <h3>Security Hardening</h3>
   <table>
     <tr><th>Mitigation</th><th>Implementation</th></tr>
     <tr><td>XSS Prevention</td><td>React auto-escaping + server-side input sanitization (HTML entity encoding)</td></tr>
     <tr><td>Rate Limiting</td><td>15 req/min/IP on Gemini endpoint, with automatic cleanup</td></tr>
-    <tr><td>CORS</td><td>Dynamic origin validation (production + localhost only)</td></tr>
+    <tr><td>CORS</td><td>Dynamic origin validation — only the deployed Vercel alias + localhost are allowlisted (test-backed). No wildcard.</td></tr>
     <tr><td>Security Headers</td><td>X-Frame-Options: DENY, X-Content-Type-Options: nosniff, X-XSS-Protection, Referrer-Policy</td></tr>
     <tr><td>Input Validation</td><td>2000 char max, type checking, empty string guards</td></tr>
     <tr><td>Secrets</td><td>GEMINI_API_KEY as Vercel env var (server-side only, never exposed to client)</td></tr>
@@ -607,7 +628,7 @@ phases = <span class="fn">assignPhases</span>(sorted, profile);
       <td><strong>AI/ML</strong></td>
       <td><span class="tag tag-amber">20%</span></td>
       <td>Dedicated algorithms, NOT API calls. DAG traversal, topological sort, 5-factor scoring, rule-based explainability</td>
-      <td>engine.js:585 lines of pure algorithmic intelligence</td>
+      <td>client-side engine + Python backend (TF-IDF similarity), all test-backed</td>
     </tr>
     <tr>
       <td><strong>Innovation</strong></td>
