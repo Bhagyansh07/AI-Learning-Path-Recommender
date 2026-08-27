@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useTheme } from './ThemeContext';
 
@@ -59,7 +60,7 @@ export default function NavBar({ active }) {
         </div>
       </div>
 
-      {menuOpen && (
+      {menuOpen && typeof document !== 'undefined' && createPortal(
         <div className="mobile-menu">
           {NAV_LINKS.map((l) => (
             <Link
@@ -76,7 +77,8 @@ export default function NavBar({ active }) {
             {theme === 'light' ? '☾ Light Mode' : '☀ Dark Mode'}
           </button>
           <Link href="/chat" className="btn btn-primary mobile-menu-cta" onClick={() => setMenuOpen(false)}>Get Started</Link>
-        </div>
+        </div>,
+        document.body
       )}
     </nav>
   );
