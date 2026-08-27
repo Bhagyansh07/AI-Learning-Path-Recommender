@@ -1,7 +1,12 @@
 const RATE_LIMIT = new Map();
 const RATE_WINDOW = 60000;
 const RATE_MAX = 15;
-const ALLOWED_ORIGINS = ['https://frontend-mtlenasgo-bhagyansh.vercel.app', 'https://frontend-mu-jet-18.vercel.app', 'http://localhost:3000'];
+const ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
+
+function isAllowedOrigin(origin) {
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  return typeof origin === 'string' && /^https:\/\/.*\.vercel\.app$/.test(origin);
+}
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -18,7 +23,7 @@ function isRateLimited(ip) {
 }
 
 function setCors(res, origin) {
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowed = isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0];
   res.setHeader('Access-Control-Allow-Origin', allowed);
 }
 
