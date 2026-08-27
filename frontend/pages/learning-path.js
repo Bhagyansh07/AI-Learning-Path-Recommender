@@ -104,6 +104,17 @@ export default function LearningPathPage() {
                           <span className="badge badge-accent course-type-badge">{course.type}</span>
                         </div>
                         {course.description && <p className="course-card-desc">{course.description}</p>}
+                        {course.provider_url && (
+                          <a
+                            className="course-card-link"
+                            href={course.provider_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Open course on {course.provider} ↗
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>

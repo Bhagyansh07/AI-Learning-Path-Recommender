@@ -84,6 +84,9 @@ function RecommendationCard({ rec }) {
         <span className="rec-score">{Math.round(rec.score * 100)}%</span>
       </div>
       <div className="rec-explanation">{rec.explanation}</div>
+      {rec.course.provider_url && (
+        <a href={rec.course.provider_url} target="_blank" rel="noopener noreferrer" className="course-card-link" style={{ marginTop: 8 }}>Open course on {rec.course.provider} ↗</a>
+      )}
       {rec.why_this && (
         <div style={{ marginTop: 8, padding: '8px 10px', background: 'var(--bg-3)', borderRadius: 'var(--r-sm)', fontSize: '0.75rem', color: 'var(--text-3)', lineHeight: 1.5 }}>
           <strong style={{ color: 'var(--text-2)' }}>Why:</strong> {rec.why_this}

@@ -93,9 +93,12 @@ export default function Dashboard() {
               <div className="rec-score t-num">{Math.round(topRec.score * 100)}%</div>
             </div>
             <p className="rec-explanation">{topRec.explanation}</p>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <Link href="/learning-path" className="btn btn-primary btn-sm">Start Learning</Link>
               <Link href="/chat" className="btn btn-secondary btn-sm">Ask AI</Link>
+              {topRec.course.provider_url && (
+                <a href={topRec.course.provider_url} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">Open course ↗</a>
+              )}
             </div>
           </div>
         )}
@@ -132,6 +135,9 @@ export default function Dashboard() {
                   <div className="rec-score t-num">{Math.round(r.score * 100)}%</div>
                 </div>
                 <p className="rec-explanation">{r.explanation}</p>
+                {r.course.provider_url && (
+                  <a href={r.course.provider_url} target="_blank" rel="noopener noreferrer" className="course-card-link" style={{ marginTop: 10 }}>Open course on {r.course.provider} ↗</a>
+                )}
               </div>
             ))}
           </section>
