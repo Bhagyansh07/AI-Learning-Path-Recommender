@@ -319,6 +319,17 @@ ul, ol { list-style: none; }
 }
 .course-card-link:hover { color: var(--accent-glow); background: var(--surface-hover); border-color: var(--accent-dim); }
 
+.phase-sublist { margin-top: 16px; }
+.phase-sublist-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-3); margin-bottom: 8px; }
+.phase-subgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.sub-card { padding: 10px 12px; background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r-md); display: flex; align-items: center; gap: 10px; }
+.sub-card--project { border-left: 3px solid var(--cyan); }
+.sub-card--assess { border-left: 3px solid var(--amber); }
+.sub-card-badge { flex-shrink: 0; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 7px; border-radius: var(--r-sm); color: var(--bg); }
+.sub-card--project .sub-card-badge { background: var(--cyan); }
+.sub-card--assess .sub-card-badge { background: var(--amber); }
+.sub-card-title { font-size: 0.78rem; font-weight: 500; color: var(--text-2); line-height: 1.4; }
+
 /* ═══ ALGORITHM ═══ */
 .algo-section {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);

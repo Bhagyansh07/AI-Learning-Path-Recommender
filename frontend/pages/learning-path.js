@@ -118,6 +118,32 @@ export default function LearningPathPage() {
                       </div>
                     ))}
                   </div>
+                  {phase.projects && phase.projects.length > 0 && (
+                    <div className="phase-sublist">
+                      <div className="phase-sublist-title">Projects</div>
+                      <div className="phase-subgrid">
+                        {phase.projects.map((p, k) => (
+                          <div key={k} className="sub-card sub-card--project">
+                            <span className="sub-card-badge">Build</span>
+                            <span className="sub-card-title">{p.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {phase.assessments && phase.assessments.length > 0 && (
+                    <div className="phase-sublist">
+                      <div className="phase-sublist-title">Assessments</div>
+                      <div className="phase-subgrid">
+                        {phase.assessments.map((a, k) => (
+                          <div key={k} className="sub-card sub-card--assess">
+                            <span className="sub-card-badge">Check</span>
+                            <span className="sub-card-title">{a.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

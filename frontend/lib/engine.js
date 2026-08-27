@@ -284,6 +284,34 @@ export function getLearningPath(profile) {
   };
 }
 
+function phaseProjects(skillIds) {
+  const projects = [];
+  skillIds.forEach(id => {
+    const skill = getSkillById(id);
+    if (!skill || !skill.resources) return;
+    skill.resources.forEach(r => {
+      if (r.type === 'project' && r.title) {
+        projects.push({ title: r.title, skill_id: id, difficulty: r.difficulty || skill.difficulty });
+      }
+    });
+  });
+  return projects.slice(0, 4);
+}
+
+function phaseAssessments(skillIds) {
+  const names = [];
+  skillIds.forEach(id => {
+    const skill = getSkillById(id);
+    if (skill) names.push(skill.name);
+  });
+  if (!names.length) return [];
+  return [
+    { title: `${names[0]} — Self-Check`, description: `Answer 5 rapid questions covering ${names[0].toLowerCase()} before moving on.` },
+    { title: `Project Round`, description: `Ship the project from the previous step and get peer-reviewed.` },
+    { title: `${names[names.length - 1]} — Capstone Check`, description: `Demonstrate mastery of ${names.length} skills learned in this phase.` },
+  ];
+}
+
 function assignPhases(sortedSkills, profile) {
   const beginner = [], intermediate = [], advanced = [];
   sortedSkills.forEach(id => {
@@ -300,16 +328,22 @@ function assignPhases(sortedSkills, profile) {
   if (beginner.length) phases.push({
     phase: 1, name: 'Foundation Building', description: 'Build strong fundamentals and core concepts',
     courses: beginner.map(id => skillToCourse(id, profile)),
+    projects: phaseProjects(beginner),
+    assessments: phaseAssessments(beginner),
     duration_weeks: Math.max(1, Math.round(beginner.reduce((s, id) => s + ((getSkillById(id) || {}).estimated_hours || 0), 0) / (10 * timeMultiplier))),
   });
   if (intermediate.length) phases.push({
     phase: 2, name: 'Skill Development', description: 'Deepen your skills with hands-on projects',
     courses: intermediate.map(id => skillToCourse(id, profile)),
+    projects: phaseProjects(intermediate),
+    assessments: phaseAssessments(intermediate),
     duration_weeks: Math.max(1, Math.round(intermediate.reduce((s, id) => s + ((getSkillById(id) || {}).estimated_hours || 0), 0) / (10 * timeMultiplier))),
   });
   if (advanced.length) phases.push({
     phase: 3, name: 'Advanced Mastery', description: 'Master advanced topics and specialize',
     courses: advanced.map(id => skillToCourse(id, profile)),
+    projects: phaseProjects(advanced),
+    assessments: phaseAssessments(advanced),
     duration_weeks: Math.max(1, Math.round(advanced.reduce((s, id) => s + ((getSkillById(id) || {}).estimated_hours || 0), 0) / (10 * timeMultiplier))),
   });
 
