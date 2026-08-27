@@ -2,17 +2,15 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
-function getInitialTheme() {
-  if (typeof window === 'undefined') return 'light';
-  try {
-    const saved = localStorage.getItem('lp_theme');
-    if (saved === 'dark' || saved === 'light') return saved;
-  } catch {}
-  return 'dark';
-}
-
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(getInitialTheme);
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('lp_theme');
+      if (saved === 'dark' || saved === 'light') setTheme(saved);
+    } catch {}
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
