@@ -26,8 +26,8 @@ function PageTransition({ children }) {
 
   return (
     <div style={{
-      opacity: transitionStage === 'enter' ? 1 : 0,
-      transform: transitionStage === 'enter' ? 'translateY(0)' : 'translateY(6px)',
+      opacity: transitionStage === 'exit' ? 0 : 1,
+      transform: transitionStage === 'exit' ? 'translateY(6px)' : 'none',
       transition: 'opacity 0.2s ease, transform 0.2s ease',
     }}>
       {displayChildren}

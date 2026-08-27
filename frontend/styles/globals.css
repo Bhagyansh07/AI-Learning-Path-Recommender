@@ -147,16 +147,23 @@ ul, ol { list-style: none; }
   .navbar .theme-toggle { display: none; }
   .mobile-menu-btn { display: flex; flex-shrink: 0; }
   .navbar-inner { gap: 8px; }
-  .navbar-right.open {
+  .mobile-menu {
     position: fixed; top: 52px; left: 0; right: 0; bottom: 0;
-    background: var(--bg); flex-direction: column; align-items: stretch; padding: 16px 20px 32px; gap: 6px;
+    display: flex; flex-direction: column; gap: 2px;
+    background: var(--bg); padding: 12px 16px 40px;
     border-top: 1px solid var(--border);
-    overflow-y: auto; z-index: 99;
+    overflow-y: auto; z-index: 999;
+    -webkit-overflow-scrolling: touch;
   }
-  .navbar-right.open .theme-toggle { display: flex; }
-  .navbar-right.open .navbar-links { display: flex; flex-direction: column; width: 100%; }
-  .navbar-right.open .navbar-links .nav-link { padding: 14px 16px; font-size: 0.95rem; border-radius: var(--r-sm); }
-  .navbar-right.open .navbar-cta { display: flex; margin: 8px 0 0; }
+  .mobile-menu-link {
+    display: block; padding: 14px 16px; font-size: 0.98rem; font-weight: 600;
+    color: var(--text-2); border-radius: var(--r-sm); text-align: left;
+  }
+  .mobile-menu-link.active { color: var(--text); background: var(--bg-3); }
+  .mobile-menu-link:active { background: var(--surface-hover); }
+  .mobile-menu-divider { height: 1px; background: var(--border); margin: 10px 4px; }
+  .mobile-menu-theme { font-weight: 500; color: var(--text); }
+  .mobile-menu-cta { margin: 14px 4px 0; }
 }
 
 /* ═══ BUTTONS ═══ */
