@@ -111,6 +111,19 @@ npm run build
 npm start
 ```
 
+### Running Tests
+
+```bash
+# Frontend (skill graph DAG integrity, acyclicity, lookups)
+cd frontend
+npm test
+
+# Backend (skill gaps, scoring, roadmap, Flask API + CORS)
+cd backend
+python -m pip install -r requirements.txt pytest
+python -m pytest tests/ -v
+```
+
 ## Project Structure
 
 ```

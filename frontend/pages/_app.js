@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/globals.css';
 import { ThemeProvider } from '../components/ThemeContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { useRouter } from 'next/router';
 
 function PageTransition({ children }) {
@@ -37,9 +38,11 @@ function PageTransition({ children }) {
 export default function App({ Component, pageProps }) {
   return (
     <ThemeProvider>
-      <PageTransition>
-        <Component {...pageProps} />
-      </PageTransition>
+      <ErrorBoundary>
+        <PageTransition>
+          <Component {...pageProps} />
+        </PageTransition>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

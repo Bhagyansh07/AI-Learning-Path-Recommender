@@ -10,7 +10,14 @@ from ml import MLRecommender, SkillGapAnalyzer, HybridScorer, RoadmapGenerator
 from ai import GeminiClient
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# Lock down CORS to the deployed frontend origins (the deployed app is the
+# only client that should call this API). The frontend is served from Vercel.
+_ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "https://frontend-mu-jet-18.vercel.app,http://localhost:3000",
+).split(",")
+CORS(app, resources={r"/api/*": {"origins": _ALLOWED_ORIGINS}})
 
 ml_recommender = MLRecommender()
 skill_gap = SkillGapAnalyzer()
