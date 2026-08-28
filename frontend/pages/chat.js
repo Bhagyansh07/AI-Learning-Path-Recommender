@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
-import { createProfile, getProfile, getRecommendations, getLearningPath, getSkillGaps } from '../lib/engine';
+import { createProfile, getProfile, getRecommendations, getLearningPath, getSkillGaps, updateProfile } from '../lib/engine';
 import { getSkillById, DOMAIN_NAMES } from '../lib/skillGraph';
 
 const DOMAIN_COLORS = {
@@ -123,6 +123,27 @@ export default function Chat() {
     setProfile(p);
     setOnboardComplete(true);
     const path = getLearningPath(p);
+    // Attach generated path + aggregate stats to the persisted profile so
+    // localStorage carries a full record (used by dashboards, sharing, audits).
+    if (typeof window !== 'undefined' && p) {
+      const acquiredSkills = (p.current_skills || []).map(s => typeof s === 'string' ? s : s.skill || s);
+      const totalSkills = path.total_courses || (path.skills ? path.skills.length : 0);
+      const completedCount = acquiredSkills.filter(s => (p.completed_courses || []).includes(s) || p.current_skills.some(c => (typeof c === 'object' ? c.skill : c) === s)).length || acquiredSkills.length;
+      const remainingCount = Math.max(0, totalSkills - (p.completed_courses || []).length);
+      updateProfile({
+        generated_path: path,
+        stats: {
+          total_skills: totalSkills,
+          total_hours: path.estimated_hours || 0,
+          estimated_weeks: path.estimated_weeks || 0,
+          phases_count: (path.phases || []).length,
+          acquired_skills: acquiredSkills,
+          completed_count: (p.completed_courses || []).length,
+          remaining_count: remainingCount,
+          remaining_hours: Math.round((path.estimated_hours || 0) * (Math.max(0, totalSkills - (p.completed_courses || []).length) / Math.max(1, totalSkills))),
+        },
+      });
+    }
     const summary = formatProfileSummary(p, path);
     const nextAction = getNextAction(p);
     addBotMessage(`Profile created!\n\n${summary}\n\nNext step: ${nextAction}\n\nYou can now ask me anything about your learning journey, or visit the Dashboard for a detailed view.`);
