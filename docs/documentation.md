@@ -197,9 +197,10 @@ submitFeedback("machine-learning", "easy", 40);
 7. **See generated path** → Skills with phases, milestones
 8. **Click "Why this?"** → Explanation panel opens
 9. **Rate a skill "Too Easy"** → Progress updates instantly
-10. **Ask "How long will this take?"** → Timeline response
-11. **Dashboard** → Progress chart, next action, skill coverage
-12. **Dark mode toggle** → Theme switches smoothly
+10. **Mark a course "Complete"** → Overall progress % + phase counter update live
+11. **Ask "How long will this take?"** → Timeline response
+12. **Dashboard** → Progress chart, next action, skill coverage
+13. **Dark mode toggle** → Theme switches smoothly
 
 ---
 
