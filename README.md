@@ -130,7 +130,8 @@ python -m pytest tests/ -v
 frontend/
 ├── components/
 │   ├── NavBar.js              # Shared navigation with theme toggle
-│   └── ThemeContext.js         # Dark/light mode context provider
+│   ├── ThemeContext.js         # Dark/light mode context provider
+│   └── LegalLayout.js          # Footer + reusable legal page layout
 ├── lib/
 │   ├── skillGraph.js          # 65-skill DAG, 8 career paths, demand scores
 │   └── engine.js              # Core intelligence engine (all algorithms)
@@ -140,6 +141,7 @@ frontend/
 │   ├── dashboard.js           # Progress dashboard with charts
 │   ├── learning-path.js       # Roadmap timeline viewer
 │   ├── profile.js             # Learner profile
+│   ├── legal/[slug].js        # Privacy, Terms, Cookie, Security & Help pages
 │   └── api/
 │       └── gemini.js          # Serverless Gemini API proxy
 ├── styles/
@@ -217,11 +219,15 @@ Pre-loaded profiles for instant demo (no onboarding needed):
 
 ## Team
 
-**NightCoders** — JECRC University, Jaipur
+**NightCoders** — JECRC University, Jaipur · Team size 5/5
 
-| Member | Role |
-|--------|------|
-| Bhagyansh | Full Stack + AI/ML Engine |
+| Member | Role | Email |
+|--------|------|-------|
+| Bhagyansh Chandel | Team Lead, Full Stack + AI/ML Engine | bhagyanshchandel3567@gmail.com |
+| Varun Jain | Backend & ML | varunjain2409@gmail.com |
+| Prashant Sharma | Frontend & UX | prashantsharma.ai28@jecrc.ac.in |
+| Raghav Gupta | Data & Testing | raghav.23bcon1939@jecrcu.edu.in |
+| Parth Manocha | Documentation | parth.manocha2901@gmail.com |
 
 ## License
 
