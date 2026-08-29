@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import Link from 'next/link';
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ export default class ErrorBoundary extends Component {
             <div className="empty-state">
               <h2>Something went wrong</h2>
               <p>An unexpected error occurred while rendering this page. Try refreshing, or head back home.</p>
-              <a className="btn btn-primary" href="/">Go to Home</a>
+              <Link className="btn btn-primary" href="/">Go to Home</Link>
             </div>
           </main>
         </div>

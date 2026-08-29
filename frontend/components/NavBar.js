@@ -83,7 +83,7 @@ export default function NavBar({ active }) {
           <button type="button" className="mobile-menu-link mobile-menu-theme" onClick={toggle}>
             {theme === 'light' ? '☾ Light Mode' : '☀ Dark Mode'}
           </button>
-          <a href="/chat" className="btn btn-primary mobile-menu-cta" onClick={closeMenu}>Get Started</a>
+          <Link href="/chat" className="btn btn-primary mobile-menu-cta" onClick={closeMenu}>Get Started</Link>
         </div>,
         document.body
       )}

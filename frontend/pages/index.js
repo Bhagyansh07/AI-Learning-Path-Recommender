@@ -163,7 +163,7 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 40px' }}>
               <div><span style={{ color: 'var(--text-3)' }}>engine</span> <span style={{ color: 'var(--text)' }}>lib/engine.js</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>graph</span> <span style={{ color: 'var(--text)' }}> nodes, {SKILL_GRAPH.skills.length} skills, {SKILL_GRAPH.skills.reduce((a, s) => a + s.prerequisites.length, 0)} edges</span></div>
-              <div><span style={{ color: 'var(--text-3)' }}>sort</span> <span style={{ color: 'var(--text)' }}>Kahn's topological (O(V+E))</span></div>
+              <div><span style={{ color: 'var(--text-3)' }}>sort</span> <span style={{ color: 'var(--text)' }}>Kahn&apos;s topological (O(V+E))</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>scoring</span> <span style={{ color: 'var(--text)' }}>5-factor weighted hybrid</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>profiler</span> <span style={{ color: 'var(--text)' }}>rule-based NLU (no LLM)</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>feedback</span> <span style={{ color: 'var(--text)' }}>Elo-inspired weight updates</span></div>

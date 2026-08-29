@@ -218,7 +218,7 @@ export default function AlgorithmPage() {
               <span className="algo-tag">O(V + E)</span>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 16 }}>
-              Kahn's algorithm ensures prerequisites are always learned before dependent skills. Watch nodes with zero in-degree get processed first.
+              Kahn&apos;s algorithm ensures prerequisites are always learned before dependent skills. Watch nodes with zero in-degree get processed first.
             </p>
             <TopoDemo />
             <div className="algo-code" style={{ marginTop: 14 }}>
@@ -230,7 +230,7 @@ export default function AlgorithmPage() {
               {'    '}sorted.<span className="fn">push</span>(node);{'\n'}
               {'    '}<span className="fn">decrementNeighbors</span>(node, inDeg, queue);{'\n'}
               {'  }'}{'}\n'}
-              {'  '}<span className="kw">return</span> sorted; <span className="str">// Valid learning order</span>
+              {'  '}<span className="kw">return</span> sorted; <span className="str">{'// Valid learning order'}</span>
               {'\n}'}
             </div>
           </section>
