@@ -223,8 +223,8 @@ Pre-loaded profiles for instant demo (no onboarding needed):
 
 | Member | Role | Email |
 |--------|------|-------|
-| Bhagyansh Chandel | Team Lead, Full Stack + AI/ML Engine | bhagyanshchandel3567@gmail.com |
-| Varun Jain | Backend & ML | varunjain2409@gmail.com |
+| Varun Jain | Team Lead, Backend & ML | varunjain2409@gmail.com |
+| Bhagyansh Chandel | Full Stack + AI/ML Engine | bhagyanshchandel3567@gmail.com |
 | Prashant Sharma | Frontend & UX | prashantsharma.ai28@jecrc.ac.in |
 | Raghav Gupta | Data & Testing | raghav.23bcon1939@jecrcu.edu.in |
 | Parth Manocha | Documentation | parth.manocha2901@gmail.com |

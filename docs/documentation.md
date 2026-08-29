@@ -221,13 +221,13 @@ submitFeedback("machine-learning", "easy", 40);
 
 **Team NightCoders · Team size: 5/5 · HCLTech AMPlified 2025 (Round 2)**
 
-| Member | Email |
-|--------|-------|
-| Bhagyansh Chandel | bhagyanshchandel3567@gmail.com |
-| Varun Jain | varunjain2409@gmail.com |
-| Prashant Sharma | prashantsharma.ai28@jecrc.ac.in |
-| Raghav Gupta | raghav.23bcon1939@jecrcu.edu.in |
-| Parth Manocha | parth.manocha2901@gmail.com |
+| Member | Role | Email |
+|--------|------|-------|
+| Bhagyansh Chandel | Full Stack + AI/ML Engine | bhagyanshchandel3567@gmail.com |
+| Varun Jain | Team Lead, Backend & ML | varunjain2409@gmail.com |
+| Prashant Sharma | Frontend & UX | prashantsharma.ai28@jecrc.ac.in |
+| Raghav Gupta | Data & Testing | raghav.23bcon1939@jecrcu.edu.in |
+| Parth Manocha | Documentation | parth.manocha2901@gmail.com |
 
 **Institution:** JECRC University, Jaipur
 
