@@ -712,12 +712,12 @@ phases = <span class="fn">assignPhases</span>(sorted, profile);
     <div>
       <h3>Team Members</h3>
       <table>
-        <tr><th>Name</th><th>Role</th></tr>
-        <tr><td>Bhagyansh Sharma</td><td>Team Lead, Full Stack</td></tr>
-        <tr><td>Member 2</td><td>Backend & ML</td></tr>
-        <tr><td>Member 3</td><td>Frontend & UX</td></tr>
-        <tr><td>Member 4</td><td>Data & Testing</td></tr>
-        <tr><td>Member 5</td><td>Documentation</td></tr>
+        <tr><th>Name</th><th>Role</th><th>Email</th></tr>
+        <tr><td>Bhagyansh Chandel</td><td>Team Lead, Full Stack</td><td>bhagyanshchandel3567@gmail.com</td></tr>
+        <tr><td>Varun Jain</td><td>Backend & ML</td><td>varunjain2409@gmail.com</td></tr>
+        <tr><td>Prashant Sharma</td><td>Frontend & UX</td><td>prashantsharma.ai28@jecrc.ac.in</td></tr>
+        <tr><td>Raghav Gupta</td><td>Data & Testing</td><td>raghav.23bcon1939@jecrcu.edu.in</td></tr>
+        <tr><td>Parth Manocha</td><td>Documentation</td><td>parth.manocha2901@gmail.com</td></tr>
       </table>
     </div>
     <div>
@@ -760,6 +760,62 @@ phases = <span class="fn">assignPhases</span>(sorted, profile);
   <div class="page-footer">
     <span>LearnPath AI — HCLTech AMPlified Round 2</span>
     <span>Page 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 10: SETUP & EXECUTION ============ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-num">10</div>
+    <div>
+      <div class="section-tag">Setup</div>
+      <h2>Local Setup &amp; Execution</h2>
+    </div>
+  </div>
+
+  <h3>Prerequisites</h3>
+  <div class="card">
+    <p><strong>Node.js</strong> v18+ and npm · <strong>Python</strong> 3.9+ and pip (backend only)</p>
+  </div>
+
+  <h3 style="margin-top:16px">1. Get the code</h3>
+  <div class="card">
+    <p>Unzip <strong>LearnPath-AI-Source-Code.zip</strong>, or clone <code>github.com/Bhagyansh07/AI-Learning-Path-Recommender</code>.</p>
+  </div>
+
+  <h3 style="margin-top:16px">2. Run the frontend (main app)</h3>
+  <div class="card">
+    <pre style="margin:0;white-space:pre-wrap">cd frontend
+npm install
+npm run dev</pre>
+    <p style="margin-bottom:0">Open <code>http://localhost:3000</code>. Profile, path, dashboard, graph &amp; algorithm all run client-side.</p>
+  </div>
+
+  <h3 style="margin-top:16px">3. Run the backend (optional)</h3>
+  <div class="card">
+    <pre style="margin:0;white-space:pre-wrap">cd backend
+python -m pip install -r requirements.txt
+python app.py</pre>
+    <p style="margin-bottom:0">Serves <code>http://localhost:5000</code>. Add a Gemini key in <code>.env</code> for NLU/NLG polish; falls back to local parsing otherwise.</p>
+  </div>
+
+  <h3 style="margin-top:16px">4. Run tests</h3>
+  <div class="card">
+    <pre style="margin:0;white-space:pre-wrap">cd frontend && npm test
+cd backend && python -m pytest tests/ -q</pre>
+    <p style="margin-bottom:0">Frontend 9 tests · Backend 13 tests — all passing.</p>
+  </div>
+
+  <h3 style="margin-top:16px">5. Production build</h3>
+  <div class="card">
+    <pre style="margin:0;white-space:pre-wrap">cd frontend
+npm run build
+npm start</pre>
+  </div>
+
+  <div class="page-footer">
+    <span>LearnPath AI — HCLTech AMPlified Round 2</span>
+    <span>Page 10</span>
   </div>
 </div>
 

@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { getLearningPath, getProfile, toggleSkillComplete, computePathProgress } from '../lib/engine';
 import ExplanationModal from '../components/ExplanationModal';
 
@@ -185,6 +186,7 @@ export default function LearningPathPage() {
         </div>
       </main>
       <ExplanationModal open={modal.open} onClose={() => setModal({ open: false })} title={modal.title} content={modal.content} />
+      <Footer />
     </div>
   );
 }

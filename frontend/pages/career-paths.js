@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { SKILL_GRAPH, SKILL_DEMAND, DOMAIN_NAMES } from '../lib/skillGraph';
 
 const DOMAIN_VAR = {
@@ -114,6 +115,7 @@ export default function CareerPathsPage() {
           </section>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

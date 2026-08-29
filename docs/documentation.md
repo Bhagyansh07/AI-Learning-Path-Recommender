@@ -217,4 +217,64 @@ submitFeedback("machine-learning", "easy", 40);
 
 ---
 
+## 8. Team — NightCoders
+
+**Team NightCoders · Team size: 5/5 · HCLTech AMPlified 2025 (Round 2)**
+
+| Member | Email |
+|--------|-------|
+| Bhagyansh Chandel | bhagyanshchandel3567@gmail.com |
+| Varun Jain | varunjain2409@gmail.com |
+| Prashant Sharma | prashantsharma.ai28@jecrc.ac.in |
+| Raghav Gupta | raghav.23bcon1939@jecrcu.edu.in |
+| Parth Manocha | parth.manocha2901@gmail.com |
+
+**Institution:** JECRC University, Jaipur
+
+---
+
+## 9. Local Setup & Execution Instructions
+
+### Prerequisites
+- **Node.js** v18+ and **npm**
+- **Python** 3.9+ and **pip** (only required for the backend / Gemini NLU polish)
+
+### 1. Get the code
+Download and unzip `LearnPath-AI-Source-Code.zip`, or clone:
+```
+git clone https://github.com/Bhagyansh07/AI-Learning-Path-Recommender.git
+```
+
+### 2. Run the frontend (the main app)
+```
+cd frontend
+npm install
+npm run dev
+```
+Open `http://localhost:3000` in your browser. The full app works locally — profile, learning path, dashboard, skill graph and algorithm are all client-side.
+
+### 3. Run the backend (optional — only for Gemini-powered NLU/NLG polish)
+```
+cd backend
+python -m pip install -r requirements.txt
+python app.py
+```
+Server runs on `http://localhost:5000`. Set your Gemini API key in `.env` (see `.env.example`). The app gracefully falls back to local parsing if no key is configured.
+
+### 4. Run the tests
+```
+cd frontend && npm test
+cd backend && python -m pytest tests/ -q
+```
+Frontend (skill-graph) has 9 passing tests; backend has 13 passing tests.
+
+### 5. Production build
+```
+cd frontend
+npm run build
+npm start
+```
+
+---
+
 *Team NightCoders — JECRC University, Jaipur*

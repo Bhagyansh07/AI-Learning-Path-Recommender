@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { SKILL_GRAPH, SKILL_DEMAND } from '../lib/skillGraph';
 
 const DEMO_SKILLS = ['python-basics', 'numpy-pandas', 'statistics-basics', 'machine-learning', 'supervised-learning', 'deep-learning', 'data-structures-algorithms', 'sql-databases'];
@@ -248,6 +249,7 @@ export default function AlgorithmPage() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

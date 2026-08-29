@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { createProfile, getProfile, getRecommendations, getLearningPath, getSkillGaps, updateProfile } from '../lib/engine';
 import { getSkillById, DOMAIN_NAMES } from '../lib/skillGraph';
 
@@ -404,6 +405,7 @@ export default function Chat() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

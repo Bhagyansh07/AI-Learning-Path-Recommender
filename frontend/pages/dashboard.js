@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { getProfile, getRecommendations, getLearningPath, getSkillGaps, getDemoProfiles, createProfile } from '../lib/engine';
 import { useState, useEffect } from 'react';
 
@@ -214,6 +215,7 @@ export default function Dashboard() {
           </section>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

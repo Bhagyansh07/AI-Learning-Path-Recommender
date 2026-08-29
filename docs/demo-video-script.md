@@ -1,6 +1,6 @@
 # LearnPath AI — Complete Step-by-Step Demo Video Script (3:30–4:45 min)
 
-**App URL:** https://frontend-bhagyansh.vercel.app
+**App URL:** https://frontend-mu-jet-18.vercel.app
 **Recommended browser:** Chrome/Edge desktop (clear) — keep fonts at 100%
 **Goal:** 90+ score. Show the ALGORITHMIC brain (AI/ML = 20%), the features (Functionality = 25%), explainability (Innovation = 15%). ALWAYS say the WHY, never just scroll.
 
@@ -74,6 +74,7 @@
 ## 4:20–4:45 — Close (25 sec)
 **SCREEN:** Skill graph or back to landing
 - **SAY:** "LearnPath AI — sequenced curriculum, explainable recommendations, adaptive feedback, and live progress tracking. A client-side rule engine so it never depends on an external model. Built with a Python ML backend and 22 automated tests. Thank you."
+- *(Optional 5s)* scroll to the footer once to show Privacy Policy, Terms, and Help Center — complete, polished product.
 
 ---
 

@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { SKILL_GRAPH, DOMAIN_NAMES } from '../lib/skillGraph';
 
 const DOMAIN_COLORS = {
@@ -188,9 +189,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="footer">
-        <div className="container">LearnPath AI — Built for <a href="https://hcltech.com" target="_blank" rel="noopener noreferrer">HCLTech AMPlified</a> Round 2</div>
-      </footer>
+      <Footer />
     </div>
   );
 }

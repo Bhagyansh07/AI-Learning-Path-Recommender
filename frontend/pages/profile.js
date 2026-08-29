@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import NavBar from '../components/NavBar';
+import { Footer } from '../components/LegalLayout';
 import { getProfile } from '../lib/engine';
 
 export default function Profile() {
@@ -158,6 +159,7 @@ export default function Profile() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
