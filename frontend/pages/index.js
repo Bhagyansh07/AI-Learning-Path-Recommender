@@ -74,7 +74,7 @@ export default function Home() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {[
-                { val: 65, label: 'Skills in DAG', color: 'var(--accent)' },
+                { val: SKILL_GRAPH.skills.length, label: 'Skills in DAG', color: 'var(--accent)' },
                 { val: 8, label: 'Career paths', color: 'var(--green)' },
                 { val: 5, label: 'Scoring factors', color: 'var(--cyan)' },
                 { val: 100, label: '% client-side', suffix: '%', color: 'var(--amber)' },

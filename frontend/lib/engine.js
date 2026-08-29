@@ -305,9 +305,16 @@ export function getLearningPath(profile) {
     phases, milestones,
     skill_gaps: sorted.filter(s => !userSkills.has(s)),
     total_courses: sorted.length,
+    total_skills: sorted.length,
     estimated_hours: totalHours,
     estimated_weeks: adjustedWeeks,
     target_level: profile.experience_level,
+    career_title: profile.goals[0] || 'Learner',
+    difficulty_distribution: {
+      beginner: beginner.length,
+      intermediate: intermediate.length,
+      advanced: advanced.length,
+    },
   };
 }
 

@@ -85,7 +85,13 @@ function ScoringDemo() {
   const [demand, setDemand] = useState(20);
   const [difficulty, setDifficulty] = useState(10);
   const [prereqs, setPrereqs] = useState(10);
-  const total = skillGap + careerMatch + demand + difficulty + prereqs;
+
+  // Compute total with safe fallback (avoid division-by-zero)
+  const rawTotal = skillGap + careerMatch + demand + difficulty + prereqs;
+  const total = rawTotal > 0 ? rawTotal : 1;
+
+  // Normalized percentages so progress bars always sum to 100%
+  const norm = rawTotal > 0 ? 100 / rawTotal : 0;
 
   const factors = [
     { label: 'Skill Gap', value: skillGap, set: setSkillGap, color: 'var(--purple)', max: 50 },
@@ -94,6 +100,9 @@ function ScoringDemo() {
     { label: 'Difficulty Fit', value: difficulty, set: setDifficulty, color: 'var(--cyan)', max: 20 },
     { label: 'Prerequisites', value: prereqs, set: setPrereqs, color: 'var(--accent-2)', max: 20 },
   ];
+
+  // Normalized values for progress bars
+  const normValues = factors.map(f => Math.round(f.value * norm));
 
   return (
     <div>
@@ -116,14 +125,14 @@ function ScoringDemo() {
       <div className="card" style={{ padding: 18 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <span className="t-label">Final Score</span>
-          <span className="t-num" style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent-2)' }}>{total}%</span>
+          <span className="t-num" style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent-2)' }}>{rawTotal > 0 ? Math.round(rawTotal * norm) : 0}%</span>
         </div>
         <div style={{ height: 24, background: 'var(--bg-4)', borderRadius: 'var(--r-sm)', overflow: 'hidden', display: 'flex' }}>
-          <div style={{ width: `${(skillGap / total) * 100}%`, background: 'var(--purple)', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(careerMatch / total) * 100}%`, background: 'var(--green)', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(demand / total) * 100}%`, background: 'var(--amber)', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(difficulty / total) * 100}%`, background: 'var(--cyan)', transition: 'width 0.3s' }} />
-          <div style={{ width: `${(prereqs / total) * 100}%`, background: 'var(--accent-2)', transition: 'width 0.3s' }} />
+          <div style={{ width: `${skillGap * norm}%`, background: 'var(--purple)', transition: 'width 0.3s' }} />
+          <div style={{ width: `${careerMatch * norm}%`, background: 'var(--green)', transition: 'width 0.3s' }} />
+          <div style={{ width: `${demand * norm}%`, background: 'var(--amber)', transition: 'width 0.3s' }} />
+          <div style={{ width: `${difficulty * norm}%`, background: 'var(--cyan)', transition: 'width 0.3s' }} />
+          <div style={{ width: `${prereqs * norm}%`, background: 'var(--accent-2)', transition: 'width 0.3s' }} />
         </div>
         <div style={{ display: 'flex', gap: 12, marginTop: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
