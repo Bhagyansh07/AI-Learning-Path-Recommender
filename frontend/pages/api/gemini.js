@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
   setCors(res, origin);
 
-  const { message, context, mode } = req.body;
+  const { message, context, mode, history } = req.body;
   if (!message || typeof message !== 'string' || message.trim().length === 0) { setCors(res, origin); return res.status(400).json({ error: 'Valid message required' }); }
   if (message.length > 2000) { setCors(res, origin); return res.status(400).json({ error: 'Message too long (max 2000 characters)' }); }
 
@@ -62,14 +62,17 @@ export default async function handler(req, res) {
     let prompt;
     if (mode === 'chat') {
       const ctx = context ? `\nLearner level: ${sanitize(context.level || '')}, interests: ${(context.interests || []).slice(0, 5).map(sanitize).join(', ')}, skills: ${(context.skills || []).slice(0, 10).map(sanitize).join(', ')}` : '';
-      prompt = `You are LearnPath AI, a friendly learning assistant for a course recommendation platform.\n${ctx}\n\nUser: ${safeMsg}\n\nRespond in 2-3 sentences max. Be helpful and encouraging. If recommending something, explain why briefly.`;
+      const convo = Array.isArray(history) && history.length
+        ? '\n\nConversation so far:\n' + history.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${sanitize(m.text || '')}`).join('\n')
+        : '';
+      prompt = `You are LearnPath AI, an empathetic and knowledgeable AI learning assistant for a course recommendation platform. Keep the conversation's continuity in mind — refer back to what the learner already said. Answer naturally and conversationally.${ctx}${convo}\n\nUser: ${safeMsg}\n\nRespond helpfully. Keep it concise (2-4 sentences) but natural, and avoid sounding like a pre-written template. If recommending, briefly explain WHY.`;
     } else if (mode === 'explain') {
       prompt = `Explain why this course is recommended in 2-3 sentences. Be concise and encouraging.\nCourse: ${safeMsg}\n\nExplanation:`;
     } else {
       prompt = `Extract a learning profile from this text. Return ONLY valid JSON with: interests (array of domains), experience_level (beginner/intermediate/advanced), skills (array), goals (array).\nText: "${safeMsg}"\nJSON:`;
     }
 
-    const model = 'gemini-2.0-flash';
+    const model = 'gemini-3.6-flash';
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

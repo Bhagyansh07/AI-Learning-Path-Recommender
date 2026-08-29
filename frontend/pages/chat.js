@@ -181,10 +181,11 @@ export default function Chat() {
     setLoading(true);
     try {
       const profileData = profile ? { level: profile.experience_level, interests: profile.interests, skills: profile.current_skills.map(s => typeof s === 'object' ? s.skill : s) } : null;
+      const historyData = messages.slice(-12).map(m => ({ role: m.role, text: m.text }));
       const res = await fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, context: profileData, mode: 'chat' }),
+        body: JSON.stringify({ message: text, context: profileData, mode: 'chat', history: historyData }),
       });
       const data = await res.json();
       const reply = data.response || data.explanation || "I'm not sure how to respond. Try asking about courses, skills, or career paths.";
@@ -330,12 +331,13 @@ export default function Chat() {
                     className="btn btn-secondary btn-sm"
                     onClick={() => {
                       setInput('');
+                      const hist = [...messages, { role: 'user', text: a.msg }].slice(-12).map(m => ({ role: m.role, text: m.text }));
                       setMessages(prev => [...prev, { role: 'user', text: a.msg }]);
                       setLoading(true);
                       fetch('/api/gemini', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: a.msg, context: profile ? { level: profile.experience_level, interests: profile.interests, skills: profile.current_skills.map(s => typeof s === 'object' ? s.skill : s) } : null, mode: 'chat' }),
+                        body: JSON.stringify({ message: a.msg, context: profile ? { level: profile.experience_level, interests: profile.interests, skills: profile.current_skills.map(s => typeof s === 'object' ? s.skill : s) } : null, mode: 'chat', history: hist }),
                       }).then(r => r.json()).then(d => { addBotMessage(d.response || "I can help with that!"); setLoading(false); }).catch(() => { addBotMessage("Try again."); setLoading(false); });
                     }}
                   >
