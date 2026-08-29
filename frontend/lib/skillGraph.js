@@ -1,6 +1,6 @@
 // ============================================================
 // SKILL GRAPH DAG — The Brain of the System
-// 65 skills, prerequisite edges, difficulty, estimated hours
+// 54 skills, prerequisite edges, difficulty, estimated hours
 // This is NOT an LLM. This is algorithmic intelligence.
 // ============================================================
 

@@ -1,4 +1,4 @@
-# Solution Documentation — LearnPath AI
+﻿# Solution Documentation — LearnPath AI
 
 > HCLTech AMPlified 2025 · Round 2 · Team NightCoders · JECRC University
 
@@ -44,7 +44,7 @@ The LLM is a UI convenience, not the brain. The brain is algorithmic.
 │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐ │
 │  │ Skill Graph │  │   Profiler   │  │    Path      │ │
 │  │    DAG      │  │   Engine     │  │  Generator   │ │
-│  │  (65 nodes) │  │ (NLU+form)   │  │ (topo sort)  │ │
+│  │  (54 nodes) │  │ (NLU+form)   │  │ (topo sort)  │ │
 │  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘ │
 │         │                │                  │          │
 │  ┌──────▼──────┐  ┌──────▼───────┐  ┌──────▼───────┐ │
@@ -66,7 +66,7 @@ The LLM is a UI convenience, not the brain. The brain is algorithmic.
 ### 3.1 Skill Graph — Knowledge Representation
 
 A **Directed Acyclic Graph (DAG)** with:
-- **65 nodes** (skills) across 9 domains
+- **54 nodes** (skills) across 9 domains
 - **Directed edges** = prerequisite relationships
 - **Node weights** = difficulty (1-5), estimated hours
 - **8 career paths** with target skill sets

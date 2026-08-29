@@ -39,7 +39,7 @@ class GeminiClient:
         try:
             import google.generativeai as genai
             genai.configure(api_key=self.api_key)
-            self._model = genai.GenerativeModel("gemini-3.6-flash")
+            self._model = genai.GenerativeModel("gemini-1.5-flash")
             return self._model
         except ImportError:
             self.available = False

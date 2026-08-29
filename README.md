@@ -27,7 +27,7 @@ Online learning platforms have thousands of courses but no map. You search "how 
 
 | Feature | Description |
 |---------|-------------|
-| **Skill Graph DAG** | 65 skills with prerequisite edges across 8 career paths — algorithmic intelligence, not LLM vibes |
+| **Skill Graph DAG** | 54 skills with prerequisite edges across 8 career paths — algorithmic intelligence, not LLM vibes |
 | **Topological Sort Path Generation** | Textbook graph algorithm generates prerequisite-ordered learning paths |
 | **Gap Analysis** | Set difference: `target_skills − current_skills` — shows exactly what you're missing |
 | **Explainable AI** | Every recommendation comes with rule-based reasoning (why this, why now) |
@@ -48,7 +48,7 @@ Online learning platforms have thousands of courses but no map. You search "how 
 │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐ │
 │  │ Skill Graph │  │   Profiler   │  │    Path      │ │
 │  │    DAG      │  │   Engine     │  │  Generator   │ │
-│  │  (65 nodes) │  │ (NLU+form)   │  │ (topo sort)  │ │
+│  │  (54 nodes) │  │ (NLU+form)   │  │ (topo sort)  │ │
 │  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘ │
 │         │                │                  │          │
 │  ┌──────▼──────┐  ┌──────▼───────┐  ┌──────▼───────┐ │
@@ -72,7 +72,7 @@ Online learning platforms have thousands of courses but no map. You search "how 
 | Frontend | Next.js 14, React 18 | Fast builds, SSG, API routes |
 | Core Intelligence | Pure JavaScript algorithms | Deterministic, explainable, no API dependency |
 | AI/ML | Skill Graph DAG + Topological Sort | Real graph algorithms, not LLM wrappers |
-| LLM (optional) | Google Gemini 3.6 Flash | NLU parsing + NLG text polish |
+| LLM (optional) | Google Gemini 1.5 Flash | NLU parsing + NLG text polish |
 | Styling | Custom CSS with CSS Variables | Light/dark mode, no framework bloat |
 | State | localStorage | No database needed for demo |
 | Deployment | Vercel | Free, fast, serverless functions |
@@ -133,7 +133,7 @@ frontend/
 │   ├── ThemeContext.js         # Dark/light mode context provider
 │   └── LegalLayout.js          # Footer + reusable legal page layout
 ├── lib/
-│   ├── skillGraph.js          # 65-skill DAG, 8 career paths, demand scores
+│   ├── skillGraph.js          # 54-skill DAG, 8 career paths, demand scores
 │   └── engine.js              # Core intelligence engine (all algorithms)
 ├── pages/
 │   ├── index.js               # Landing page
@@ -154,7 +154,7 @@ frontend/
 ### 1. Skill Graph (Knowledge Representation)
 
 A Directed Acyclic Graph where:
-- **Nodes** = 65 skills (Python, ML, React, Docker, etc.)
+- **Nodes** = 54 skills (Python, ML, React, Docker, etc.)
 - **Edges** = prerequisite relationships (ML requires NumPy + Statistics)
 - **Weights** = difficulty (1-5), estimated hours, demand score
 

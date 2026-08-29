@@ -293,7 +293,7 @@ export default function Chat() {
     <div className="page-wrapper">
       <Head><title>AI Assistant — LearnPath AI</title></Head>
       <NavBar active="chat" />
-      <main className="container" style={{ paddingTop: 52, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <main className="container" style={{ paddingTop: 52, flex: 1, minHeight: 'calc(100vh - 52px)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 14px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: 'var(--r-md)', background: 'var(--accent-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

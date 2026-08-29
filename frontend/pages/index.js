@@ -145,7 +145,7 @@ export default function Home() {
             {[
               { title: 'Conversational AI', desc: 'Natural language input. Hindi and English. Type what you want to learn.' },
               { title: 'Explainable recommendations', desc: 'Every suggestion comes with a clear why. No opaque AI decisions.' },
-              { title: 'Interactive Skill Graph', desc: '65-skill DAG. Pan, zoom, click nodes. See prerequisite chains visually.' },
+              { title: 'Interactive Skill Graph', desc: 'Skill Graph DAG. Pan, zoom, click nodes. See prerequisite chains visually.' },
               { title: 'Algorithm Transparency', desc: 'Watch topological sort run live. Adjust scoring sliders. See gap analysis in action.' },
             ].map((f, i) => (
               <div key={i} style={{ padding: '20px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)' }}>
@@ -162,7 +162,7 @@ export default function Home() {
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 24, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', lineHeight: 1.8, color: 'var(--text-2)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 40px' }}>
               <div><span style={{ color: 'var(--text-3)' }}>engine</span> <span style={{ color: 'var(--text)' }}>lib/engine.js</span></div>
-              <div><span style={{ color: 'var(--text-3)' }}>graph</span> <span style={{ color: 'var(--text)' }}>65 nodes, {SKILL_GRAPH.skills.reduce((a, s) => a + s.prerequisites.length, 0)} edges</span></div>
+              <div><span style={{ color: 'var(--text-3)' }}>graph</span> <span style={{ color: 'var(--text)' }}> nodes, {SKILL_GRAPH.skills.length} skills, {SKILL_GRAPH.skills.reduce((a, s) => a + s.prerequisites.length, 0)} edges</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>sort</span> <span style={{ color: 'var(--text)' }}>Kahn's topological (O(V+E))</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>scoring</span> <span style={{ color: 'var(--text)' }}>5-factor weighted hybrid</span></div>
               <div><span style={{ color: 'var(--text-3)' }}>profiler</span> <span style={{ color: 'var(--text)' }}>rule-based NLU (no LLM)</span></div>

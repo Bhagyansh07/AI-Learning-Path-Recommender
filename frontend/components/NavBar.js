@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: '/skill-graph', key: 'graph', label: 'Graph' },
   { href: '/algorithm', key: 'algorithm', label: 'Algorithm' },
   { href: '/career-paths', key: 'career', label: 'Careers' },
+  { href: '/profile', key: 'profile', label: 'Profile' },
 ];
 
 export default function NavBar({ active }) {

@@ -301,6 +301,12 @@ export function getLearningPath(profile) {
   const timeMultiplier = TIME_MULTIPLIER[profile.time_commitment] || 1;
   const adjustedWeeks = Math.max(1, Math.round(totalHours / (10 * timeMultiplier)));
 
+  const allSkills = [...sorted, ...[...userSkills].filter(id => allRequiredSkills.has(id))];
+  const diffBeginner = allSkills.filter(id => (getSkillById(id) || {}).difficulty <= 1).length;
+  const diffIntermediate = allSkills.filter(id => { const d = (getSkillById(id) || {}).difficulty; return d > 1 && d <= 3; }).length;
+  const diffAdvanced = allSkills.filter(id => (getSkillById(id) || {}).difficulty > 3).length;
+  const careerTitle = (profile.career_goals && profile.career_goals[0]) || (profile.goals && profile.goals[0]) || 'Learner';
+
   return {
     phases, milestones,
     skill_gaps: sorted.filter(s => !userSkills.has(s)),
@@ -309,11 +315,11 @@ export function getLearningPath(profile) {
     estimated_hours: totalHours,
     estimated_weeks: adjustedWeeks,
     target_level: profile.experience_level,
-    career_title: profile.goals[0] || 'Learner',
+    career_title: careerTitle,
     difficulty_distribution: {
-      beginner: beginner.length,
-      intermediate: intermediate.length,
-      advanced: advanced.length,
+      beginner: diffBeginner,
+      intermediate: diffIntermediate,
+      advanced: diffAdvanced,
     },
   };
 }
@@ -408,6 +414,7 @@ function skillToCourse(skillId, profile) {
     skills: skill ? skill.prerequisites.concat(skillId) : [skillId],
     completed: completed.has(skillId),
     difficulty: skill ? skill.difficulty : 1,
+    type: bestResource ? bestResource.type : 'Course',
   };
 }
 
