@@ -54,7 +54,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.length < 10) {
-    return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
+    return res.status(200).json({ source: 'fallback', response: getFallback(message, mode, context) });
   }
 
   try {
@@ -81,12 +81,12 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       console.error('Gemini API error:', response.status);
-      return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
+      return res.status(200).json({ source: 'fallback', response: getFallback(message, mode, context) });
     }
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-    if (!text) return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
+    if (!text) return res.status(200).json({ source: 'fallback', response: getFallback(message, mode, context) });
 
     if (mode === 'chat') return res.status(200).json({ source: 'gemini', response: text });
     if (mode === 'explain') return res.status(200).json({ source: 'gemini', explanation: text });
@@ -98,15 +98,21 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error('Gemini fetch error:', err.message);
-    return res.status(200).json({ source: 'fallback', response: getFallback(message, mode) });
+    return res.status(200).json({ source: 'fallback', response: getFallback(message, mode, context) });
   }
 }
 
-function getFallback(msg, mode) {
+function getFallback(msg, mode, context) {
   const m = (msg || '').toLowerCase();
+  const hasSkills = context && Array.isArray(context.skills) && context.skills.length > 0;
+  const skillList = hasSkills ? context.skills.slice(0, 5).map(s => sanitize(s)).join(', ') : '';
   if (mode === 'explain') return 'This course is recommended because it aligns with your interests and matches your skill level. It will help you build practical, in-demand skills.';
   if (m.includes('hello') || m.includes('hi') || m.includes('hey')) return "Hello! I'm LearnPath AI. Tell me your learning goals and I'll create a personalized roadmap for you!";
-  if (m.includes('recommend') || m.includes('suggest') || m.includes('what should')) return "Set up your profile through the onboarding, and I'll suggest the best courses tailored for you!";
+  if (m.includes('recommend') || m.includes('suggest') || m.includes('what should')) {
+    return hasSkills
+      ? `Based on your profile (${skillList || 'no skills yet'}), I recommend starting with foundational courses matched to your target career. Head to the Path page to see your full, sequenced roadmap.`
+      : "Set up your profile through the onboarding, and I'll suggest the best courses tailored for you!";
+  }
   if (m.includes('skill') || m.includes('gap')) return "Check the Dashboard Skills tab to see your acquired skills and gaps. Focus on high-priority skills first!";
   if (m.includes('career') || m.includes('job')) return "Our system maps courses to career paths with salary data. Complete onboarding to see which careers match you!";
   if (m.includes('next') || m.includes('what now')) return "Check your Learning Path page to see your next recommended course!";
