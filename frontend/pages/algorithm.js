@@ -229,7 +229,7 @@ export default function AlgorithmPage() {
               {'    '}<span className="kw">const</span> node = queue.<span className="fn">shift</span>();{'\n'}
               {'    '}sorted.<span className="fn">push</span>(node);{'\n'}
               {'    '}<span className="fn">decrementNeighbors</span>(node, inDeg, queue);{'\n'}
-              {'  }'}{'}\n'}
+              {'  }'}{'\n'}
               {'  '}<span className="kw">return</span> sorted; <span className="str">{'// Valid learning order'}</span>
               {'\n}'}
             </div>
