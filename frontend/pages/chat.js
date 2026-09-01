@@ -59,11 +59,13 @@ function getNextAction(profile) {
 function TypingText({ text, speed = 12, onDone }) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
   useEffect(() => {
     setDisplayed(''); setDone(false); let i = 0;
     const interval = setInterval(() => {
       i++;
-      if (i >= text.length) { setDisplayed(text); setDone(true); clearInterval(interval); onDone?.(); return; }
+      if (i >= text.length) { setDisplayed(text); setDone(true); clearInterval(interval); onDoneRef.current?.(); return; }
       setDisplayed(text.substring(0, i));
     }, speed);
     return () => clearInterval(interval);
@@ -173,11 +175,33 @@ export default function Chat() {
     }
   };
 
+  const handleRecommendCourses = useCallback(() => {
+    if (!profile || !Object.keys(profile).length) {
+      addBotMessage("Please set up your profile first — click **Start Onboarding** to give me your goals and current skills, then I can recommend the best courses for you.");
+      return;
+    }
+    const recs = getRecommendations(profile, 5);
+    if (!recs.length) {
+      addBotMessage(profile.current_skills && profile.current_skills.length >= 10
+        ? "You've already got a strong skill foundation! Check your Learning Path to keep building, or add a new career goal to discover fresh skills."
+        : "I couldn't find new courses to recommend. Check your Learning Path for what to tackle next.");
+      return;
+    }
+    addBotMessage(`Here are your top ${recs.length} course recommendations, ranked by gap, career relevance, and ML skill similarity:`, { recommendations: recs });
+  }, [profile, addBotMessage]);
+
   const send = async () => {
     if (!input.trim() || loading) return;
     const text = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text }]);
+    const lower = text.toLowerCase();
+    if (/recommend.*(course|skill)|course.*(recommend|suggest)|what.*(should|course).*learn|suggest.*(course|skill)/.test(lower)) {
+      setLoading(true);
+      handleRecommendCourses();
+      setTimeout(() => setLoading(false), 400);
+      return;
+    }
     setLoading(true);
     try {
       const profileData = profile ? { level: profile.experience_level, interests: profile.interests, skills: profile.current_skills.map(s => typeof s === 'object' ? s.skill : s) } : null;
@@ -330,9 +354,15 @@ export default function Chat() {
                     key={i}
                     className="btn btn-secondary btn-sm"
                     onClick={() => {
+                      setMessages(prev => [...prev, { role: 'user', text: a.msg }]);
+                      if (a.msg.toLowerCase().includes('recommend') || a.msg.toLowerCase().includes('course')) {
+                        setLoading(true);
+                        handleRecommendCourses();
+                        setTimeout(() => setLoading(false), 400);
+                        return;
+                      }
                       setInput('');
                       const hist = [...messages, { role: 'user', text: a.msg }].slice(-12).map(m => ({ role: m.role, text: m.text }));
-                      setMessages(prev => [...prev, { role: 'user', text: a.msg }]);
                       setLoading(true);
                       fetch('/api/gemini', {
                         method: 'POST',
