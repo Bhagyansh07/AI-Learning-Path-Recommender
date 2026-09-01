@@ -1,5 +1,4 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useRouter } from 'next/router';
 import LegalLayout from '../../components/LegalLayout';
 
 const now = '31 August 2026';
@@ -12,7 +11,7 @@ const Section = ({ h, children }) => (
 );
 
 const P = ({ children }) => <p style={{ marginBottom: 12 }}>{children}</p>;
-const Ul = ({ children }) => <ul style={{ padding: 0, margin: '0 0 12px' }}>{children}</ul>;
+const Ul = ({ children }) => <ul style={{ padding: 0, margin: '0 0 12x' }}>{children}</ul>;
 const Li = ({ children }) => <li style={{ marginBottom: 6, marginLeft: 20 }}>{children}</li>;
 
 const CONTENT = {
@@ -165,11 +164,20 @@ const CONTENT = {
   },
 };
 
-export default function LegalPage() {
-  const router = useRouter();
-  const { slug } = router.query;
-  const data = CONTENT[slug];
+export const getStaticPaths = () => {
+  return {
+    paths: Object.keys(CONTENT).map((slug) => ({ params: { slug } })),
+    fallback: false,
+  };
+};
 
+export const getStaticProps = async (context) => {
+  const { params } = context;
+  return { props: { slug: params.slug } };
+};
+
+export default function LegalPage({ slug }) {
+  const data = CONTENT[slug];
   return (
     <LegalLayout title={data ? data.title : 'Page not found'} lastUpdated={data ? now : null}>
       {data ? (
